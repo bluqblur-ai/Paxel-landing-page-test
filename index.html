@@ -87,6 +87,11 @@ section{padding:84px 0;}
   flex:1;
 }
 .tabs::-webkit-scrollbar{display:none;}
+
+/* Buy Me a Coffee */
+.bmc-btn{flex-shrink:0;padding-left:16px;display:flex;align-items:center;}
+.bmc-btn img{height:34px;width:auto;display:block;border-radius:3px;}
+@media(max-width:480px){.bmc-btn img{height:28px;}}
 .tab{
   font-size:13px;
   font-weight:700;
@@ -519,6 +524,11 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <button class="tab" id="tab-tool" onclick="showPage('tool')">Pixel tool</button>
       <span class="tab soon">Gallery <span class="pill">SOON</span></span>
       <span class="tab soon">Placeholder <span class="pill">SOON</span></span>
+    </div>
+    <div class="bmc-btn">
+      <a href="https://www.buymeacoffee.com/paxel" target="_blank" rel="noopener">
+        <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=paxel&button_colour=d8d1bc&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" alt="Buy me a coffee">
+      </a>
     </div>
   </div>
 </nav>
