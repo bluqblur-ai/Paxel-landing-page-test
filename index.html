@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
   --blue:#46B6E2;
@@ -19,6 +20,8 @@
   --paper-alt:#F5F5F5;
   --dormant:#E7E2D3;
   --dormant-2:#D8D1BC;
+  --wt-special:#46B6E2;
+  --wt-hidden:#CF7500;
   --font:'Cairo',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -37,10 +40,7 @@ a{color:inherit;text-decoration:none;}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;}}
 .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
 @media(max-width:640px){.wrap{padding:0 16px;}}
-
-/* Mono utility — Cairo replaces JetBrains Mono everywhere */
 .mono{font-family:var(--font);font-variant-numeric:tabular-nums;letter-spacing:.03em;}
-
 .eyebrow{
   font-family:var(--font);
   font-size:11px;
@@ -75,8 +75,6 @@ section{padding:84px 0;}
 .nav-inner{display:flex;align-items:center;height:72px;gap:0;}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;cursor:pointer;flex-shrink:0;padding-right:20px;}
 .logo img{height:30px;width:108px;display:block;}
-
-/* TABS — always visible, scroll on mobile */
 .tabs{
   display:flex;
   align-items:center;
@@ -87,8 +85,6 @@ section{padding:84px 0;}
   flex:1;
 }
 .tabs::-webkit-scrollbar{display:none;}
-
-/* Buy Me a Coffee */
 .bmc-btn{flex-shrink:0;padding-left:16px;display:flex;align-items:center;}
 .bmc-btn img{height:34px;width:auto;display:block;border-radius:3px;}
 @media(max-width:480px){.bmc-btn img{height:28px;}}
@@ -181,112 +177,32 @@ section{padding:84px 0;}
 .f-num{font-family:var(--font);font-weight:800;font-size:13px;width:30px;height:30px;flex-shrink:0;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .feature-item h4{font-size:15.5px;font-weight:800;margin-bottom:3px;}
 .feature-item p{font-size:14px;color:var(--ink-soft);line-height:1.6;font-weight:500;}
-
-/* Certificate card */
 .cert-card{background:#fff;overflow:hidden;}
-.cert-header{
-  background:var(--paper-alt);
-  padding:22px 24px 18px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-bottom:2px solid var(--dormant);
-}
-.cert-header-title{
-  font-family:var(--font);
-  font-size:18px;
-  font-weight:800;
-  color:var(--ink);
-  letter-spacing:.01em;
-  text-align:center;
-}
-
-/* Art centered with generous spacing */
-.cert-art-wrap{
-  padding:28px 24px 20px;
-  display:flex;
-  justify-content:center;
-}
-.cert-art{
-  width:130px;
-  height:130px;
-  object-fit:cover;
-  image-rendering:pixelated;
-  border:2px solid var(--ink);
-  border-radius:3px;
-  display:block;
-}
-
+.cert-header{background:var(--paper-alt);padding:22px 24px 18px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid var(--dormant);}
+.cert-header-title{font-family:var(--font);font-size:18px;font-weight:800;color:var(--ink);letter-spacing:.01em;text-align:center;}
+.cert-art-wrap{padding:28px 24px 20px;display:flex;justify-content:center;}
+.cert-art{width:130px;height:130px;object-fit:cover;image-rendering:pixelated;border:2px solid var(--ink);border-radius:3px;display:block;}
 .cert-fields{padding:0 22px 20px;}
 .cert-field{padding:9px 0;border-bottom:1.5px solid var(--paper-alt);display:grid;grid-template-columns:1fr 1.4fr;gap:8px;align-items:baseline;}
 .cert-field:last-child{border-bottom:none;}
-.cert-field .f-label{
-  font-family:var(--font);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-}
-.cert-field .f-value{
-  font-family:var(--font);
-  font-size:12px;
-  font-weight:700;
-  color:var(--ink);
-  word-break:break-all;
-}
+.cert-field .f-label{font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+.cert-field .f-value{font-family:var(--font);font-size:12px;font-weight:700;color:var(--ink);word-break:break-all;}
 .cert-field .f-value.empty{color:var(--dormant-2);font-style:italic;}
 .cert-field .f-value.hash{font-size:10px;color:var(--blue-deep);word-break:break-all;}
 .cert-footer{border-top:3px solid var(--ink);padding:14px 22px;display:flex;align-items:center;justify-content:flex-end;background:var(--paper-alt);}
-.cert-footer-badge{
-  font-family:var(--font);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-}
+.cert-footer-badge{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
 
 /* ROADMAP */
 .roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 @media(max-width:760px){.roadmap-grid{grid-template-columns:1fr;}}
 .roadmap-card{background:var(--paper);padding:24px;}
-.roadmap-card .r-pill{
-  font-family:var(--font);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  background:var(--dormant);
-  color:var(--ink-soft);
-  padding:4px 10px;
-  border-radius:12px;
-  display:inline-block;
-  margin-bottom:14px;
-}
+.roadmap-card .r-pill{font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--dormant);color:var(--ink-soft);padding:4px 10px;border-radius:12px;display:inline-block;margin-bottom:14px;}
 .roadmap-card h4{font-size:17px;font-weight:800;margin-bottom:8px;}
 .roadmap-card p{font-size:14px;color:var(--ink-soft);line-height:1.65;font-weight:500;}
 .roadmap-card.pixel-featured{background:#fff;border-color:var(--blue);box-shadow:5px 5px 0 var(--blue);cursor:pointer;transition:transform .2s,box-shadow .2s;}
 .roadmap-card.pixel-featured:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--blue);}
 .roadmap-card.pixel-featured .r-pill{background:var(--blue);color:var(--ink);}
-.roadmap-card.pixel-featured h4{color:var(--ink);}
-.roadmap-card.pixel-featured p{color:var(--ink-soft);}
-.pixel-open-btn{
-  margin-top:18px;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-size:13px;
-  font-weight:800;
-  font-family:var(--font);
-  background:var(--ink);
-  color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:3px;
-  cursor:pointer;
-  transition:background .2s;
-}
+.pixel-open-btn{margin-top:18px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;font-family:var(--font);background:var(--ink);color:#fff;border:none;padding:10px 18px;border-radius:3px;cursor:pointer;transition:background .2s;}
 .pixel-open-btn:hover{background:var(--blue-deep);}
 .ghost-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-top:16px;opacity:.45;}
 .ghost-grid div{aspect-ratio:1/1;background:var(--dormant);border-radius:1px;}
@@ -309,7 +225,7 @@ footer .foot-tabs button{font-size:13px;font-weight:700;color:var(--ink-soft);ba
 footer .foot-tabs button:hover{color:var(--ink);}
 
 /* ============================
-   PIXEL TOOL PAGE
+   SHARED TOOL PAGE STYLES
    ============================ */
 .tool-page{background:var(--paper);}
 .tool-hero{background:var(--paper-alt);color:var(--ink);padding:52px 0 44px;border-bottom:3px solid var(--ink);}
@@ -317,158 +233,112 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .tool-hero h1{font-weight:800;font-size:clamp(28px,4vw,44px);line-height:1.1;margin-bottom:12px;}
 .tool-hero h1 .accent{color:var(--blue-deep);}
 .tool-hero p{color:var(--ink-soft);font-size:15.5px;line-height:1.75;max-width:520px;font-weight:500;}
-.tool-back{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-family:var(--font);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  color:var(--ink);
-  background:transparent;
-  border:2px solid var(--ink);
-  padding:8px 14px;
-  border-radius:3px;
-  cursor:pointer;
-  transition:background .2s,color .2s;
-  margin-bottom:22px;
-}
+.tool-back{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:transparent;border:2px solid var(--ink);padding:8px 14px;border-radius:3px;cursor:pointer;transition:background .2s,color .2s;margin-bottom:22px;}
 .tool-back:hover{background:var(--ink);color:#fff;}
-
-/* Controls area */
 .tool-controls-section{padding:40px 0;}
 .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
 @media(max-width:900px){.tool-grid{grid-template-columns:1fr;}}
-
-/* control panels */
 .ctrl-panel{background:var(--paper-alt);border:3px solid var(--ink);border-radius:4px;padding:28px;}
-.ctrl-panel-title{
-  font-family:var(--font);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-  margin-bottom:22px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
+.ctrl-panel-title{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:22px;display:flex;align-items:center;gap:8px;}
 .ctrl-panel-title::before{content:'';width:8px;height:8px;background:var(--blue);border-radius:1px;flex-shrink:0;}
 .ctrl-row{display:flex;flex-direction:column;gap:6px;margin-bottom:18px;}
 .ctrl-row:last-child{margin-bottom:0;}
 .ctrl-label{font-size:14px;font-weight:800;color:var(--ink);}
 .ctrl-sublabel{font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:1px;}
-
-/* format buttons */
 .format-btns{display:flex;gap:8px;flex-wrap:wrap;}
-.fmt-btn{
-  font-family:var(--font);
-  font-size:13px;
-  font-weight:800;
-  padding:9px 18px;
-  border:2.5px solid var(--ink);
-  border-radius:3px;
-  background:#fff;
-  cursor:pointer;
-  transition:background .2s,color .2s,box-shadow .2s;
-}
+.fmt-btn{font-family:var(--font);font-size:13px;font-weight:800;padding:9px 18px;border:2.5px solid var(--ink);border-radius:3px;background:#fff;cursor:pointer;transition:background .2s,color .2s,box-shadow .2s;}
 .fmt-btn:hover,.fmt-btn.selected{background:var(--ink);color:#fff;}
 .fmt-btn.selected{box-shadow:3px 3px 0 var(--blue);}
-
-/* resolution selector */
-.ctrl-select{
-  width:100%;
-  font-family:var(--font);
-  font-size:13px;
-  font-weight:700;
-  padding:10px 12px;
-  border:2.5px solid var(--ink);
-  border-radius:3px;
-  background:#fff;
-  cursor:pointer;
-  appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2310131A' stroke-width='2' fill='none'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-}
-
-/* range slider */
+.ctrl-select{width:100%;font-family:var(--font);font-size:13px;font-weight:700;padding:10px 12px;border:2.5px solid var(--ink);border-radius:3px;background:#fff;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2310131A' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
 .ctrl-range{width:100%;accent-color:var(--blue);height:4px;cursor:pointer;}
-.ctrl-range-value{
-  font-family:var(--font);
-  font-size:13px;
-  font-weight:800;
-  color:var(--blue-deep);
-  margin-top:4px;
-}
-
-/* number input */
-.ctrl-number{
-  font-family:var(--font);
-  font-size:14px;
-  font-weight:700;
-  padding:9px 12px;
-  border:2.5px solid var(--ink);
-  border-radius:3px;
-  width:90px;
-  background:#fff;
-}
-
-/* file upload zone */
-.upload-zone{
-  border:3px dashed var(--dormant-2);
-  border-radius:4px;
-  padding:32px 24px;
-  text-align:center;
-  cursor:pointer;
-  transition:border-color .2s,background .2s;
-  background:#fff;
-  position:relative;
-}
+.ctrl-range-value{font-family:var(--font);font-size:13px;font-weight:800;color:var(--blue-deep);margin-top:4px;}
+.ctrl-number{font-family:var(--font);font-size:14px;font-weight:700;padding:9px 12px;border:2.5px solid var(--ink);border-radius:3px;width:90px;background:#fff;}
+.upload-zone{border:3px dashed var(--dormant-2);border-radius:4px;padding:32px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fff;position:relative;}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--blue);background:#F0F9FD;}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-zone-icon{font-size:28px;margin-bottom:10px;}
 .upload-zone p{font-size:14px;font-weight:800;color:var(--ink);}
 .upload-zone span{font-size:12px;color:var(--ink-soft);font-weight:500;}
 .upload-preview{width:100%;max-height:160px;object-fit:contain;border:2px solid var(--dormant);border-radius:3px;margin-top:12px;display:none;image-rendering:pixelated;}
-
-/* canvas display */
 .canvas-panel{display:flex;flex-direction:column;gap:16px;}
-.canvas-wrap{
-  background:var(--blue);
-  border:3px solid var(--ink);
-  border-radius:4px;
-  overflow:hidden;
+.canvas-wrap{background:var(--blue);border:3px solid var(--ink);border-radius:4px;overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;transition:aspect-ratio .3s ease-in-out;box-shadow:5px 5px 0 var(--ink);}
+.canvas-wrap .p5Container{width:100%;height:100%;display:flex;align-items:stretch;}
+.canvas-wrap .p5Container canvas{width:100%!important;height:100%!important;display:block;image-rendering:pixelated;}
+.canvas-empty{color:var(--ink);font-family:var(--font);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:40px;width:100%;align-self:center;}
+.action-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-primary{font-family:var(--font);font-size:15px;font-weight:800;padding:14px 24px;border:3px solid var(--ink);border-radius:3px;background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .2s,box-shadow .2s;}
+.btn-primary:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
+.btn-primary:disabled{background:var(--dormant);color:var(--ink-soft);cursor:not-allowed;box-shadow:none;transform:none;}
+.btn-secondary{font-family:var(--font);font-size:14px;font-weight:800;padding:13px 20px;border:3px solid var(--ink);border-radius:3px;background:#fff;color:var(--ink);cursor:pointer;transition:background .2s;}
+.btn-secondary:hover{background:var(--paper-alt);}
+.btn-secondary:disabled{opacity:.4;cursor:not-allowed;}
+.day-status{font-family:var(--font);font-size:13px;font-weight:700;color:var(--ink-soft);letter-spacing:.04em;text-align:center;padding:10px;}
+.day-status .day-highlight{color:var(--blue-deep);font-size:17px;font-weight:800;}
+
+/* ============================
+   PIXEL WATERER — extra styles
+   ============================ */
+.wt-panel-title::before{background:var(--blue)!important;}
+
+/* Coins HUD */
+.wt-hud{
   display:flex;
   align-items:stretch;
-  justify-content:stretch;
-  position:relative;
-  width:100%;
-  aspect-ratio:1/1;
-  transition:aspect-ratio .3s ease-in-out;
-  box-shadow:5px 5px 0 var(--ink);
+  gap:12px;
+  flex-wrap:wrap;
 }
-.canvas-wrap #p5Container{width:100%;height:100%;display:flex;align-items:stretch;}
-.canvas-wrap #p5Container canvas{width:100%!important;height:100%!important;display:block;image-rendering:pixelated;}
-.canvas-empty{
-  color:var(--ink);
-  font-family:var(--font);
-  font-size:13px;
+.wt-hud-card{
+  flex:1;
+  min-width:120px;
+  background:#fff;
+  border:3px solid var(--ink);
+  border-radius:4px;
+  padding:14px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+.wt-hud-label{
+  font-size:10px;
   font-weight:800;
-  letter-spacing:.08em;
+  letter-spacing:.1em;
   text-transform:uppercase;
-  text-align:center;
-  padding:40px;
-  width:100%;
-  align-self:center;
+  color:var(--ink-soft);
+}
+.wt-hud-value{
+  font-size:24px;
+  font-weight:800;
+  color:var(--ink);
+  line-height:1;
+}
+.wt-hud-value.gold{color:var(--blue-deep);}
+.wt-hud-value.purple{color:var(--ink-soft);}
+
+/* Special block legend */
+.wt-legend{
+  display:flex;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+.wt-legend-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--ink-soft);
+}
+.wt-legend-swatch{
+  width:14px;
+  height:14px;
+  border:2px solid var(--ink);
+  border-radius:2px;
+  flex-shrink:0;
 }
 
-/* action buttons */
-.action-btns{display:flex;gap:12px;flex-wrap:wrap;}
-.btn-primary{
+/* Holy Water button — gold accent */
+.btn-holy{
   font-family:var(--font);
   font-size:15px;
   font-weight:800;
@@ -480,35 +350,83 @@ footer .foot-tabs button:hover{color:var(--ink);}
   cursor:pointer;
   box-shadow:4px 4px 0 var(--ink);
   transition:transform .2s,box-shadow .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
-.btn-primary:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
-.btn-primary:disabled{background:var(--dormant);color:var(--ink-soft);cursor:not-allowed;box-shadow:none;transform:none;}
-.btn-secondary{
+.btn-holy:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
+.btn-holy:disabled{background:var(--dormant);color:var(--ink-soft);cursor:not-allowed;box-shadow:none;transform:none;}
+
+/* Reveal button — blue accent, prominent */
+.btn-reveal{
   font-family:var(--font);
-  font-size:14px;
+  font-size:15px;
   font-weight:800;
-  padding:13px 20px;
+  padding:14px 24px;
   border:3px solid var(--ink);
   border-radius:3px;
-  background:#fff;
+  background:var(--blue);
   color:var(--ink);
   cursor:pointer;
-  transition:background .2s;
+  box-shadow:4px 4px 0 var(--ink);
+  transition:transform .2s,box-shadow .2s;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
 }
-.btn-secondary:hover{background:var(--paper-alt);}
-.btn-secondary:disabled{opacity:.4;cursor:not-allowed;}
+.btn-reveal:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
+.btn-reveal:disabled{background:var(--dormant);color:var(--ink-soft);cursor:not-allowed;box-shadow:none;transform:none;}
 
-/* day status */
-.day-status{
-  font-family:var(--font);
-  font-size:13px;
+/* Day tracker row */
+.wt-day-track{
+  display:flex;
+  gap:4px;
+  flex-wrap:wrap;
+}
+.wt-day-pip{
+  width:22px;
+  height:22px;
+  border:2px solid var(--ink);
+  border-radius:3px;
+  background:var(--dormant);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  font-weight:800;
+  color:var(--ink-soft);
+  transition:background .3s;
+}
+.wt-day-pip.done{background:var(--dormant-2);color:var(--ink-soft);}
+.wt-day-pip.revealed{background:var(--blue);color:#fff;}
+.wt-day-pip.unrevealed{background:#CF7500;color:#fff;}
+.wt-day-pip.active{background:var(--ink);color:#fff;}
+
+/* Cost badge */
+.wt-cost-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  background:var(--dormant);
+  color:var(--ink-soft);
+  border:2px solid var(--ink);
+  border-radius:3px;
+  padding:5px 10px;
+}
+.wt-cost-badge .cost-num{color:var(--gold);font-size:13px;}
+
+/* Pending days info */
+.wt-pending-info{
+  font-size:12px;
   font-weight:700;
   color:var(--ink-soft);
-  letter-spacing:.04em;
-  text-align:center;
-  padding:10px;
+  margin-top:6px;
 }
-.day-status .day-highlight{color:var(--blue-deep);font-size:17px;font-weight:800;}
+.wt-pending-info span{color:var(--ink);font-weight:800;}
 </style>
 </head>
 <body>
@@ -522,7 +440,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <div class="tabs">
       <button class="tab active-tab" id="tab-home" onclick="showPage('home')">Home</button>
       <button class="tab" id="tab-tool" onclick="showPage('tool')">Pixel tool</button>
-      <span class="tab soon">Gallery <span class="pill">SOON</span></span>
+      <button class="tab" id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
       <span class="tab soon">Placeholder <span class="pill">SOON</span></span>
     </div>
     <div class="bmc-btn">
@@ -633,11 +551,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
       </div>
       <div>
         <div class="cert-card px-border">
-          <!-- Clean header: just the title, no black background, no logo -->
           <div class="cert-header">
             <span class="cert-header-title">Certificate of Authenticity</span>
           </div>
-          <!-- Art centered with generous padding -->
           <div class="cert-art-wrap">
             <img class="cert-art" src="utopia-still.jpg" alt="Utopia">
           </div>
@@ -651,7 +567,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
             <div class="cert-field"><span class="f-label">Collection</span><span class="f-value empty">&mdash;</span></div>
             <div class="cert-field"><span class="f-label">Purity</span><span class="f-value">100%</span></div>
             <div class="cert-field"><span class="f-label">Genesis</span><span class="f-value">True</span></div>
-
           </div>
           <div class="cert-footer">
             <span class="cert-footer-badge">PAXEL&#8482; &middot; SLOW ART</span>
@@ -680,11 +595,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <button class="pixel-open-btn" onclick="showPage('tool')">Open Pixel tool &rarr;</button>
         <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
-      <div class="roadmap-card px-border">
-        <span class="r-pill">SOON</span>
-        <h4>Gallery</h4>
-        <p>Upload your creations to Paxel and explore the art made by others in our gallery!</p>
-        <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      <div class="roadmap-card pixel-featured px-border" onclick="showPage('waterer')" style="border-color:var(--blue);box-shadow:5px 5px 0 var(--blue);">
+        <span class="r-pill" style="background:var(--blue);color:var(--ink);">TRY IT NOW</span>
+        <h4>Pixel waterer</h4>
+        <p>Upload your image and watch it grow day by day. Reveal today's colors, earn coins and use Holy Water to recover past days!</p>
+        <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('waterer')">Open Pixel waterer &rarr;</button>
+        <div class="ghost-grid" style="opacity:.45;"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
       <div class="roadmap-card px-border">
         <span class="r-pill">SOON</span>
@@ -702,76 +618,37 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <div class="eyebrow">UPCOMING</div>
     <h2>Paxel Art is still <span class="accent">growing.</span><br>Come back to see how it settles.</h2>
     <p>14 days of real-time growth, a certificate that proves you waited &mdash; and a project that&rsquo;s still being built.</p>
-    <div class="closing-tags">PIXEL TOOL &middot; GALLERY &middot; PLACEHOLDER</div>
+    <div class="closing-tags">PIXEL TOOL &middot; PIXEL WATERER &middot; PLACEHOLDER</div>
     <p class="closing-disc">*PAXEL&#8482; is an evolving experiment. Mechanics, fees, and timelines are subject to change as part of its natural evolution.</p>
   </div>
 </section>
-  <div class="divider"></div>
+<div class="divider"></div>
 
 <!-- LEGAL -->
 <section id="legal" class="alt-bg">
   <div class="wrap">
-
     <div class="section-head">
       <div class="eyebrow">LEGAL</div>
       <h2>Legal Information & Privacy</h2>
-      <p>
-        Transparency, privacy, and responsible platform development are
-        important values for PAXEL™. The information below outlines the
-        current legal framework of the project.
-      </p>
+      <p>Transparency, privacy, and responsible platform development are important values for PAXEL™. The information below outlines the current legal framework of the project.</p>
     </div>
-
     <div class="roadmap-grid">
-
-      <!-- LEGAL NOTICE -->
       <div class="roadmap-card px-border">
         <span class="r-pill">LEGAL NOTICE</span>
         <h4>Website ownership</h4>
-        <p>
-          PAXEL™ is a digital art and pixel-art project currently under
-          development. Information regarding the legal owner, company
-          registration details, tax identification number, and registered
-          address will be published before commercial launch.
-          All content displayed on this website, including designs,
-          graphics, logos, source code, artwork, certificates,
-          animations, and branding elements, is protected by intellectual
-          property rights and may not be reproduced without permission.
-        </p>
+        <p>PAXEL™ is a digital art and pixel-art project currently under development. Information regarding the legal owner, company registration details, tax identification number, and registered address will be published before commercial launch. All content displayed on this website, including designs, graphics, logos, source code, artwork, certificates, animations, and branding elements, is protected by intellectual property rights and may not be reproduced without permission.</p>
       </div>
-
-      <!-- PRIVACY POLICY -->
       <div class="roadmap-card px-border">
         <span class="r-pill">PRIVACY POLICY</span>
         <h4>Your data</h4>
-        <p>
-          PAXEL™ may collect information such as usernames, email
-          addresses, uploaded artwork, browser information, technical
-          device data, and platform usage statistics when platform
-          services become available.
-          Data is processed solely for platform operation, user support,
-          certificate issuance, security purposes, and service
-          improvement. Personal information is never sold to third
-          parties.
-        </p>
+        <p>PAXEL™ may collect information such as usernames, email addresses, uploaded artwork, browser information, technical device data, and platform usage statistics when platform services become available. Data is processed solely for platform operation, user support, certificate issuance, security purposes, and service improvement. Personal information is never sold to third parties.</p>
       </div>
-
-      <!-- COOKIE POLICY -->
       <div class="roadmap-card px-border">
         <span class="r-pill">COOKIES</span>
         <h4>Coming soon</h4>
-        <p>
-          The Cookie Policy is currently under preparation.
-          Before introducing analytics, user accounts, advertising,
-          personalization features, or other cookie-based technologies,
-          PAXEL™ will publish a complete Cookie Policy explaining the
-          purpose, duration, providers, and management options of all
-          cookies used on the platform.
-        </p>
+        <p>The Cookie Policy is currently under preparation. Before introducing analytics, user accounts, advertising, personalization features, or other cookie-based technologies, PAXEL™ will publish a complete Cookie Policy explaining the purpose, duration, providers, and management options of all cookies used on the platform.</p>
       </div>
-
     </div>
-
   </div>
 </section>
 
@@ -779,15 +656,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
   <div class="foot-tabs">
     <button onclick="showPage('tool')">Pixel tool</button>
-    <button onclick="showPage('home');setTimeout(()=>document.getElementById('gallery').scrollIntoView({behavior:'smooth'}),50)">
-      Gallery
-    </button>
-    <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">
-      Themes
-    </button>
-    <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">
-      Legal
-    </button>
+    <button onclick="showPage('waterer')">Pixel waterer</button>
+    <button onclick="showPage('home');setTimeout(()=>document.getElementById('gallery').scrollIntoView({behavior:'smooth'}),50)">Themes</button>
+    <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
   </div>
   <span class="mono">&copy; 2026</span>
 </footer>
@@ -808,9 +679,106 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <h1>Pixel <span class="accent">tool</span></h1>
         <p>Upload any image, choose your format and resolution, control the generation speed &mdash; then watch it pixelate in real time and download it in high quality.</p>
       </div>
-      <div class="eyebrow" style="align-self:center;">
-        <span class="blip"></span>PAXEL&#8482; TOOLS
+      <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
+    </div>
+  </div>
+
+  <div class="tool-controls-section">
+    <div class="wrap">
+      <div class="tool-grid">
+
+        <!-- LEFT: Controls -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Upload image</div>
+            <div class="upload-zone" id="ptUploadZone">
+              <input type="file" accept="image/*" id="ptFileInput" onchange="ptHandleFileInput(this)">
+              <div class="upload-zone-icon">&#128247;</div>
+              <p>Drop your image here</p>
+              <span>PNG, JPG, GIF &mdash; any size</span>
+              <img id="ptUploadPreview" class="upload-preview" alt="preview">
+            </div>
+          </div>
+
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Format</div>
+            <div class="ctrl-row">
+              <span class="ctrl-sublabel">Canvas aspect ratio</span>
+              <div class="format-btns">
+                <button class="fmt-btn selected" id="pt-fmt-1-1" onclick="ptSetFmt('1:1',600,600,this)">1:1</button>
+                <button class="fmt-btn" id="pt-fmt-3-4" onclick="ptSetFmt('3:4',450,600,this)">3:4</button>
+                <button class="fmt-btn" id="pt-fmt-4-3" onclick="ptSetFmt('4:3',600,450,this)">4:3</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Generation settings</div>
+            <div class="ctrl-row">
+              <label class="ctrl-label">Resolution</label>
+              <span class="ctrl-sublabel">Higher = more detail, slower</span>
+              <select class="ctrl-select" id="ptResSelect" onchange="ptOnResChange()"></select>
+            </div>
+            <div class="ctrl-row">
+              <label class="ctrl-label">Duration (days)</label>
+              <span class="ctrl-sublabel">Split pixel generation into N equal parts</span>
+              <select class="ctrl-select" id="ptDaysSelect" onchange="pt.TOTAL_DIAS=parseInt(this.value);pt.diaActual=0;pt.indiceActual=0;if(pt.img){ptProcesarImagen();}ptUpdateDayStatus();">
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+                <option>11</option><option>12</option><option>13</option><option selected>14</option>
+              </select>
+            </div>
+            <div class="ctrl-row">
+              <label class="ctrl-label">Speed (ms between ticks)</label>
+              <span class="ctrl-sublabel">Lower = faster generation</span>
+              <input type="range" class="ctrl-range" id="ptSpeedRange" min="1" max="200" value="30"
+                oninput="ptIntervalSpeed=parseInt(this.value);document.getElementById('ptSpeedVal').textContent=this.value+'ms'">
+              <div class="ctrl-range-value" id="ptSpeedVal">30ms</div>
+            </div>
+            <div class="ctrl-row">
+              <label class="ctrl-label">Pixels per tick</label>
+              <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
+              <input type="number" class="ctrl-number" id="ptPpcInput" min="1" max="500" value="1"
+                oninput="ptBloquesPorCiclo=parseInt(this.value)||1">
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Canvas -->
+        <div class="canvas-panel">
+          <div class="canvas-wrap px-border" id="ptCanvasWrap">
+            <div class="canvas-empty" id="ptCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN</div>
+            <div class="p5Container" id="ptP5Container" style="display:none;"></div>
+          </div>
+          <div class="day-status" id="ptDayStatus"></div>
+          <div class="action-btns">
+            <button class="btn-primary" id="ptGenBtn" disabled onclick="ptIniciarConstruccionDia()">Upload an image first</button>
+            <button class="btn-secondary" id="ptDlBtn" disabled onclick="ptDownloadCanvas()">&#8595; Download HD</button>
+          </div>
+        </div>
+
       </div>
+    </div>
+  </div>
+
+</div>
+</div><!-- /page-tool -->
+
+
+<!-- ============================
+     PIXEL WATERER PAGE
+     ============================ -->
+<div class="page" id="page-waterer">
+<div class="tool-page">
+
+  <div class="tool-hero">
+    <div class="wrap tool-hero-inner">
+      <div>
+        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO HOME</button>
+        <h1>Pixel <span class="accent">waterer</span></h1>
+        <p>Upload any image and watch it grow day by day. Reveal today&rsquo;s hidden colors once per day to earn coins &mdash; and spend Holy Water to recover past days you missed.</p>
+      </div>
+      <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
     </div>
   </div>
 
@@ -824,13 +792,35 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <!-- Upload -->
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Upload image</div>
-            <div class="upload-zone" id="uploadZone">
-              <input type="file" accept="image/*" id="fileInput" onchange="handleFileInput(this)">
-              <div class="upload-zone-icon">&#128247;</div>
+            <div class="upload-zone" id="wtUploadZone">
+              <input type="file" accept="image/*" id="wtFileInput" onchange="wtHandleFileInput(this)">
+              <div class="upload-zone-icon">&#127807;</div>
               <p>Drop your image here</p>
               <span>PNG, JPG, GIF &mdash; any size</span>
-              <img id="uploadPreview" class="upload-preview" alt="preview">
+              <img id="wtUploadPreview" class="upload-preview" alt="preview">
             </div>
+          </div>
+
+          <!-- Color key -->
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Color key</div>
+            <div class="wt-legend">
+              <div class="wt-legend-item">
+                <div class="wt-legend-swatch" style="background:var(--wt-hidden);"></div>
+                Special pixel (hidden)
+              </div>
+              <div class="wt-legend-item">
+                <div class="wt-legend-swatch" style="background:var(--wt-special);"></div>
+                Special pixel (revealed)
+              </div>
+              <div class="wt-legend-item">
+                <div class="wt-legend-swatch" style="background:var(--ink);"></div>
+                Normal pixel
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:10px;line-height:1.6;">
+              Each day ~30% of newly placed pixels are <strong>special</strong> &mdash; they appear in a neutral disguise until you reveal them. Use <em>Reveal color</em> once per day to uncover them and earn a coin.
+            </p>
           </div>
 
           <!-- Format -->
@@ -839,25 +829,25 @@ footer .foot-tabs button:hover{color:var(--ink);}
             <div class="ctrl-row">
               <span class="ctrl-sublabel">Canvas aspect ratio</span>
               <div class="format-btns">
-                <button class="fmt-btn selected" id="fmt-1-1" onclick="setFmt('1:1',600,600,this)">1:1</button>
-                <button class="fmt-btn" id="fmt-3-4" onclick="setFmt('3:4',450,600,this)">3:4</button>
-                <button class="fmt-btn" id="fmt-4-3" onclick="setFmt('4:3',600,450,this)">4:3</button>
+                <button class="fmt-btn selected" id="wt-fmt-1-1" onclick="wtSetFmt('1:1',600,600,this)">1:1</button>
+                <button class="fmt-btn" id="wt-fmt-3-4" onclick="wtSetFmt('3:4',450,600,this)">3:4</button>
+                <button class="fmt-btn" id="wt-fmt-4-3" onclick="wtSetFmt('4:3',600,450,this)">4:3</button>
               </div>
             </div>
           </div>
 
-          <!-- Resolution + speed + pixels per cycle -->
+          <!-- Generation settings -->
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Generation settings</div>
             <div class="ctrl-row">
               <label class="ctrl-label">Resolution</label>
               <span class="ctrl-sublabel">Higher = more detail, slower</span>
-              <select class="ctrl-select" id="resSelect" onchange="onResChange()"></select>
+              <select class="ctrl-select" id="wtResSelect" onchange="wtOnResChange()"></select>
             </div>
             <div class="ctrl-row">
               <label class="ctrl-label">Duration (days)</label>
               <span class="ctrl-sublabel">Split pixel generation into N equal parts</span>
-              <select class="ctrl-select" id="daysSelect" onchange="pt.TOTAL_DIAS=parseInt(this.value);pt.diaActual=0;pt.indiceActual=0;if(pt.img){procesarImagen();}updateDayStatus();">
+              <select class="ctrl-select" id="wtDaysSelect" onchange="wt.TOTAL_DIAS=parseInt(this.value);wt.diaActual=0;wt.indiceActual=0;if(wt.img){wtProcesarImagen();}wtUpdateUI();">
                 <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
                 <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
                 <option>11</option><option>12</option><option>13</option><option selected>14</option>
@@ -866,33 +856,68 @@ footer .foot-tabs button:hover{color:var(--ink);}
             <div class="ctrl-row">
               <label class="ctrl-label">Speed (ms between ticks)</label>
               <span class="ctrl-sublabel">Lower = faster generation</span>
-              <input type="range" class="ctrl-range" id="speedRange" min="1" max="200" value="30"
-                oninput="intervalSpeed=parseInt(this.value);document.getElementById('speedVal').textContent=this.value+'ms'">
-              <div class="ctrl-range-value" id="speedVal">30ms</div>
+              <input type="range" class="ctrl-range" id="wtSpeedRange" min="1" max="200" value="30"
+                oninput="wt.intervalSpeed=parseInt(this.value);document.getElementById('wtSpeedVal').textContent=this.value+'ms'">
+              <div class="ctrl-range-value" id="wtSpeedVal">30ms</div>
             </div>
             <div class="ctrl-row">
               <label class="ctrl-label">Pixels per tick</label>
               <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
-              <input type="number" class="ctrl-number" id="ppcInput" min="1" max="500" value="1"
-                oninput="bloquesPorCiclo=parseInt(this.value)||1">
+              <input type="number" class="ctrl-number" id="wtPpcInput" min="1" max="500" value="1"
+                oninput="wt.bloquesPorCiclo=parseInt(this.value)||1">
             </div>
           </div>
 
         </div>
 
-        <!-- RIGHT: Canvas + action buttons -->
+        <!-- RIGHT: Canvas + status + actions -->
         <div class="canvas-panel">
-          <div class="canvas-wrap px-border" id="canvasWrap">
-            <div class="canvas-empty" id="canvasEmpty">
-              UPLOAD AN IMAGE<br>TO BEGIN
+
+          <!-- Canvas -->
+          <div class="canvas-wrap px-border" id="wtCanvasWrap">
+            <div class="canvas-empty" id="wtCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN</div>
+            <div class="p5Container" id="wtP5Container" style="display:none;"></div>
+          </div>
+
+          <!-- Day tracker pips -->
+          <div id="wtDayTrack" class="wt-day-track"></div>
+
+          <!-- HUD: coins + pending -->
+          <div class="wt-hud">
+            <div class="wt-hud-card">
+              <div class="wt-hud-label">Day</div>
+              <div class="wt-hud-value" id="wtHudDay">&mdash;</div>
             </div>
-            <div id="p5Container" style="display:none;"></div>
+            <div class="wt-hud-card">
+              <div class="wt-hud-label">Coins</div>
+              <div class="wt-hud-value" style="color:var(--blue-deep);" id="wtHudCoins">0</div>
+            </div>
+            <div class="wt-hud-card">
+              <div class="wt-hud-label">Unrevealed</div>
+              <div class="wt-hud-value" id="wtHudPending">0</div>
+            </div>
           </div>
-          <div class="day-status" id="dayStatus"></div>
+
+          <!-- Holy Water info bar -->
+          <div style="background:var(--paper-alt);border:2px solid var(--dormant-2);border-radius:4px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:16px;">&#128167;</span>
+              <div>
+                <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
+                <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="wtCostBadge">1</span> coin per unrevealed day</div>
+              </div>
+            </div>
+            <div id="wtPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
+          </div>
+
+          <!-- Action buttons -->
           <div class="action-btns">
-            <button class="btn-primary" id="genBtn" disabled onclick="iniciarConstruccionDia()">Upload an image first</button>
-            <button class="btn-secondary" id="dlBtn" disabled onclick="downloadCanvas()">&#8595; Download HD</button>
+            <button class="btn-primary" id="wtGenBtn" disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
+            <button class="btn-reveal" id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
+            <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
+            <button class="btn-secondary" id="wtDlBtn" disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
           </div>
+
         </div>
 
       </div>
@@ -900,7 +925,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
   </div>
 
 </div>
-</div><!-- /page-tool -->
+</div><!-- /page-waterer -->
+
 
 <script>
 // ============================================================
@@ -913,14 +939,15 @@ function showPage(id) {
   const t = document.getElementById('tab-' + id);
   if (t) t.classList.add('active-tab');
   window.scrollTo(0, 0);
-  if (id === 'tool' && !p5Instance) initP5();
+  if (id === 'tool' && !ptP5Instance) ptInitP5();
+  if (id === 'waterer' && !wtP5Instance) wtInitP5();
 }
 
 // ============================================================
-// PIXEL TOOL — p5.js integration
+// PIXEL TOOL — p5.js instance
 // ============================================================
-let p5Instance = null;
-let pxSketch = null;
+let ptP5Instance = null;
+let ptPxSketch = null;
 
 let pt = {
   img: null,
@@ -934,21 +961,19 @@ let pt = {
   canvasW: 600,
   canvasH: 600,
 };
-let intervalSpeed = 30;
-let bloquesPorCiclo = 1;
-let currentInterval = null;
+let ptIntervalSpeed = 30;
+let ptBloquesPorCiclo = 1;
+let ptCurrentInterval = null;
 
-function initP5() {
+function ptInitP5() {
   const sketch = function(p) {
-    pxSketch = p;
-
+    ptPxSketch = p;
     p.setup = function() {
       let cnv = p.createCanvas(pt.canvasW, pt.canvasH);
-      cnv.parent('p5Container');
+      cnv.parent('ptP5Container');
       p.pixelDensity(5);
       p.background(0);
     };
-
     p.draw = function() {
       if (!pt.img) return;
       let w = p.width / pt.COLS;
@@ -962,28 +987,25 @@ function initP5() {
       }
     };
   };
-
-  p5Instance = new p5(sketch);
-  document.getElementById('canvasEmpty').style.display = 'none';
-  document.getElementById('p5Container').style.display = 'flex';
+  ptP5Instance = new p5(sketch);
+  document.getElementById('ptCanvasEmpty').style.display = 'none';
+  document.getElementById('ptP5Container').style.display = 'flex';
 }
 
-function handleFileInput(input) {
+function ptHandleFileInput(input) {
   if (!input.files || !input.files[0]) return;
   const file = input.files[0];
   const reader = new FileReader();
-
-  const prev = document.getElementById('uploadPreview');
+  const prev = document.getElementById('ptUploadPreview');
   prev.src = URL.createObjectURL(file);
   prev.style.display = 'block';
-
   reader.onload = function(e) {
-    if (!p5Instance) initP5();
+    if (!ptP5Instance) ptInitP5();
     const imgEl = new Image();
     imgEl.onload = function() {
-      pxSketch.loadImage(e.target.result, function(p5img) {
+      ptPxSketch.loadImage(e.target.result, function(p5img) {
         pt.img = p5img;
-        procesarImagen();
+        ptProcesarImagen();
       });
     };
     imgEl.src = e.target.result;
@@ -991,23 +1013,20 @@ function handleFileInput(input) {
   reader.readAsDataURL(file);
 }
 
-function procesarImagen() {
-  if (!pt.img || !pxSketch) return;
-  pxSketch.background(255);
+function ptProcesarImagen() {
+  if (!pt.img || !ptPxSketch) return;
+  ptPxSketch.background(255);
   pt.bloquesADibujar = [];
   pt.indiceActual = 0;
   pt.diaActual = 0;
-  if (currentInterval) { clearInterval(currentInterval); currentInterval = null; }
+  if (ptCurrentInterval) { clearInterval(ptCurrentInterval); ptCurrentInterval = null; }
   pt.construyendo = false;
-
-  document.getElementById('dlBtn').disabled = true;
-  document.getElementById('canvasEmpty').style.display = 'none';
-  document.getElementById('p5Container').style.display = 'flex';
-
+  document.getElementById('ptDlBtn').disabled = true;
+  document.getElementById('ptCanvasEmpty').style.display = 'none';
+  document.getElementById('ptP5Container').style.display = 'flex';
   pt.img.loadPixels();
   let celdaW = pt.img.width / pt.COLS;
   let celdaH = pt.img.height / pt.ROWS;
-
   for (let y = 0; y < pt.ROWS; y++) {
     for (let x = 0; x < pt.COLS; x++) {
       let cx = Math.floor(x * celdaW + celdaW / 2);
@@ -1024,30 +1043,24 @@ function procesarImagen() {
     let j = Math.floor(Math.random() * (i + 1));
     [pt.bloquesADibujar[i], pt.bloquesADibujar[j]] = [pt.bloquesADibujar[j], pt.bloquesADibujar[i]];
   }
-
-  const genBtn = document.getElementById('genBtn');
+  const genBtn = document.getElementById('ptGenBtn');
   genBtn.disabled = false;
   genBtn.textContent = 'Generate Day 1';
-  updateDayStatus();
+  ptUpdateDayStatus();
 }
 
-function iniciarConstruccionDia() {
+function ptIniciarConstruccionDia() {
   if (pt.construyendo || pt.diaActual >= pt.TOTAL_DIAS) return;
   pt.construyendo = true;
   pt.diaActual++;
-
-  const genBtn = document.getElementById('genBtn');
-  genBtn.disabled = true;
-
+  document.getElementById('ptGenBtn').disabled = true;
   let pixelesRestantes = pt.bloquesADibujar.length - pt.indiceActual;
   let diasRestantes = pt.TOTAL_DIAS - pt.diaActual + 1;
   let pixelesHoy = Math.ceil(pixelesRestantes / diasRestantes);
   let pixelesContados = 0;
-
-  updateDayStatus();
-
-  currentInterval = setInterval(() => {
-    for (let i = 0; i < bloquesPorCiclo; i++) {
+  ptUpdateDayStatus();
+  ptCurrentInterval = setInterval(() => {
+    for (let i = 0; i < ptBloquesPorCiclo; i++) {
       if (pixelesContados < pixelesHoy && pt.indiceActual < pt.bloquesADibujar.length) {
         pt.bloquesADibujar[pt.indiceActual].activo = true;
         pt.indiceActual++;
@@ -1055,18 +1068,17 @@ function iniciarConstruccionDia() {
       }
     }
     if (pixelesContados >= pixelesHoy || pt.indiceActual >= pt.bloquesADibujar.length) {
-      clearInterval(currentInterval);
-      currentInterval = null;
+      clearInterval(ptCurrentInterval); ptCurrentInterval = null;
       pt.construyendo = false;
-      actualizarBoton();
+      ptActualizarBoton();
     }
-  }, intervalSpeed);
+  }, ptIntervalSpeed);
 }
 
-function actualizarBoton() {
-  const genBtn = document.getElementById('genBtn');
-  const dlBtn = document.getElementById('dlBtn');
-  updateDayStatus();
+function ptActualizarBoton() {
+  const genBtn = document.getElementById('ptGenBtn');
+  const dlBtn = document.getElementById('ptDlBtn');
+  ptUpdateDayStatus();
   if (pt.diaActual < pt.TOTAL_DIAS) {
     genBtn.disabled = false;
     genBtn.textContent = 'Generate Day ' + (pt.diaActual + 1);
@@ -1077,8 +1089,8 @@ function actualizarBoton() {
   }
 }
 
-function updateDayStatus() {
-  const el = document.getElementById('dayStatus');
+function ptUpdateDayStatus() {
+  const el = document.getElementById('ptDayStatus');
   if (!pt.img) { el.innerHTML = ''; return; }
   if (pt.diaActual === 0) {
     el.innerHTML = 'Ready to generate &mdash; Day 1 of ' + pt.TOTAL_DIAS;
@@ -1089,101 +1101,599 @@ function updateDayStatus() {
   }
 }
 
-function downloadCanvas() {
-  if (!pxSketch) return;
+function ptDownloadCanvas() {
+  if (!ptPxSketch) return;
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let hash = '';
   for (let i = 0; i < 8; i++) hash += chars[Math.floor(Math.random() * chars.length)];
-  pxSketch.saveCanvas('paxel_' + hash, 'png');
+  ptPxSketch.saveCanvas('paxel_' + hash, 'png');
 }
 
-// ============================================================
-// FORMAT & RESOLUTION
-// ============================================================
-let currentFmt = '1:1';
-
-function setFmt(tipo, w, h, btn) {
-  document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('selected'));
+function ptSetFmt(tipo, w, h, btn) {
+  document.querySelectorAll('#page-tool .fmt-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
-  currentFmt = tipo;
   pt.canvasW = w; pt.canvasH = h;
-
-  const wrap = document.getElementById('canvasWrap');
+  const wrap = document.getElementById('ptCanvasWrap');
   wrap.style.aspectRatio = w + '/' + h;
-  const wrapWidth = wrap.getBoundingClientRect().width || wrap.offsetWidth;
-  if (wrapWidth > 0) {
-    wrap.style.height = Math.round(wrapWidth * h / w) + 'px';
-  } else {
-    wrap.style.height = '';
+  if (ptP5Instance && ptPxSketch) {
+    ptPxSketch.resizeCanvas(w, h);
+    if (pt.img) { ptPxSketch.background(255); pt.bloquesADibujar = []; pt.indiceActual = 0; pt.diaActual = 0; ptUpdateDayStatus(); }
+    document.getElementById('ptDlBtn').disabled = true;
   }
-
-  if (p5Instance && pxSketch) {
-    pxSketch.resizeCanvas(w, h);
-    if (pt.img) {
-      pxSketch.background(255);
-      pt.bloquesADibujar = [];
-      pt.indiceActual = 0;
-      pt.diaActual = 0;
-      updateDayStatus();
-    }
-    document.getElementById('dlBtn').disabled = true;
-  }
-
-  const sel = document.getElementById('resSelect');
+  const sel = document.getElementById('ptResSelect');
   sel.innerHTML = '';
-  let opts = [];
-  if (tipo === '1:1') opts = ['16x16','32x32','64x64','128x128'];
-  else if (tipo === '3:4') opts = ['12x16','24x32','48x64','96x128'];
-  else if (tipo === '4:3') opts = ['16x12','32x24','64x48','128x96'];
-  opts.forEach((o,i) => {
-    const opt = document.createElement('option');
-    opt.value = o; opt.textContent = o;
-    if (i === 1) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  onResChange();
+  let opts = tipo === '1:1' ? ['16x16','32x32','64x64','128x128'] : (tipo === '3:4' ? ['12x16','24x32','48x64','96x128'] : ['16x12','32x24','64x48','128x96']);
+  opts.forEach((o,i) => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; if (i===1) opt.selected = true; sel.appendChild(opt); });
+  ptOnResChange();
 }
 
-function onResChange() {
-  const val = document.getElementById('resSelect').value;
+function ptOnResChange() {
+  const val = document.getElementById('ptResSelect').value;
   if (!val) return;
   const parts = val.split('x');
   pt.COLS = parseInt(parts[0]); pt.ROWS = parseInt(parts[1]);
-  if (pt.img) procesarImagen();
+  if (pt.img) ptProcesarImagen();
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('fmt-1-1');
-  document.getElementById('canvasWrap').style.aspectRatio = '600/600';
-  setFmt('1:1', 600, 600, btn);
-});
+// ============================================================
+// PIXEL WATERER — p5.js instance
+// ============================================================
+let wtP5Instance = null;
+let wtPxSketch = null;
 
-window.addEventListener('resize', () => {
-  const wrap = document.getElementById('canvasWrap');
-  if (!wrap) return;
-  const wrapWidth = wrap.offsetWidth;
-  if (wrapWidth > 0) {
-    wrap.style.height = Math.round(wrapWidth * pt.canvasH / pt.canvasW) + 'px';
+// Gold and purple as RGB
+// Hidden special pixels use the orange disguise colour
+const WT_HIDDEN_A = [207, 117, 0]; // orange
+const WT_HIDDEN_B = [207, 117, 0]; // orange
+let wt = {
+  img: null,
+  bloquesADibujar: [],
+  indiceActual: 0,
+  diaActual: 0,
+  construyendo: false,
+  TOTAL_DIAS: 14,
+  COLS: 32,
+  ROWS: 32,
+  canvasW: 600,
+  canvasH: 600,
+  intervalSpeed: 30,
+  bloquesPorCiclo: 1,
+  monedas: 0,
+  diasRevelados: [],
+  costoHolyWater: 1,
+  costoMaximoAlcanzado: 1,
+};
+let wtCurrentInterval = null;
+
+function wtInitP5() {
+  const sketch = function(p) {
+    wtPxSketch = p;
+    p.setup = function() {
+      let cnv = p.createCanvas(wt.canvasW, wt.canvasH);
+      cnv.parent('wtP5Container');
+      p.pixelDensity(5);
+      p.background(0);
+    };
+    p.draw = function() {
+      if (!wt.img) return;
+      let w = p.width / wt.COLS;
+      let h = p.height / wt.ROWS;
+      for (let b of wt.bloquesADibujar) {
+        if (b.activo) {
+          p.fill(b.colorActual[0], b.colorActual[1], b.colorActual[2]);
+          p.noStroke();
+          p.rect(b.columna * w, b.fila * h, w, h);
+        }
+      }
+    };
+  };
+  wtP5Instance = new p5(sketch);
+  document.getElementById('wtCanvasEmpty').style.display = 'none';
+  document.getElementById('wtP5Container').style.display = 'flex';
+}
+
+function wtHandleFileInput(input) {
+  if (!input.files || !input.files[0]) return;
+  const file = input.files[0];
+  const reader = new FileReader();
+  const prev = document.getElementById('wtUploadPreview');
+  prev.src = URL.createObjectURL(file);
+  prev.style.display = 'block';
+  reader.onload = function(e) {
+    if (!wtP5Instance) wtInitP5();
+    const imgEl = new Image();
+    imgEl.onload = function() {
+      wtPxSketch.loadImage(e.target.result, function(p5img) {
+        wt.img = p5img;
+        wtProcesarImagen();
+      });
+    };
+    imgEl.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function wtProcesarImagen() {
+  if (!wt.img || !wtPxSketch) return;
+  wtPxSketch.background(255);
+  wt.bloquesADibujar = [];
+  wt.indiceActual = 0;
+  wt.diaActual = 0;
+  wt.diasRevelados = [];
+  wt.diasReveladosNativos = [];
+  wt.monedas = 0;
+  wt.costoMaximoAlcanzado = 1;
+  wt.costoHolyWater = 1;
+  if (wtCurrentInterval) { clearInterval(wtCurrentInterval); wtCurrentInterval = null; }
+  wt.construyendo = false;
+
+  document.getElementById('wtDlBtn').disabled = true;
+  document.getElementById('wtCanvasEmpty').style.display = 'none';
+  document.getElementById('wtP5Container').style.display = 'flex';
+
+  wt.img.loadPixels();
+  let celdaW = wt.img.width / wt.COLS;
+  let celdaH = wt.img.height / wt.ROWS;
+
+  for (let y = 0; y < wt.ROWS; y++) {
+    for (let x = 0; x < wt.COLS; x++) {
+      let cx = Math.floor(x * celdaW + celdaW / 2);
+      let cy = Math.floor(y * celdaH + celdaH / 2);
+      let idx = (cx + cy * wt.img.width) * 4;
+      let r = wt.img.pixels[idx], g = wt.img.pixels[idx+1], b = wt.img.pixels[idx+2];
+
+      // Special pixels are disguised as orange; revealed = true colour
+      let esEspecial = Math.random() < 0.3;
+      let colorFinal = esEspecial ? (Math.random() < 0.5 ? WT_HIDDEN_A.slice() : WT_HIDDEN_B.slice()) : [r, g, b];
+
+      wt.bloquesADibujar.push({
+        columna: x, fila: y,
+        colorOriginal: [r, g, b],
+        colorActual: colorFinal,
+        esEspecial: esEspecial,
+        activo: false,
+        parte: 0
+      });
+    }
   }
-});
 
-const zone = document.getElementById('uploadZone');
-if (zone) {
-  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
-  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
-  zone.addEventListener('drop', e => {
-    e.preventDefault();
-    zone.classList.remove('dragover');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const input = document.getElementById('fileInput');
-      const dt = new DataTransfer();
-      dt.items.add(file);
-      input.files = dt.files;
-      handleFileInput(input);
+  // Fisher-Yates shuffle
+  for (let i = wt.bloquesADibujar.length - 1; i > 0; i--) {
+    let j = Math.floor(Math.random() * (i + 1));
+    [wt.bloquesADibujar[i], wt.bloquesADibujar[j]] = [wt.bloquesADibujar[j], wt.bloquesADibujar[i]];
+  }
+
+  document.getElementById('wtGenBtn').disabled = false;
+  document.getElementById('wtGenBtn').textContent = 'Generate Day 1';
+  wtUpdateUI();
+}
+
+function wtIniciarConstruccionDia() {
+  if (wt.construyendo || wt.diaActual >= wt.TOTAL_DIAS) return;
+  wt.construyendo = true;
+  wt.diaActual++;
+  document.getElementById('wtGenBtn').disabled = true;
+
+  let pixelesRestantes = wt.bloquesADibujar.length - wt.indiceActual;
+  let diasRestantes = wt.TOTAL_DIAS - wt.diaActual + 1;
+  let pixelesHoy = Math.ceil(pixelesRestantes / diasRestantes);
+  let pixelesContados = 0;
+
+  wtUpdateUI();
+
+  wtCurrentInterval = setInterval(() => {
+    for (let i = 0; i < wt.bloquesPorCiclo; i++) {
+      if (pixelesContados < pixelesHoy && wt.indiceActual < wt.bloquesADibujar.length) {
+        wt.bloquesADibujar[wt.indiceActual].activo = true;
+        wt.bloquesADibujar[wt.indiceActual].parte = wt.diaActual;
+        wt.indiceActual++;
+        pixelesContados++;
+      }
+    }
+    if (pixelesContados >= pixelesHoy || wt.indiceActual >= wt.bloquesADibujar.length) {
+      clearInterval(wtCurrentInterval); wtCurrentInterval = null;
+      wt.construyendo = false;
+      wtActualizarBotones();
+    }
+  }, wt.intervalSpeed);
+}
+
+function wtAnimarRevelado(bloques, callback) {
+  if (bloques.length === 0) { if (callback) callback(); return; }
+  wt.construyendo = true;
+  let indice = 0;
+  let timer = setInterval(() => {
+    for (let i = 0; i < wt.bloquesPorCiclo; i++) {
+      if (indice < bloques.length) {
+        bloques[indice].colorActual = bloques[indice].colorOriginal.slice();
+        bloques[indice].esEspecial = false;
+        indice++;
+      }
+    }
+    if (indice >= bloques.length) {
+      clearInterval(timer);
+      wt.construyendo = false;
+      if (callback) callback();
+      wtUpdateUI();
+    }
+  }, wt.intervalSpeed);
+}
+
+function wtRevelarColorActual() {
+  if (wt.diasRevelados.includes(wt.diaActual)) return;
+  wt.monedas++;
+  if (!wt.diasReveladosNativos) wt.diasReveladosNativos = [];
+  wt.diasReveladosNativos.push(wt.diaActual);
+  document.getElementById('wtRevealBtn').disabled = true;
+  let bloquesARevelar = wt.bloquesADibujar.filter(b => b.activo && b.parte === wt.diaActual && b.esEspecial);
+  wtAnimarRevelado(bloquesARevelar, () => {
+    wt.diasRevelados.push(wt.diaActual);
+    document.getElementById('wtRevealBtn').textContent = 'Color revealed ✓';
+    wtUpdateUI();
+    if (wt.diaActual >= wt.TOTAL_DIAS) document.getElementById('wtDlBtn').disabled = false;
+  });
+}
+
+function wtUsarHolyWater() {
+  let diaASubsanar = -1;
+  for (let i = 1; i <= wt.diaActual; i++) {
+    if (!wt.diasRevelados.includes(i)) { diaASubsanar = i; break; }
+  }
+  if (diaASubsanar === -1 || wt.monedas < wt.costoHolyWater) return;
+
+  let bloquesDeEsaParte = wt.bloquesADibujar.filter(b => b.activo && b.parte === diaASubsanar);
+  wt.monedas -= wt.costoHolyWater;
+
+  wtAnimarRevelado(bloquesDeEsaParte, () => {
+    wt.diasRevelados.push(diaASubsanar);
+    wtUpdateUI();
+    if (diaASubsanar === wt.diaActual) {
+      document.getElementById('wtRevealBtn').textContent = 'Color revealed ✓';
+      document.getElementById('wtRevealBtn').disabled = true;
+    }
+    if (wt.diaActual >= wt.TOTAL_DIAS && wtTodosRevelados()) {
+      document.getElementById('wtDlBtn').disabled = false;
     }
   });
 }
+
+function wtTodosRevelados() {
+  for (let i = 1; i <= wt.diaActual; i++) {
+    if (!wt.diasRevelados.includes(i)) return false;
+  }
+  return true;
+}
+
+function wtActualizarBotones() {
+  const genBtn = document.getElementById('wtGenBtn');
+  if (wt.diaActual < wt.TOTAL_DIAS) {
+    genBtn.disabled = false;
+    genBtn.textContent = 'Generate Day ' + (wt.diaActual + 1);
+  } else {
+    genBtn.disabled = true;
+    genBtn.textContent = 'COMPLETE!';
+    if (wtTodosRevelados()) document.getElementById('wtDlBtn').disabled = false;
+  }
+  // Reset reveal button for new day
+  const revBtn = document.getElementById('wtRevealBtn');
+  if (!wt.diasRevelados.includes(wt.diaActual)) {
+    revBtn.disabled = false;
+    revBtn.textContent = '◎ Reveal color';
+  }
+  wtUpdateUI();
+}
+
+function wtUpdateUI() {
+  // Update Holy Water cost
+  if (wt.diaActual >= 8) wt.costoMaximoAlcanzado = 2;
+  wt.costoHolyWater = wt.costoMaximoAlcanzado;
+
+  // Count pending (generated but not revealed)
+  let pendientes = 0;
+  for (let i = 1; i <= wt.diaActual; i++) {
+    if (!wt.diasRevelados.includes(i)) pendientes++;
+  }
+
+  // HUD
+  document.getElementById('wtHudDay').textContent = wt.diaActual === 0 ? '—' : wt.diaActual + ' / ' + wt.TOTAL_DIAS;
+  document.getElementById('wtHudCoins').textContent = wt.monedas;
+  document.getElementById('wtHudPending').textContent = pendientes;
+  document.getElementById('wtCostBadge').textContent = wt.costoHolyWater;
+
+  // Pending info
+  const pendInfo = document.getElementById('wtPendingInfo');
+  if (pendientes > 0) {
+    pendInfo.innerHTML = '<span>' + pendientes + '</span> day' + (pendientes > 1 ? 's' : '') + ' unrevealed';
+  } else {
+    pendInfo.innerHTML = wt.diaActual > 0 ? 'All days revealed &#10003;' : '';
+  }
+
+  // Holy Water button
+  const holyBtn = document.getElementById('wtHolyBtn');
+  document.getElementById('wtHolyCount').textContent = pendientes;
+  holyBtn.disabled = (wt.monedas < wt.costoHolyWater || pendientes === 0);
+
+  // Day tracker pips
+  const track = document.getElementById('wtDayTrack');
+  track.innerHTML = '';
+  for (let i = 1; i <= wt.TOTAL_DIAS; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'wt-day-pip';
+    pip.textContent = i;
+    if (i === wt.diaActual && !wt.diasRevelados.includes(i) && wt.diaActual > 0) pip.classList.add('active');
+    else if (wt.diasRevelados.includes(i)) pip.classList.add('revealed');
+    else if (i < wt.diaActual && !wt.diasRevelados.includes(i)) pip.classList.add('unrevealed');
+    track.appendChild(pip);
+  }
+}
+
+function wtGenerateHash(len) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let r = '';
+  for (let i = 0; i < len; i++) r += chars[Math.floor(Math.random() * chars.length)];
+  return r;
+}
+
+function wtCalcPurity() {
+  // Purity = % of days where user clicked Reveal Color on the same day
+  // Holy Water fixes don't count — only native reveals count
+  // wt.diasReveladosNativos tracks days revealed WITHOUT holy water
+  if (wt.TOTAL_DIAS === 0) return '0%';
+  const natural = (wt.diasReveladosNativos || []).length;
+  const pct = Math.round((natural / wt.TOTAL_DIAS) * 100);
+  return pct + '%';
+}
+
+async function wtDownloadCanvas() {
+  if (!wtPxSketch) return;
+
+  const hash = wtGenerateHash(8);
+  const longHash = '0x' + Array.from({length: 40}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  const isoDate = new Date().toISOString().split('T')[0];
+  const purity = wtCalcPurity();
+
+  // --- Download PNG ---
+  wtPxSketch.saveCanvas('paxel_waterer_' + hash, 'png');
+
+  // --- Build PDF with jsPDF ---
+  await new Promise(r => setTimeout(r, 300)); // let p5 canvas settle
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+  const PW = 210; // A4 width mm
+  const PH = 297; // A4 height mm
+  const M  = 18;  // margin
+
+  // Palette
+  const INK     = [16,  19,  26];
+  const BLUE    = [70, 182, 226];
+  const SOFT    = [75,  85,  99];
+  const BGALT   = [245,245,245];
+  const DORMANT = [216,209,188];
+  const WHITE   = [255,255,255];
+
+  // ── Background ──
+  doc.setFillColor(...WHITE);
+  doc.rect(0, 0, PW, PH, 'F');
+
+  // ── Top bar ──
+  doc.setFillColor(...INK);
+  doc.rect(0, 0, PW, 18, 'F');
+
+  // Logo text in top bar
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(...BLUE);
+  doc.text('PAXEL\u2122', M, 12);
+
+  // "SLOW ART SYSTEM" label right side
+  doc.setFontSize(7);
+  doc.setTextColor(...DORMANT);
+  doc.setFont('helvetica', 'bold');
+  doc.text('SLOW ART SYSTEM', PW - M, 12, { align: 'right' });
+
+  // ── Title block ──
+  doc.setFillColor(...BGALT);
+  doc.rect(0, 18, PW, 26, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(...INK);
+  doc.text('Pre-Certificate of Authenticity', PW / 2, 33, { align: 'center' });
+
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...SOFT);
+  doc.text('PIXEL WATERER \u00B7 PAXEL\u2122', PW / 2, 40, { align: 'center' });
+
+  // Divider
+  doc.setDrawColor(...INK);
+  doc.setLineWidth(0.6);
+  doc.line(M, 44, PW - M, 44);
+
+  // ── Disclaimer box ──
+  doc.setFillColor(255, 249, 235);
+  doc.setDrawColor(207, 117, 0);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(M, 48, PW - M*2, 22, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.setTextColor(150, 80, 0);
+  doc.text('NOTICE \u2014 FOR FUN ONLY', M + 4, 56);
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(100, 60, 0);
+  const disclaimer =
+    'This pre-certificate is issued for entertainment purposes only and has no monetary value, ' +
+    'legal standing, or transferable rights within the PAXEL\u2122 platform or any other context. ' +
+    'It does not constitute ownership, a collectible asset, or a binding document of any kind.';
+  const discLines = doc.splitTextToSize(disclaimer, PW - M*2 - 8);
+  doc.text(discLines, M + 4, 62);
+
+  // ── Canvas image ──
+  let imgY = 76;
+  try {
+    const p5canvas = wtPxSketch.elt; // p5 canvas DOM element
+    const imgData = p5canvas.toDataURL('image/png');
+    const imgSize = 72; // square mm
+    const imgX = (PW - imgSize) / 2;
+    doc.addImage(imgData, 'PNG', imgX, imgY, imgSize, imgSize);
+
+    // Border around image
+    doc.setDrawColor(...INK);
+    doc.setLineWidth(0.5);
+    doc.rect(imgX, imgY, imgSize, imgSize);
+    imgY += imgSize + 6;
+  } catch(e) {
+    imgY += 4;
+  }
+
+  // ── Fields table ──
+  const fields = [
+    ['Username',        'N/A'],
+    ['Hash',            longHash],
+    ['Date of creation', isoDate],
+    ['Image title',     'N/A'],
+    ['Theme',           'N/A'],
+    ['Edition',         'N/A'],
+    ['Collection',      'N/A'],
+    ['Purity',          purity],
+    ['Genesis',         'N/A'],
+  ];
+
+  const colLabel = M;
+  const colValue = M + 46;
+  const rowH = 9;
+  let fy = imgY + 2;
+
+  doc.setLineWidth(0.3);
+
+  fields.forEach(([label, value], idx) => {
+    const rowY = fy + idx * rowH;
+
+    // Alternating row bg
+    if (idx % 2 === 0) {
+      doc.setFillColor(...BGALT);
+      doc.rect(M, rowY - 5.5, PW - M*2, rowH, 'F');
+    }
+
+    // Label
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...SOFT);
+    doc.text(label.toUpperCase(), colLabel, rowY);
+
+    // Value
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(label === 'Hash' ? 6.5 : 8.5);
+    doc.setTextColor(label === 'Hash' ? 30 : INK[0], label === 'Hash' ? 100 : INK[1], label === 'Hash' ? 180 : INK[2]);
+    const valText = doc.splitTextToSize(String(value), PW - colValue - M);
+    doc.text(valText, colValue, rowY);
+
+    // Row divider
+    doc.setDrawColor(...DORMANT);
+    doc.setLineWidth(0.2);
+    doc.line(M, rowY + 3.5, PW - M, rowY + 3.5);
+  });
+
+  // ── Footer ──
+  const footY = PH - 14;
+  doc.setFillColor(...INK);
+  doc.rect(0, footY, PW, 14, 'F');
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7);
+  doc.setTextColor(...BLUE);
+  doc.text('PAXEL\u2122 \u00B7 SLOW ART SYSTEM', M, footY + 9);
+
+  doc.setTextColor(...DORMANT);
+  doc.text('paxelart.com', PW - M, footY + 9, { align: 'right' });
+
+  // ── Save PDF ──
+  doc.save('paxel_precertificate_' + hash + '.pdf');
+}
+
+function wtSetFmt(tipo, w, h, btn) {
+  document.querySelectorAll('#page-waterer .fmt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  wt.canvasW = w; wt.canvasH = h;
+  const wrap = document.getElementById('wtCanvasWrap');
+  wrap.style.aspectRatio = w + '/' + h;
+  if (wtP5Instance && wtPxSketch) {
+    wtPxSketch.resizeCanvas(w, h);
+    if (wt.img) { wtPxSketch.background(255); wt.bloquesADibujar = []; wt.indiceActual = 0; wt.diaActual = 0; wtUpdateUI(); }
+    document.getElementById('wtDlBtn').disabled = true;
+  }
+  const sel = document.getElementById('wtResSelect');
+  sel.innerHTML = '';
+  let opts = tipo === '1:1' ? ['16x16','32x32','64x64','128x128'] : (tipo === '3:4' ? ['12x16','24x32','48x64','96x128'] : ['16x12','32x24','64x48','128x96']);
+  opts.forEach((o,i) => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; if (i===1) opt.selected = true; sel.appendChild(opt); });
+  wtOnResChange();
+}
+
+function wtOnResChange() {
+  const val = document.getElementById('wtResSelect').value;
+  if (!val) return;
+  const parts = val.split('x');
+  wt.COLS = parseInt(parts[0]); wt.ROWS = parseInt(parts[1]);
+  if (wt.img) wtProcesarImagen();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  // Pixel tool
+  ptSetFmt('1:1', 600, 600, document.getElementById('pt-fmt-1-1'));
+  // Pixel waterer
+  wtSetFmt('1:1', 600, 600, document.getElementById('wt-fmt-1-1'));
+  wtUpdateUI();
+
+  // Drag & drop — Pixel tool
+  const ptZone = document.getElementById('ptUploadZone');
+  if (ptZone) {
+    ptZone.addEventListener('dragover', e => { e.preventDefault(); ptZone.classList.add('dragover'); });
+    ptZone.addEventListener('dragleave', () => ptZone.classList.remove('dragover'));
+    ptZone.addEventListener('drop', e => {
+      e.preventDefault(); ptZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const input = document.getElementById('ptFileInput');
+        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+        ptHandleFileInput(input);
+      }
+    });
+  }
+
+  // Drag & drop — Pixel waterer
+  const wtZone = document.getElementById('wtUploadZone');
+  if (wtZone) {
+    wtZone.addEventListener('dragover', e => { e.preventDefault(); wtZone.classList.add('dragover'); });
+    wtZone.addEventListener('dragleave', () => wtZone.classList.remove('dragover'));
+    wtZone.addEventListener('drop', e => {
+      e.preventDefault(); wtZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const input = document.getElementById('wtFileInput');
+        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
+        wtHandleFileInput(input);
+      }
+    });
+  }
+});
+
+window.addEventListener('resize', () => {
+  ['ptCanvasWrap','wtCanvasWrap'].forEach(id => {
+    const wrap = document.getElementById(id);
+    if (!wrap) return;
+    const wrapWidth = wrap.offsetWidth;
+    const ratio = id === 'ptCanvasWrap' ? pt.canvasH / pt.canvasW : wt.canvasH / wt.canvasW;
+    if (wrapWidth > 0) wrap.style.height = Math.round(wrapWidth * ratio) + 'px';
+  });
+});
 </script>
 </body>
 </html>
