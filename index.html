@@ -169,28 +169,106 @@ section{padding:84px 0;}
 .art-card-info .meta{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;}
 
 /* CERTIFICATE */
-.cert-layout{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;}
-@media(max-width:920px){.cert-layout{grid-template-columns:1fr;gap:48px;}}
+.cert-layout{display:grid;grid-template-columns:1fr 520px;gap:64px;align-items:start;}
+@media(max-width:1000px){.cert-layout{grid-template-columns:1fr;gap:48px;}}
 .ownership-side h3{font-weight:800;font-size:clamp(22px,2.6vw,30px);margin:14px 0 18px;line-height:1.15;}
 .feature-list{display:flex;flex-direction:column;gap:20px;}
 .feature-item{display:flex;gap:14px;align-items:flex-start;}
 .f-num{font-family:var(--font);font-weight:800;font-size:13px;width:30px;height:30px;flex-shrink:0;background:var(--ink);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .feature-item h4{font-size:15.5px;font-weight:800;margin-bottom:3px;}
 .feature-item p{font-size:14px;color:var(--ink-soft);line-height:1.6;font-weight:500;}
-.cert-card{background:#fff;overflow:hidden;}
-.cert-header{background:var(--paper-alt);padding:22px 24px 18px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid var(--dormant);}
-.cert-header-title{font-family:var(--font);font-size:18px;font-weight:800;color:var(--ink);letter-spacing:.01em;text-align:center;}
-.cert-art-wrap{padding:28px 24px 20px;display:flex;justify-content:center;}
-.cert-art{width:130px;height:130px;object-fit:cover;image-rendering:pixelated;border:2px solid var(--ink);border-radius:3px;display:block;}
-.cert-fields{padding:0 22px 20px;}
-.cert-field{padding:9px 0;border-bottom:1.5px solid var(--paper-alt);display:grid;grid-template-columns:1fr 1.4fr;gap:8px;align-items:baseline;}
+.cert-card{background:#fff;overflow:hidden;border:3px solid var(--ink);border-radius:4px;}
+
+/* Header — light grey, large bold title */
+.cert-header{
+  background:var(--paper-alt);
+  padding:28px 28px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:2px solid var(--dormant);
+}
+.cert-header-title{
+  font-family:var(--font);
+  font-size:22px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-.01em;
+  text-align:center;
+}
+
+/* Art — larger, centered, black border */
+.cert-art-wrap{
+  padding:32px 28px 24px;
+  display:flex;
+  justify-content:center;
+  background:#fff;
+}
+.cert-art{
+  width:180px;
+  height:180px;
+  object-fit:cover;
+  image-rendering:pixelated;
+  border:2.5px solid var(--ink);
+  border-radius:3px;
+  display:block;
+}
+
+/* Fields — full-width dividers, spacious rows */
+.cert-fields{padding:0 24px 4px;}
+.cert-field{
+  padding:13px 0;
+  border-bottom:1.5px solid #EBEBEB;
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  gap:12px;
+  align-items:center;
+}
 .cert-field:last-child{border-bottom:none;}
-.cert-field .f-label{font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
-.cert-field .f-value{font-family:var(--font);font-size:12px;font-weight:700;color:var(--ink);word-break:break-all;}
-.cert-field .f-value.empty{color:var(--dormant-2);font-style:italic;}
-.cert-field .f-value.hash{font-size:10px;color:var(--blue-deep);word-break:break-all;}
-.cert-footer{border-top:3px solid var(--ink);padding:14px 22px;display:flex;align-items:center;justify-content:flex-end;background:var(--paper-alt);}
-.cert-footer-badge{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+.cert-field .f-label{
+  font-family:var(--font);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.cert-field .f-value{
+  font-family:var(--font);
+  font-size:14px;
+  font-weight:800;
+  color:var(--ink);
+  word-break:break-all;
+}
+.cert-field .f-value.empty{
+  color:var(--dormant-2);
+  font-weight:700;
+}
+.cert-field .f-value.hash{
+  font-size:10px;
+  font-weight:700;
+  color:var(--blue-deep);
+  word-break:break-all;
+}
+
+/* Footer — dark ink background, white text */
+.cert-footer{
+  border-top:3px solid var(--ink);
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  background:var(--ink);
+}
+
+.cert-footer-badge{
+  font-family:var(--font);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:#fff;
+}
 
 /* ROADMAP */
 .roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
@@ -550,27 +628,63 @@ footer .foot-tabs button:hover{color:var(--ink);}
         </div>
       </div>
       <div>
-        <div class="cert-card px-border">
+        <div class="cert-card">
+
+          <!-- Header -->
           <div class="cert-header">
             <span class="cert-header-title">Certificate of Authenticity</span>
           </div>
+
+          <!-- Pixel art image -->
           <div class="cert-art-wrap">
             <img class="cert-art" src="utopia-still.jpg" alt="Utopia">
           </div>
+
+          <!-- Fields -->
           <div class="cert-fields">
-            <div class="cert-field"><span class="f-label">Username</span><span class="f-value">Paxel</span></div>
-            <div class="cert-field"><span class="f-label">Hash</span><span class="f-value hash">0x00806def45b7a266bbdc0ea804675156ce4822ad</span></div>
-            <div class="cert-field"><span class="f-label">Date of creation</span><span class="f-value empty">&mdash;</span></div>
-            <div class="cert-field"><span class="f-label">Image title</span><span class="f-value empty">&mdash;</span></div>
-            <div class="cert-field"><span class="f-label">Theme</span><span class="f-value">Utopia</span></div>
-            <div class="cert-field"><span class="f-label">Edition</span><span class="f-value">1 / 1</span></div>
-            <div class="cert-field"><span class="f-label">Collection</span><span class="f-value empty">&mdash;</span></div>
-            <div class="cert-field"><span class="f-label">Purity</span><span class="f-value">100%</span></div>
-            <div class="cert-field"><span class="f-label">Genesis</span><span class="f-value">True</span></div>
+            <div class="cert-field">
+              <span class="f-label">Username</span>
+              <span class="f-value">Paxel</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Hash</span>
+              <span class="f-value hash">0x00806def45b7a266bbdc0ea804675156ce4822ad</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Date of creation</span>
+              <span class="f-value empty">&mdash;</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Image title</span>
+              <span class="f-value empty">&mdash;</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Theme</span>
+              <span class="f-value">Utopia</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Edition</span>
+              <span class="f-value">1 / 1</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Collection</span>
+              <span class="f-value empty">&mdash;</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Purity</span>
+              <span class="f-value">100%</span>
+            </div>
+            <div class="cert-field">
+              <span class="f-label">Genesis</span>
+              <span class="f-value">True</span>
+            </div>
           </div>
+
+          <!-- Footer -->
           <div class="cert-footer">
             <span class="cert-footer-badge">PAXEL&#8482; &middot; SLOW ART</span>
           </div>
+
         </div>
       </div>
     </div>
@@ -700,8 +814,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="foot-tabs">
     <button onclick="showPage('tool')">Pixel tool</button>
     <button onclick="showPage('waterer')">Pixel waterer</button>
-    <button onclick="showPage('home');setTimeout(()=>document.getElementById('gallery').scrollIntoView({behavior:'smooth'}),50)">Themes</button>
+    <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">Placeholder</button>
     <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
+    <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'">
+      <img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;">
+      Twitter
+    </a>
   </div>
   <span class="mono">&copy; 2026</span>
 </footer>
@@ -804,6 +922,21 @@ footer .foot-tabs button:hover{color:var(--ink);}
     </div>
   </div>
 
+
+  <footer class="wrap">
+    <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
+    <div class="foot-tabs">
+      <button onclick="showPage('tool')">Pixel tool</button>
+      <button onclick="showPage('waterer')">Pixel waterer</button>
+      <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">Placeholder</button>
+      <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
+      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'">
+        <img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;">
+        Twitter
+      </a>
+    </div>
+    <span class="mono">&copy; 2026</span>
+  </footer>
 </div>
 </div><!-- /page-tool -->
 
@@ -970,6 +1103,21 @@ footer .foot-tabs button:hover{color:var(--ink);}
     </div>
   </div>
 
+
+  <footer class="wrap">
+    <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
+    <div class="foot-tabs">
+      <button onclick="showPage('tool')">Pixel tool</button>
+      <button onclick="showPage('waterer')">Pixel waterer</button>
+      <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">Placeholder</button>
+      <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
+      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'">
+        <img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;">
+        Twitter
+      </a>
+    </div>
+    <span class="mono">&copy; 2026</span>
+  </footer>
 </div>
 </div><!-- /page-waterer -->
 
@@ -1524,165 +1672,176 @@ async function wtDownloadCanvas() {
 
   // --- Download PNG ---
   wtPxSketch.saveCanvas('paxel_waterer_' + hash, 'png');
-
-  // --- Build PDF with jsPDF ---
-  await new Promise(r => setTimeout(r, 300)); // let p5 canvas settle
+  await new Promise(r => setTimeout(r, 300));
 
   const { jsPDF } = window.jspdf;
+  const PW = 210, PH = 297;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-  const PW = 210; // A4 width mm
-  const PH = 297; // A4 height mm
-  const M  = 18;  // margin
+  // ── Colours matching PAXEL CSS vars ──
+  const INK      = [16,  19,  26];
+  const INK_SOFT = [75,  85,  99];
+  const BLUE_D   = [30, 143, 190];
+  const PAPER_ALT= [245, 245, 245];
+  const DORMANT  = [231, 226, 211];
+  const DORMANT2 = [216, 209, 188];
+  const EBEBEB   = [235, 235, 235];
+  const ECE8DE   = [236, 232, 222];
+  const WHITE    = [255, 255, 255];
 
-  // Palette
-  const INK     = [16,  19,  26];
-  const BLUE    = [70, 182, 226];
-  const SOFT    = [75,  85,  99];
-  const BGALT   = [245,245,245];
-  const DORMANT = [216,209,188];
-  const WHITE   = [255,255,255];
+  const ML = 14;  // left margin
+  const MR = 14;  // right margin
+  const CW = PW - ML - MR;  // content width
 
-  // ── Background ──
+  // ── White background ──
   doc.setFillColor(...WHITE);
   doc.rect(0, 0, PW, PH, 'F');
 
-  // ── Top bar ──
-  doc.setFillColor(...INK);
-  doc.rect(0, 0, PW, 18, 'F');
+  // ════════════════════════════════════════
+  // HEADER — paper-alt bg with banner logo top-left
+  // ════════════════════════════════════════
+  const HDR_H = 22;
+  doc.setFillColor(...PAPER_ALT);
+  doc.rect(0, 0, PW, HDR_H, 'F');
 
-  // Logo text in top bar
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(...BLUE);
-  doc.text('PAXEL\u2122', M, 12);
-
-  // "SLOW ART SYSTEM" label right side
-  doc.setFontSize(7);
-  doc.setTextColor(...DORMANT);
-  doc.setFont('helvetica', 'bold');
-  doc.text('SLOW ART SYSTEM', PW - M, 12, { align: 'right' });
-
-  // ── Title block ──
-  doc.setFillColor(...BGALT);
-  doc.rect(0, 18, PW, 26, 'F');
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(18);
-  doc.setTextColor(...INK);
-  doc.text('Pre-Certificate of Authenticity', PW / 2, 33, { align: 'center' });
-
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(...SOFT);
-  doc.text('PIXEL WATERER \u00B7 PAXEL\u2122', PW / 2, 40, { align: 'center' });
-
-  // Divider
-  doc.setDrawColor(...INK);
-  doc.setLineWidth(0.6);
-  doc.line(M, 44, PW - M, 44);
-
-  // ── Disclaimer box ──
-  doc.setFillColor(255, 249, 235);
-  doc.setDrawColor(207, 117, 0);
+  // Header bottom border (dormant)
+  doc.setDrawColor(...DORMANT);
   doc.setLineWidth(0.5);
-  doc.roundedRect(M, 48, PW - M*2, 22, 2, 2, 'FD');
+  doc.line(0, HDR_H, PW, HDR_H);
 
+  // Logo banner — top-left corner, drapes below header
+  // PNG is roughly square visually at top, banner shape extends down
+  // We want the logo portion to be square (~20x20mm) at the top
+  const LOGO_W  = 20;
+  const LOGO_H  = 28;  // taller than header to show the banner drape
+  doc.addImage(
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANcAAAHCCAMAAABLz6wbAAAAn1BMVEVMaXEBAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQCFhoYBAQD09PQiIiFkZWTZ2dmhoqK9vb19fn4JCQgZGhlsbW1TVFQyMzJcXFxDQ0M6OzoqKioRERB0dXVLTEvn5+eTlJSam5uMjY2vr6/ExMSmp6ff4ODLy8u4uLjHx8errKy2t7fc3NyfoKDJyclXipQDAAAAEHRSTlMAoGAg8NAwQMAQkHCwgOBQKuVoxQAAAAlwSFlzAAAmcgAAJnIBISuX7gAACBdJREFUeJztnGl31DgQRZ1AdkKmgSwEQtiGsAwMs/z/3zYQIqndLrtkuUr2y7z7KbQdqy851JFvTDfNPWVvdR/ZpxcU9MKCXlhEr6e/3Q+e0QsKemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCotTr5uyOL1/OunwQvuOjcN5ZOpxe+zi0nHhpQ6/TJ0OcC99xJp2YDqfXzoRvTstJl6YXvehFL3rRi153/HHa5VvcHvwTv/ounHeadhmL85Lexnk8ms47lS4j/QzpRS960Yte9KIXvXy8pEsPu9KLXvSiF73oRa//jZfE55hjPsfXfh/8DgyvtIlLPzl60Yte9KIXvejl7/XX4HMpyetv6bmU9M7T746+C+f9GY9+quU1/Fe5tlOUDks/uQX3qAS96JUDvfoWopcAveh1i7fXh7hluJEOw3op0Itet9CrbyF6CdCLXrfQq82NkB4k/o1ffZYuIzWPWf/fTWK4TCm//3KDXn3Qqyb06oNeNaFXH/fL69N54Nv5EF8Frw/pcLpgei1zR+HjNaVHrf12KJ34JPOCmdCrDb3oRS8derWhF6rXV2GXkd4arpeE9LwNvehFL3rRi1708veSPlckPdQped2kE9cuGBEf9KjvNel5Gzfo1YZe9LKEXm3oRS9L6NWGXvSyhF5t6EUvS+jVhl6oXsOkMiV+zm2CXvSiF73oRS960QsMemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AuLObwuKqwxg9fF5bX/IjN4Xa1Wr9wXqe91/WOV5y+8V6nu9ep2mUvvf2O1vV48/7XOG+d1KntdXK7ueO27UGWvN6vIS9eF6npdJy3n2VHV6+Vqnbees6OmV5gZAc+1KnpdvF1t4Dg7Kno9DTrb+/6zo57X6yBz2Bw8Dl+7zY5qXnFm7DdNs/swDEWv2VHL60XQenzww6vZDn+8dFqvktdFGIUPd5tbjoPYlc+Clbzi9mm7ueOR7+yo43UVJI6DVnOwE1575rFiFa84Mx41iTQ73jksWcPrWdDaOVjzak7i7HAYihW83m3OjMCR4+zw90q3XCfNBlvhyHvzVf294sw42tRamx3mIcfd631461sdraZ5EGeH9YbK2+uVPDMCe16zw9kr3nI9fCBprW2ojEOOr1eaGXuy1trssI3Avl4x02z3aTVNnB2mGypXr5hppJkRh6LL7PD0itunnQGtHxuqcJplyHH0SjNDHIXC7DBc3M8rZZrdYa2mOQxn2oUcP6+UaTStprEPOW5eMdMMzYyAfcjx8mplGh3zkOPktZFpdKxDjo9XJ9PoxNlhczPm49XNNDq2IcfFK95yHeZrGYccDy8x0+iYhhwHr55Mo2MZcuy9ejONjmEENvcayDQ6diHH3EtIu/nYhRxrr8FMo2MWcoy9lEyjYxVybL3UTKMTI/C0kGPqlZFpdGxCjqlXzDTdtDsCk9lh6ZWVaXRMQo6hV5oZk7RsQo6dV3am0TEIOWZeIzKNTpwdxSHHzGtMptGZHHKsvEZlGp0Yckpnh5HXyEyjMzXk2HjFmZGbaXQmhhwTr4JMozMt5Jh4lWQanUkhx8KrKNPopJuxgtlh4FWYaXSmhJzpXjHtlt5y9TMh5Ez2mpBpdMpDzlSvSZlGpzjkTPWalGl0iiPwRK+JmUanNORM8ypOu/kUhpxJXgaZRqcs5EzxMsk0OkUhZ4qXTaZRKYrAE7yMMk2GWMHsKPeanHbzKQg5xV6GmUZnfMgp9TLNNDqjQ06pl22m0Rn7NF+hl3Gm0Rkbcsq8Mp/As2RkyCnycsg0OuNCTomXS6bRGRVySrx8Mo3OmAhc4OWUaXTGhJzxXuZpN58Rs2O0l2Om0ckPOWO9XDONTnbIGenlnGl0YgRWQs5IL+dMo5MbcsZ5xUxjnXbzeZAXgUd5Vcg0OnkhZ4zXuxqZRicr5IzwqpRpdHJCzgivSplGJyfk5HtVyzQZYnrIyfaqmGl0YsjpnR25XlUzjY4acjK90syYZfvURQs5mV61M42OEnLyvKpnGh0l5GR5zZBpdOLNmBiBc7xmyTQ6gyEnwyum3XluufoZCjkZXnNlGp2BkKN7zZZpdAZCjuo1Y6bR6Q85mtesmUanN+QoXjOl3Xz6Qs6w1+yZRqcn5Ax7zZ5pdHpCzqDXAjKNjvw035DXIjKNjhhyBrwWkml0pJDT77WYTKMjhJx+r8VkGh0h5PR6LSjT6HSf5uvzWlSm0emEnB6vKk/gWbIZcmSvxWUanY2QI3stL9PotEOO6LXATKPTjsCS1yIzjU4r5AheC0u7+azPjq7XYjONzlrI6XotN9PopJDT8VpwptFJn6/1fsMrfqT/EjONTpwdqw2vwLLSbj4nw154MyNwPOi12Eyj82jAa7mZRifdjHW8lpxpdNZnR8sL45arnz3ZC3dmBI5Er8VnGp0twWv5mUYnzo7khXTL1U8IOdELfWYEdtteKJlGZ7vlBT8KE1trXoC3XP3sRK/7MTMCP0POrRdWptHZ/eWFlml0tn964W+fuhzuN7v3amYEjv4DsXaHRtYxejsAAAAASUVORK5CYII=',
+    'PNG', ML, 0, LOGO_W, LOGO_H
+  );
+
+  // Title "Certificate of Authenticity" — vertically centred in header, to the right of logo
+  const TITLE_X = ML + LOGO_W + 6;
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7.5);
-  doc.setTextColor(150, 80, 0);
-  doc.text('NOTICE \u2014 FOR FUN ONLY', M + 4, 56);
+  doc.setFontSize(14);
+  doc.setTextColor(...INK);
+  doc.text('Certificate of Authenticity', TITLE_X, HDR_H * 0.62);
 
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7);
-  doc.setTextColor(100, 60, 0);
-  const disclaimer =
-    'This pre-certificate is issued for entertainment purposes only and has no monetary value, ' +
-    'legal standing, or transferable rights within the PAXEL\u2122 platform or any other context. ' +
-    'It does not constitute ownership, a collectible asset, or a binding document of any kind.';
-  const discLines = doc.splitTextToSize(disclaimer, PW - M*2 - 8);
-  doc.text(discLines, M + 4, 62);
+  // ════════════════════════════════════════
+  // ART IMAGE — centred, generous padding, black border
+  // Matches .cert-art-wrap padding: 32px top, 24px bottom
+  // ════════════════════════════════════════
+  const ART_PT  = 12;
+  const ART_SZ  = 80;
+  const ART_X   = (PW - ART_SZ) / 2;
+  const ART_Y   = HDR_H + ART_PT;
 
-  // ── Canvas image ──
-  let imgY = 76;
   try {
-    const p5canvas = wtPxSketch.elt; // p5 canvas DOM element
-    const imgData = p5canvas.toDataURL('image/png');
-    const imgSize = 72; // square mm
-    const imgX = (PW - imgSize) / 2;
-    doc.addImage(imgData, 'PNG', imgX, imgY, imgSize, imgSize);
-
-    // Border around image
+    const container = document.getElementById('wtP5Container');
+    const rawCanvas = container ? container.querySelector('canvas') : null;
+    const p5canvas  = rawCanvas || wtPxSketch.elt;
+    const offscreen = document.createElement('canvas');
+    offscreen.width  = wt.canvasW;
+    offscreen.height = wt.canvasH;
+    const ctx = offscreen.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(p5canvas, 0, 0, offscreen.width, offscreen.height);
+    doc.addImage(offscreen.toDataURL('image/png'), 'PNG', ART_X, ART_Y, ART_SZ, ART_SZ);
     doc.setDrawColor(...INK);
-    doc.setLineWidth(0.5);
-    doc.rect(imgX, imgY, imgSize, imgSize);
-    imgY += imgSize + 6;
-  } catch(e) {
-    imgY += 4;
-  }
+    doc.setLineWidth(0.7);
+    doc.rect(ART_X, ART_Y, ART_SZ, ART_SZ);
+  } catch(e) { console.error('PDF img:', e); }
 
-  // ── Fields table ──
+  // ════════════════════════════════════════
+  // FIELDS — fill from below image to just above footer
+  // ════════════════════════════════════════
+  const FTR_H   = 18;
+  const FTR_Y   = PH - FTR_H;
+  const FLD_TOP = ART_Y + ART_SZ + 8;
+  const FLD_H   = FTR_Y - FLD_TOP;
+
   const fields = [
-    ['Username',        'N/A'],
-    ['Hash',            longHash],
-    ['Date of creation', isoDate],
-    ['Image title',     'N/A'],
-    ['Theme',           'N/A'],
-    ['Edition',         'N/A'],
-    ['Collection',      'N/A'],
-    ['Purity',          purity],
-    ['Genesis',         'N/A'],
+    ['Username',         'N/A',    'empty'],
+    ['Hash',             longHash, 'hash' ],
+    ['Date of creation', isoDate,  'value'],
+    ['Image title',      'N/A',    'empty'],
+    ['Theme',            'N/A',    'empty'],
+    ['Edition',          'N/A',    'empty'],
+    ['Collection',       'N/A',    'empty'],
+    ['Purity',           purity,   'value'],
+    ['Genesis',          'N/A',    'empty'],
   ];
 
-  const colLabel = M;
-  const colValue = M + 46;
-  const rowH = 9;
-  let fy = imgY + 2;
+  const ROW_H  = FLD_H / fields.length;
+  const FL     = ML;
+  const FR     = PW - MR;
+  // label col = 38.5% of content width (mirrors 1fr vs 1.6fr grid)
+  const FV     = FL + CW * 0.385;
 
-  doc.setLineWidth(0.3);
+  fields.forEach(([label, value, type], i) => {
+    const rowTop = FLD_TOP + i * ROW_H;
+    const textY  = rowTop + ROW_H * 0.60;
 
-  fields.forEach(([label, value], idx) => {
-    const rowY = fy + idx * rowH;
-
-    // Alternating row bg
-    if (idx % 2 === 0) {
-      doc.setFillColor(...BGALT);
-      doc.rect(M, rowY - 5.5, PW - M*2, rowH, 'F');
+    // Row divider — full width, #EBEBEB
+    if (i > 0) {
+      doc.setDrawColor(...EBEBEB);
+      doc.setLineWidth(0.35);
+      doc.line(FL, rowTop, FR, rowTop);
     }
 
-    // Label
+    // LABEL — 10px bold uppercase, ink-soft
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(7.5);
-    doc.setTextColor(...SOFT);
-    doc.text(label.toUpperCase(), colLabel, rowY);
+    doc.setFontSize(6.5);
+    doc.setTextColor(...INK_SOFT);
+    doc.text(label.toUpperCase(), FL, textY);
 
-    // Value
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(label === 'Hash' ? 6.5 : 8.5);
-    doc.setTextColor(label === 'Hash' ? 30 : INK[0], label === 'Hash' ? 100 : INK[1], label === 'Hash' ? 180 : INK[2]);
-    const valText = doc.splitTextToSize(String(value), PW - colValue - M);
-    doc.text(valText, colValue, rowY);
-
-    // Row divider
-    doc.setDrawColor(...DORMANT);
-    doc.setLineWidth(0.2);
-    doc.line(M, rowY + 3.5, PW - M, rowY + 3.5);
+    // VALUE
+    if (type === 'empty') {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...DORMANT2);
+      doc.text('\u2014', FV, textY);
+    } else if (type === 'hash') {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...BLUE_D);
+      const lines = doc.splitTextToSize(value, FR - FV);
+      doc.text(lines, FV, textY);
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...INK);
+      doc.text(String(value), FV, textY);
+    }
   });
 
-  // ── Footer ──
-  const footY = PH - 14;
-  doc.setFillColor(...INK);
-  doc.rect(0, footY, PW, 14, 'F');
+  // ════════════════════════════════════════
+  // FOOTER — white bg, paxelart.eu btn left, "PAXEL™ · SLOW ART" right
+  // ════════════════════════════════════════
 
+  // "paxelart.eu" button — #EBEBEB fill, #ece8de border, black text
+  const BTN_W = 34, BTN_H = 10;
+  const BTN_X = ML;
+  const BTN_Y = FTR_Y + (FTR_H - BTN_H) / 2;
+
+  doc.setFillColor(...EBEBEB);
+  doc.setDrawColor(...ECE8DE);
+  doc.setLineWidth(0.5);
+  doc.roundedRect(BTN_X, BTN_Y, BTN_W, BTN_H, 2, 2, 'FD');
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(...INK);
+  doc.textWithLink('paxelart.eu', BTN_X + BTN_W / 2, BTN_Y + BTN_H * 0.65, {
+    url: 'https://paxelart.eu/',
+    align: 'center'
+  });
+
+  // "PAXEL™ · SLOW ART" — right-aligned bold, ink colour
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(7);
-  doc.setTextColor(...BLUE);
-  doc.text('PAXEL\u2122 \u00B7 SLOW ART SYSTEM', M, footY + 9);
+  doc.setFontSize(9);
+  doc.setTextColor(...INK);
+  doc.text('PAXEL\u2122 \u00B7 SLOW ART', FR, BTN_Y + BTN_H * 0.65, { align: 'right' });
 
-  doc.setTextColor(...DORMANT);
-  doc.text('paxelart.com', PW - M, footY + 9, { align: 'right' });
-
-  // ── Save PDF ──
   doc.save('paxel_precertificate_' + hash + '.pdf');
 }
 
