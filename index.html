@@ -177,19 +177,97 @@ section{padding:84px 0;}
 .feature-item h4{font-size:15.5px;font-weight:800;margin-bottom:3px;}
 .feature-item p{font-size:14px;color:var(--ink-soft);line-height:1.6;font-weight:500;}
 .cert-card{background:#fff;overflow:hidden;}
-.cert-header{background:var(--paper-alt);padding:22px 24px 18px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid var(--dormant);}
-.cert-header-title{font-family:var(--font);font-size:18px;font-weight:800;color:var(--ink);letter-spacing:.01em;text-align:center;}
-.cert-art-wrap{padding:28px 24px 20px;display:flex;justify-content:center;}
-.cert-art{width:130px;height:130px;object-fit:cover;image-rendering:pixelated;border:2px solid var(--ink);border-radius:3px;display:block;}
-.cert-fields{padding:0 22px 20px;}
-.cert-field{padding:9px 0;border-bottom:1.5px solid var(--paper-alt);display:grid;grid-template-columns:1fr 1.4fr;gap:8px;align-items:baseline;}
-.cert-field:last-child{border-bottom:none;}
-.cert-field .f-label{font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
-.cert-field .f-value{font-family:var(--font);font-size:12px;font-weight:700;color:var(--ink);word-break:break-all;}
-.cert-field .f-value.empty{color:var(--dormant-2);font-style:italic;}
-.cert-field .f-value.hash{font-size:10px;color:var(--blue-deep);word-break:break-all;}
-.cert-footer{border-top:3px solid var(--ink);padding:14px 22px;display:flex;align-items:center;justify-content:flex-end;background:var(--paper-alt);}
-.cert-footer-badge{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);}
+
+/* Header — light grey, large bold title, bottom border */
+.cert-header{
+  background:var(--paper-alt);
+  padding:28px 28px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1.5px solid var(--dormant);
+}
+.cert-header-title{
+  font-family:var(--font);
+  font-size:22px;
+  font-weight:800;
+  color:var(--ink);
+  letter-spacing:-.01em;
+  text-align:center;
+}
+
+/* Art — larger, white bg, black border */
+.cert-art-wrap{
+  padding:32px 28px 28px;
+  display:flex;
+  justify-content:center;
+  background:#fff;
+}
+.cert-art{
+  width:180px;
+  height:180px;
+  object-fit:cover;
+  image-rendering:pixelated;
+  border:2.5px solid var(--ink);
+  border-radius:2px;
+  display:block;
+}
+
+/* Fields — spacious rows, full-width light dividers */
+.cert-fields{padding:0 24px 8px;}
+.cert-field{
+  padding:13px 0;
+  border-bottom:1.5px solid #EBEBEB;
+  display:grid;
+  grid-template-columns:1fr 1.6fr;
+  gap:12px;
+  align-items:center;
+}
+.cert-field:last-child{border-bottom:none;padding-bottom:20px;}
+.cert-field .f-label{
+  font-family:var(--font);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
+.cert-field .f-value{
+  font-family:var(--font);
+  font-size:14px;
+  font-weight:800;
+  color:var(--ink);
+  word-break:break-all;
+}
+.cert-field .f-value.empty{
+  color:var(--dormant-2);
+  font-weight:700;
+  font-style:normal;
+}
+.cert-field .f-value.hash{
+  font-size:10px;
+  font-weight:700;
+  color:var(--blue-deep);
+  word-break:break-all;
+}
+
+/* Footer — light grey bg, dark text right-aligned */
+.cert-footer{
+  border-top:3px solid var(--ink);
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  background:var(--paper-alt);
+}
+.cert-footer-badge{
+  font-family:var(--font);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink-soft);
+}
 
 /* ROADMAP */
 .roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
@@ -896,7 +974,18 @@ function handleFileInput(input) {
   const reader = new FileReader();
   const prev = document.getElementById('uploadPreview');
   prev.src = URL.createObjectURL(file);
-  prev.style.display = 'block';
+  // preview hidden intentionally
+  const zoneP = document.querySelector('#uploadZone p');
+  const zoneIcon = document.querySelector('#uploadZone .upload-zone-icon');
+  const origIcon = zoneIcon.textContent;
+  zoneP.textContent = '⟳ Loading...';
+  zoneIcon.style.fontSize = '36px';
+  zoneIcon.textContent = '⟳';
+  setTimeout(() => {
+    zoneP.textContent = 'Your image has been dropped';
+    zoneIcon.textContent = origIcon;
+    zoneIcon.style.fontSize = '';
+  }, 900);
   reader.onload = function(e) {
     if (!p5Instance) initP5();
     const imgEl = new Image();
