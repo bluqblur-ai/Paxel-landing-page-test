@@ -12,50 +12,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{
-  --blue:#46B6E2;
-  --blue-deep:#1E8FBE;
-  --ink:#10131A;
-  --ink-soft:#4B5563;
-  --paper:#FFFFFF;
-  --paper-alt:#F5F5F5;
-  --dormant:#E7E2D3;
-  --dormant-2:#D8D1BC;
-  --wt-special:#46B6E2;
-  --wt-hidden:#CF7500;
-  --font:'Cairo',sans-serif;
+  --blue:#46B6E2;--blue-deep:#1E8FBE;--ink:#10131A;--ink-soft:#4B5563;
+  --paper:#FFFFFF;--paper-alt:#F5F5F5;--dormant:#E7E2D3;--dormant-2:#D8D1BC;
+  --wt-special:#46B6E2;--wt-hidden:#CF7500;--font:'Cairo',sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{
-  background:var(--paper);
-  color:var(--ink);
-  font-family:var(--font);
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-  font-size:16px;
-  line-height:1.6;
-}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:16px;line-height:1.6;}
 a{color:inherit;text-decoration:none;}
 ::selection{background:var(--blue);color:#fff;}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;}}
 .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
 @media(max-width:640px){.wrap{padding:0 16px;}}
 .mono{font-family:var(--font);font-variant-numeric:tabular-nums;letter-spacing:.03em;}
-.eyebrow{
-  font-family:var(--font);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--blue-deep);
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  background:#fff;
-  border:2px solid var(--ink);
-  padding:6px 14px;
-  border-radius:3px;
-}
+.eyebrow{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--blue-deep);display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid var(--ink);padding:6px 14px;border-radius:3px;}
 .eyebrow .blip{width:8px;height:8px;background:var(--blue);animation:blip 1.8s steps(2) infinite;border-radius:1px;}
 @keyframes blip{50%{opacity:.2;}}
 .px-border{border:3px solid var(--ink);border-radius:4px;box-shadow:5px 5px 0 var(--ink);}
@@ -65,59 +35,21 @@ section{padding:84px 0;}
 .section-head{margin-bottom:44px;max-width:640px;}
 .section-head h2{font-weight:800;font-size:clamp(26px,3.4vw,38px);margin-top:14px;line-height:1.1;}
 .section-head p{margin-top:12px;color:var(--ink-soft);font-size:16px;line-height:1.7;font-weight:500;max-width:580px;}
-
-/* PAGES */
-.page{display:none;}
-.page.active{display:block;}
-
-/* NAV */
+.page{display:none;}.page.active{display:block;}
 .nav{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:3px solid var(--ink);}
 .nav-inner{display:flex;align-items:center;height:72px;gap:0;}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;cursor:pointer;flex-shrink:0;padding-right:20px;}
 .logo img{height:30px;width:108px;display:block;}
-.tabs{
-  display:flex;
-  align-items:center;
-  gap:2px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-  flex:1;
-}
+.tabs{display:flex;align-items:center;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;}
 .tabs::-webkit-scrollbar{display:none;}
 .bmc-btn{flex-shrink:0;padding-left:16px;display:flex;align-items:center;}
 .bmc-btn img{height:34px;width:auto;display:block;border-radius:3px;}
 @media(max-width:480px){.bmc-btn img{height:28px;}}
-.tab{
-  font-size:13px;
-  font-weight:700;
-  padding:8px 14px;
-  border-radius:20px;
-  white-space:nowrap;
-  transition:background .2s,color .2s;
-  cursor:pointer;
-  border:none;
-  background:none;
-  font-family:var(--font);
-  color:var(--ink);
-  flex-shrink:0;
-}
+.tab{font-size:13px;font-weight:700;padding:8px 14px;border-radius:20px;white-space:nowrap;transition:background .2s,color .2s;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--ink);flex-shrink:0;}
 .tab.active-tab{background:var(--ink);color:#fff;}
 .tab.soon{color:var(--ink-soft);display:inline-flex;align-items:center;gap:5px;cursor:default;}
 .tab.soon:hover{background:var(--paper-alt);}
-.tab.soon .pill{
-  font-family:var(--font);
-  font-size:8px;
-  font-weight:800;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  background:var(--dormant);
-  color:var(--ink-soft);
-  padding:2px 6px;
-  border-radius:10px;
-}
-
-/* HERO */
+.tab.soon .pill{font-family:var(--font);font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--dormant);color:var(--ink-soft);padding:2px 6px;border-radius:10px;}
 .hero{padding:64px 0 80px;}
 .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center;}
 @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:48px;}.hero{padding:44px 0 56px;}}
@@ -138,26 +70,10 @@ section{padding:84px 0;}
 .hero-card{background:#fff;padding:16px;}
 .hero-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .hero-card-top span{font-family:var(--font);font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.05em;}
-.hero-video{width:100%;aspect-ratio:1/1;display:block;object-fit:cover;image-rendering:pixelated;border-radius:2px;background:var(--paper-alt);}
 .hero-status-bar{margin-top:14px;display:flex;justify-content:flex-end;}
 .hero-status-bar span{font-family:var(--font);font-size:10px;font-weight:600;color:var(--ink-soft);letter-spacing:.04em;}
-.badge{
-  font-family:var(--font);
-  font-weight:800;
-  font-size:11px;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  background:var(--blue);
-  border:2px solid var(--ink);
-  padding:7px 14px;
-  border-radius:20px;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-}
+.badge{font-family:var(--font);font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;background:var(--blue);border:2px solid var(--ink);padding:7px 14px;border-radius:20px;display:inline-flex;align-items:center;gap:8px;}
 .badge .dot{width:7px;height:7px;background:var(--ink);animation:blip 1.4s steps(2) infinite;border-radius:50%;}
-
-/* GALLERY */
 .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
 @media(max-width:920px){.gallery-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:480px){.gallery-grid{grid-template-columns:1fr;}}
@@ -167,8 +83,6 @@ section{padding:84px 0;}
 .art-card-info{padding:14px 16px;}
 .art-card-info .name{font-size:15px;font-weight:800;}
 .art-card-info .meta{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;}
-
-/* CERTIFICATE */
 .cert-layout{display:grid;grid-template-columns:1fr 520px;gap:64px;align-items:start;}
 @media(max-width:1000px){.cert-layout{grid-template-columns:1fr;gap:48px;}}
 .ownership-side h3{font-weight:800;font-size:clamp(22px,2.6vw,30px);margin:14px 0 18px;line-height:1.15;}
@@ -178,99 +92,19 @@ section{padding:84px 0;}
 .feature-item h4{font-size:15.5px;font-weight:800;margin-bottom:3px;}
 .feature-item p{font-size:14px;color:var(--ink-soft);line-height:1.6;font-weight:500;}
 .cert-card{background:#fff;overflow:hidden;border:3px solid var(--ink);border-radius:4px;}
-
-/* Header — light grey, large bold title */
-.cert-header{
-  background:var(--paper-alt);
-  padding:28px 28px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-bottom:2px solid var(--dormant);
-}
-.cert-header-title{
-  font-family:var(--font);
-  font-size:22px;
-  font-weight:800;
-  color:var(--ink);
-  letter-spacing:-.01em;
-  text-align:center;
-}
-
-/* Art — larger, centered, black border */
-.cert-art-wrap{
-  padding:32px 28px 24px;
-  display:flex;
-  justify-content:center;
-  background:#fff;
-}
-.cert-art{
-  width:180px;
-  height:180px;
-  object-fit:cover;
-  image-rendering:pixelated;
-  border:2.5px solid var(--ink);
-  border-radius:3px;
-  display:block;
-}
-
-/* Fields — full-width dividers, spacious rows */
+.cert-header{background:var(--paper-alt);padding:28px 28px 24px;display:flex;align-items:center;justify-content:center;border-bottom:2px solid var(--dormant);}
+.cert-header-title{font-family:var(--font);font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.01em;text-align:center;}
+.cert-art-wrap{padding:32px 28px 24px;display:flex;justify-content:center;background:#fff;}
+.cert-art{width:180px;height:180px;object-fit:cover;image-rendering:pixelated;border:2.5px solid var(--ink);border-radius:3px;display:block;}
 .cert-fields{padding:0 24px 4px;}
-.cert-field{
-  padding:13px 0;
-  border-bottom:1.5px solid #EBEBEB;
-  display:grid;
-  grid-template-columns:1fr 1.6fr;
-  gap:12px;
-  align-items:center;
-}
+.cert-field{padding:13px 0;border-bottom:1.5px solid #EBEBEB;display:grid;grid-template-columns:1fr 1.6fr;gap:12px;align-items:center;}
 .cert-field:last-child{border-bottom:none;}
-.cert-field .f-label{
-  font-family:var(--font);
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-}
-.cert-field .f-value{
-  font-family:var(--font);
-  font-size:14px;
-  font-weight:800;
-  color:var(--ink);
-  word-break:break-all;
-}
-.cert-field .f-value.empty{
-  color:var(--dormant-2);
-  font-weight:700;
-}
-.cert-field .f-value.hash{
-  font-size:10px;
-  font-weight:700;
-  color:var(--blue-deep);
-  word-break:break-all;
-}
-
-/* Footer — dark ink background, white text */
-.cert-footer{
-  border-top:3px solid var(--ink);
-  padding:16px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  background:var(--ink);
-}
-
-.cert-footer-badge{
-  font-family:var(--font);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:#fff;
-}
-
-/* ROADMAP */
+.cert-field .f-label{font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);}
+.cert-field .f-value{font-family:var(--font);font-size:14px;font-weight:800;color:var(--ink);word-break:break-all;}
+.cert-field .f-value.empty{color:var(--dormant-2);font-weight:700;}
+.cert-field .f-value.hash{font-size:10px;font-weight:700;color:var(--blue-deep);word-break:break-all;}
+.cert-footer{border-top:3px solid var(--ink);padding:16px 24px;display:flex;align-items:center;justify-content:flex-end;background:var(--ink);}
+.cert-footer-badge{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#fff;}
 .roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
 @media(max-width:760px){.roadmap-grid{grid-template-columns:1fr;}}
 .roadmap-card{background:var(--paper);padding:24px;}
@@ -285,8 +119,6 @@ section{padding:84px 0;}
 .ghost-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-top:16px;opacity:.45;}
 .ghost-grid div{aspect-ratio:1/1;background:var(--dormant);border-radius:1px;}
 .roadmap-card.pixel-featured .ghost-grid div{background:var(--blue);opacity:.25;}
-
-/* CLOSING */
 .closing{background:var(--ink);color:#fff;padding:90px 0;text-align:center;}
 .closing .eyebrow{background:transparent;border-color:var(--blue);color:var(--blue);justify-content:center;}
 .closing h2{font-weight:800;font-size:clamp(28px,4vw,44px);margin:20px auto 16px;max-width:660px;line-height:1.15;}
@@ -294,17 +126,11 @@ section{padding:84px 0;}
 .closing p{color:#A8B3C2;font-size:16px;max-width:460px;margin:0 auto;line-height:1.7;font-weight:500;}
 .closing-tags{margin-top:28px;font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#5C7184;}
 .closing-disc{margin-top:20px;font-size:12px;color:#5C7184;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.6;font-weight:500;}
-
-/* FOOTER */
 footer{padding:36px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;border-top:3px solid var(--ink);}
 footer .mono{font-size:12px;color:var(--ink-soft);font-weight:700;letter-spacing:.04em;}
 footer .foot-tabs{display:flex;gap:18px;flex-wrap:wrap;}
 footer .foot-tabs button{font-size:13px;font-weight:700;color:var(--ink-soft);background:none;border:none;cursor:pointer;font-family:var(--font);}
 footer .foot-tabs button:hover{color:var(--ink);}
-
-/* ============================
-   SHARED TOOL PAGE STYLES
-   ============================ */
 .tool-page{background:var(--paper);}
 .tool-hero{background:var(--paper-alt);color:var(--ink);padding:52px 0 44px;border-bottom:3px solid var(--ink);}
 .tool-hero-inner{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;}
@@ -333,13 +159,21 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .ctrl-number{font-family:var(--font);font-size:14px;font-weight:700;padding:9px 12px;border:2.5px solid var(--ink);border-radius:3px;width:90px;background:#fff;}
 .upload-zone{border:3px dashed var(--dormant-2);border-radius:4px;padding:32px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fff;position:relative;}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--blue);background:#F0F9FD;}
+.upload-zone-icon{font-size:28px;margin-bottom:10px;transition:transform .3s ease;}
+.upload-zone.wt-uploading .upload-zone-icon,
+.upload-zone.pt-uploading .upload-zone-icon{
+  display:inline-block;
+  animation:spin-icon .7s linear infinite;
+}
+@keyframes spin-icon{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.upload-zone p{transition:color .25s ease;}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-zone-icon{font-size:28px;margin-bottom:10px;}
 .upload-zone p{font-size:14px;font-weight:800;color:var(--ink);}
 .upload-zone span{font-size:12px;color:var(--ink-soft);font-weight:500;}
-.upload-preview{width:100%;max-height:160px;object-fit:contain;border:2px solid var(--dormant);border-radius:3px;margin-top:12px;display:none;image-rendering:pixelated;}
+/* .upload-preview removed — preview images no longer shown in upload zones */
 .canvas-panel{display:flex;flex-direction:column;gap:16px;}
-.canvas-wrap{background:var(--blue);border:3px solid var(--ink);border-radius:4px;overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;transition:aspect-ratio .3s ease-in-out;box-shadow:5px 5px 0 var(--ink);}
+.canvas-wrap{background:var(--blue);border:3px solid var(--ink);border-radius:4px;overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:5px 5px 0 var(--ink);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 .canvas-wrap .p5Container{width:100%;height:100%;display:flex;align-items:stretch;}
 .canvas-wrap .p5Container canvas{width:100%!important;height:100%!important;display:block;image-rendering:pixelated;}
 .canvas-empty{color:var(--ink);font-family:var(--font);font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:40px;width:100%;align-self:center;}
@@ -352,174 +186,138 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .btn-secondary:disabled{opacity:.4;cursor:not-allowed;}
 .day-status{font-family:var(--font);font-size:13px;font-weight:700;color:var(--ink-soft);letter-spacing:.04em;text-align:center;padding:10px;}
 .day-status .day-highlight{color:var(--blue-deep);font-size:17px;font-weight:800;}
-
-/* ============================
-   PIXEL WATERER — extra styles
-   ============================ */
-.wt-panel-title::before{background:var(--blue)!important;}
-
-/* Coins HUD */
-.wt-hud{
-  display:flex;
-  align-items:stretch;
-  gap:12px;
-  flex-wrap:wrap;
-}
-.wt-hud-card{
-  flex:1;
-  min-width:120px;
-  background:#fff;
-  border:3px solid var(--ink);
-  border-radius:4px;
-  padding:14px 18px;
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-}
-.wt-hud-label{
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  color:var(--ink-soft);
-}
-.wt-hud-value{
-  font-size:24px;
-  font-weight:800;
-  color:var(--ink);
-  line-height:1;
-}
-.wt-hud-value.gold{color:var(--blue-deep);}
-.wt-hud-value.purple{color:var(--ink-soft);}
-
-/* Special block legend */
-.wt-legend{
-  display:flex;
-  gap:16px;
-  flex-wrap:wrap;
-  margin-top:4px;
-}
-.wt-legend-item{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  font-size:12px;
-  font-weight:700;
-  color:var(--ink-soft);
-}
-.wt-legend-swatch{
-  width:14px;
-  height:14px;
-  border:2px solid var(--ink);
-  border-radius:2px;
-  flex-shrink:0;
-}
-
-/* Holy Water button — gold accent */
-.btn-holy{
-  font-family:var(--font);
-  font-size:15px;
-  font-weight:800;
-  padding:14px 24px;
-  border:3px solid var(--ink);
-  border-radius:3px;
-  background:var(--blue);
-  color:var(--ink);
-  cursor:pointer;
-  box-shadow:4px 4px 0 var(--ink);
-  transition:transform .2s,box-shadow .2s;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-}
+/* WATERER */
+.wt-hud{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;}
+.wt-hud-card{flex:1;min-width:120px;background:#fff;border:3px solid var(--ink);border-radius:4px;padding:14px 18px;display:flex;flex-direction:column;gap:4px;}
+.wt-hud-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
+.wt-hud-value{font-size:24px;font-weight:800;color:var(--ink);line-height:1;}
+.wt-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;}
+.wt-legend-item{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--ink-soft);}
+.wt-legend-swatch{width:14px;height:14px;border:2px solid var(--ink);border-radius:2px;flex-shrink:0;}
+.btn-holy{font-family:var(--font);font-size:15px;font-weight:800;padding:14px 24px;border:3px solid var(--ink);border-radius:3px;background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:8px;}
 .btn-holy:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
 .btn-holy:disabled{background:var(--dormant);color:var(--ink-soft);cursor:not-allowed;box-shadow:none;transform:none;}
-
-/* Reveal button — blue accent, prominent */
-.btn-reveal{
-  font-family:var(--font);
-  font-size:15px;
-  font-weight:800;
-  padding:14px 24px;
-  border:3px solid var(--ink);
-  border-radius:3px;
-  background:var(--blue);
-  color:var(--ink);
-  cursor:pointer;
-  box-shadow:4px 4px 0 var(--ink);
-  transition:transform .2s,box-shadow .2s;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-}
+.btn-reveal{font-family:var(--font);font-size:15px;font-weight:800;padding:14px 24px;border:3px solid var(--ink);border-radius:3px;background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:8px;}
 .btn-reveal:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink);}
 .btn-reveal:disabled{background:var(--dormant);color:var(--ink-soft);cursor:not-allowed;box-shadow:none;transform:none;}
-
-/* Day tracker row */
-.wt-day-track{
-  display:flex;
-  gap:4px;
-  flex-wrap:wrap;
-}
-.wt-day-pip{
-  width:22px;
-  height:22px;
-  border:2px solid var(--ink);
-  border-radius:3px;
-  background:var(--dormant);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:9px;
-  font-weight:800;
-  color:var(--ink-soft);
-  transition:background .3s;
-}
-.wt-day-pip.done{background:var(--dormant-2);color:var(--ink-soft);}
+.wt-day-track{display:flex;gap:4px;flex-wrap:wrap;}
+.wt-day-pip{width:22px;height:22px;border:2px solid var(--ink);border-radius:3px;background:var(--dormant);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:var(--ink-soft);transition:background .3s;}
 .wt-day-pip.revealed{background:var(--blue);color:#fff;}
 .wt-day-pip.unrevealed{background:#CF7500;color:#fff;}
 .wt-day-pip.active{background:var(--ink);color:#fff;}
 
-/* Cost badge */
-.wt-cost-badge{
-  display:inline-flex;
+/* ============================
+   WATERER — TOGGLE CONTROLS
+   ============================ */
+/* Toggle bar — simple flex, button always visible */
+.wt-toggle-bar{
+  display:flex;
   align-items:center;
-  gap:6px;
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.06em;
-  text-transform:uppercase;
-  background:var(--dormant);
-  color:var(--ink-soft);
-  border:2px solid var(--ink);
-  border-radius:3px;
-  padding:5px 10px;
+  justify-content:space-between;
+  margin-bottom:16px;
+  gap:12px;
+  flex-wrap:wrap;
 }
-.wt-cost-badge .cost-num{color:var(--gold);font-size:13px;}
+.wt-toggle-bar-label{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.04em;transition:opacity .28s ease;}
+.btn-toggle-ctrl{
+  font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  padding:8px 16px;border:2.5px solid var(--ink);border-radius:3px;background:var(--paper-alt);
+  color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:background .2s,color .2s;white-space:nowrap;flex-shrink:0;
+}
+.btn-toggle-ctrl:hover{background:var(--ink);color:#fff;}
+/* Arrow rotates 180deg when hidden */
+.toggle-arrow{font-size:14px;line-height:1;display:inline-block;transition:transform .35s cubic-bezier(.4,0,.2,1);}
+.btn-toggle-ctrl.ctrl-hidden .toggle-arrow{transform:rotate(180deg);}
 
-/* Pending days info */
-.wt-pending-info{
-  font-size:12px;
-  font-weight:700;
-  color:var(--ink-soft);
-  margin-top:6px;
+/*
+  LAYOUT GRID
+  Default:  [controls 1fr] [canvas 1fr]
+  Hidden:   [slot auto]    [canvas locked-px]
+  CSS grid itself is not animated — we animate the children instead.
+*/
+/*
+  Always 3 columns: [slot] [controls] [canvas]
+  Normally: slot=0px (invisible), controls=1fr, canvas=1fr
+  Hidden:   slot=minmax(240px,auto), controls=0px (collapsed), canvas=locked-px
+  This way canvasCol is always in column 3 — never wraps to a new row.
+*/
+#wtLayoutGrid{
+  display:grid;
+  grid-template-columns:0px 1fr 1fr;
+  gap:0 40px;
+  align-items:start;
 }
-.wt-pending-info span{color:var(--ink);font-weight:800;}
+#wtLayoutGrid.ctrl-hidden{
+  grid-template-columns:minmax(240px,auto) 0px var(--wt-canvas-col-w,1fr);
+}
+@media(max-width:900px){
+  #wtLayoutGrid{grid-template-columns:1fr!important;}
+  #wtLayoutGrid.ctrl-hidden{grid-template-columns:1fr!important;}
+}
+
+/* ── Controls column ──
+   The grid column itself collapses to 0px via grid-template-columns change.
+   We only animate opacity + visibility so content fades while the grid squeezes it.
+   overflow:hidden clips the content as the column shrinks.
+*/
+#wtControlsCol{
+  display:flex;flex-direction:column;gap:20px;
+  overflow:hidden;
+  opacity:1;
+  visibility:visible;
+  transition:opacity .28s ease, visibility .28s ease;
+  will-change:opacity;
+}
+#wtControlsCol.wt-collapsing{
+  opacity:0;
+  visibility:hidden;
+}
+
+#wtCanvasCol{display:flex;flex-direction:column;gap:16px;min-width:0;}
+#wtBelowCanvas{display:flex;flex-direction:column;gap:16px;}
+
+/* ── Below-canvas panel transition ──
+   When it moves between columns it gets a slide+fade animation via a class.
+   Direction is controlled by a CSS custom property --wt-slide-from set by JS.
+*/
+#wtBelowCanvas{
+  transition:opacity .32s ease, transform .35s cubic-bezier(.4,0,.2,1);
+}
+#wtBelowCanvas.wt-sliding{
+  opacity:0;
+  transform:translateX(var(--wt-slide-from, 60px));
+}
+
+/* Slot: always in DOM (col 1), zero-width and hidden by default */
+#wtSidePanelSlot{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  overflow:hidden;
+  width:0;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .28s ease;
+}
+/* When controls are hidden, slot becomes the active left column */
+#wtLayoutGrid.ctrl-hidden #wtSidePanelSlot{
+  width:auto;
+  opacity:1;
+  pointer-events:auto;
+}
 </style>
 </head>
 <body>
 
-<!-- SHARED NAV -->
 <nav class="nav">
   <div class="wrap nav-inner">
-    <div class="logo" onclick="showPage('home')">
-      <img src="paxel-recto.png" alt="PAXEL" width="200">
-    </div>
+    <div class="logo" onclick="showPage('home')"><img src="paxel-recto.png" alt="PAXEL" width="200"></div>
     <div class="tabs">
-      <button class="tab active-tab" id="tab-home" onclick="showPage('home')">Home</button>
-      <button class="tab" id="tab-tool" onclick="showPage('tool')">Pixel tool</button>
-      <button class="tab" id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
-      <span class="tab soon">Placeholder <span class="pill">SOON</span></span>
+      <button class="tab active-tab" id="tab-home"    onclick="showPage('home')">Home</button>
+      <button class="tab"            id="tab-tool"    onclick="showPage('tool')">Pixel tool</button>
+      <button class="tab"            id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
+      <span  class="tab soon">Placeholder <span class="pill">SOON</span></span>
     </div>
     <div class="bmc-btn">
       <a href="https://www.buymeacoffee.com/paxel" target="_blank" rel="noopener">
@@ -529,52 +327,32 @@ footer .foot-tabs button:hover{color:var(--ink);}
   </div>
 </nav>
 
-<!-- ============================
-     HOME PAGE
-     ============================ -->
+<!-- HOME PAGE -->
 <div class="page active" id="page-home">
-
 <header class="hero">
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow"><span class="blip"></span>SLOW ART &middot; GROWS IN REAL TIME</div>
-      <h1>
-        Patience,<br>
-        <span class="ul">rendered</span> <span class="accent">pixel</span><br>
-        by pixel.
-      </h1>
-      <p class="lede">
-        Paxel Art is an upcoming project consisting in slowly rendering your pixel art day after day, until it settles into a piece nobody else will ever own. Check out our latest tools below or on the tabs to try out our Paxel prototypes to get the gist!
-      </p>
+      <h1>Patience,<br><span class="ul">rendered</span> <span class="accent">pixel</span><br>by pixel.</h1>
+      <p class="lede">Paxel Art is an upcoming project consisting in slowly rendering your pixel art day after day, until it settles into a piece nobody else will ever own. Check out our latest tools below or on the tabs to try out our Paxel prototypes to get the gist!</p>
       <div class="hero-actions">
         <a href="#gallery" class="btn-ghost">See what Paxel is about &darr;</a>
         <div class="tool-promo-chip" onclick="showPage('tool')">
           <span class="tool-promo-icon">&#9632;</span>
-          <div>
-            <div class="tool-promo-title">Try the Pixel tool!</div>
-            <div class="tool-promo-sub">Turn any photo into pixel art &rarr;</div>
-          </div>
+          <div><div class="tool-promo-title">Try the Pixel tool!</div><div class="tool-promo-sub">Turn any photo into pixel art &rarr;</div></div>
         </div>
       </div>
     </div>
     <div class="hero-visual">
       <div class="hero-card px-border">
-        <div class="hero-card-top">
-          <span>CANVAS &mdash; UTOPIA</span>
-          <span class="badge"><span class="dot"></span>GENERATING</span>
-        </div>
+        <div class="hero-card-top"><span>CANVAS &mdash; UTOPIA</span><span class="badge"><span class="dot"></span>GENERATING</span></div>
         <img src="Utopia.gif" alt="Utopia canvas" width="100%">
-        <div class="hero-status-bar">
-          <span>Pixel tool demonstration</span>
-        </div>
+        <div class="hero-status-bar"><span>Pixel tool demonstration</span></div>
       </div>
     </div>
   </div>
 </header>
-
 <div class="divider"></div>
-
-<!-- GALLERY -->
 <section class="alt-bg" id="gallery">
   <div class="wrap">
     <div class="section-head">
@@ -583,29 +361,14 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <p>Each PAXEL cycle opens around a new theme &mdash; from sweeping landscapes like <em>Utopia</em> to intimate human moments like <em>Happiness</em> and stark contrasts like <em>Darkness</em>. Every theme shapes the palette, the mood and the kind of scene that slowly emerges from the noise. No two themes repeat, and no two canvases within a theme ever settle the same way.</p>
     </div>
     <div class="gallery-grid">
-      <div class="art-card px-border">
-        <img src="utopia-still.jpg" alt="Utopia" width="100%">
-        <div class="art-card-info"><div class="name">Utopia</div><div class="meta">FINISHED PIECE</div></div>
-      </div>
-      <div class="art-card px-border">
-        <img src="felicidad-still.jpg" alt="Happiness" width="100%">
-        <div class="art-card-info"><div class="name">Happiness</div><div class="meta">FINISHED PIECE</div></div>
-      </div>
-      <div class="art-card px-border">
-        <img src="oscuridad-still.jpg" alt="Darkness" width="100%">
-        <div class="art-card-info"><div class="name">Darkness</div><div class="meta">FINISHED PIECE</div></div>
-      </div>
-      <div class="art-card px-border">
-        <img src="nieve-still.jpg" alt="Snow" width="100%">
-        <div class="art-card-info"><div class="name">Snow</div><div class="meta">FINISHED PIECE</div></div>
-      </div>
+      <div class="art-card px-border"><img src="utopia-still.jpg" alt="Utopia" width="100%"><div class="art-card-info"><div class="name">Utopia</div><div class="meta">FINISHED PIECE</div></div></div>
+      <div class="art-card px-border"><img src="felicidad-still.jpg" alt="Happiness" width="100%"><div class="art-card-info"><div class="name">Happiness</div><div class="meta">FINISHED PIECE</div></div></div>
+      <div class="art-card px-border"><img src="oscuridad-still.jpg" alt="Darkness" width="100%"><div class="art-card-info"><div class="name">Darkness</div><div class="meta">FINISHED PIECE</div></div></div>
+      <div class="art-card px-border"><img src="nieve-still.jpg" alt="Snow" width="100%"><div class="art-card-info"><div class="name">Snow</div><div class="meta">FINISHED PIECE</div></div></div>
     </div>
   </div>
 </section>
-
 <div class="divider"></div>
-
-<!-- CERTIFICATE -->
 <section id="certificate">
   <div class="wrap">
     <div class="cert-layout">
@@ -613,87 +376,33 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <div class="eyebrow">OWNERSHIP</div>
         <h3>The wait is the proof.</h3>
         <div class="feature-list">
-          <div class="feature-item">
-            <div class="f-num">1</div>
-            <div><h4>You start the canvas</h4><p>A blank 14-day canvas is assigned to you, ready to begin filling in pixel by pixel.</p></div>
-          </div>
-          <div class="feature-item">
-            <div class="f-num">2</div>
-            <div><h4>It grows on its own clock</h4><p>Pixels settle in over real days. You can check in, but you cannot speed it up. In the meantime, experience tasks like writing your diary of the day, obtain emotional phrases and revealing the colors!</p></div>
-          </div>
-          <div class="feature-item">
-            <div class="f-num">3</div>
-            <div><h4>You receive the certificate</h4><p>On day 14 the canvas locks for good. A unique certificate of authenticity is issued, validating your patience and permanently tying the piece to you.</p></div>
-          </div>
+          <div class="feature-item"><div class="f-num">1</div><div><h4>You start the canvas</h4><p>A blank 14-day canvas is assigned to you, ready to begin filling in pixel by pixel.</p></div></div>
+          <div class="feature-item"><div class="f-num">2</div><div><h4>It grows on its own clock</h4><p>Pixels settle in over real days. You can check in, but you cannot speed it up. In the meantime, experience tasks like writing your diary of the day, obtain emotional phrases and revealing the colors!</p></div></div>
+          <div class="feature-item"><div class="f-num">3</div><div><h4>You receive the certificate</h4><p>On day 14 the canvas locks for good. A unique certificate of authenticity is issued, validating your patience and permanently tying the piece to you.</p></div></div>
         </div>
       </div>
       <div>
         <div class="cert-card">
-
-          <!-- Header -->
-          <div class="cert-header">
-            <span class="cert-header-title">Certificate of Authenticity</span>
-          </div>
-
-          <!-- Pixel art image -->
-          <div class="cert-art-wrap">
-            <img class="cert-art" src="utopia-still.jpg" alt="Utopia">
-          </div>
-
-          <!-- Fields -->
+          <div class="cert-header"><span class="cert-header-title">Certificate of Authenticity</span></div>
+          <div class="cert-art-wrap"><img class="cert-art" src="utopia-still.jpg" alt="Utopia"></div>
           <div class="cert-fields">
-            <div class="cert-field">
-              <span class="f-label">Username</span>
-              <span class="f-value">Paxel</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Hash</span>
-              <span class="f-value hash">0x00806def45b7a266bbdc0ea804675156ce4822ad</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Date of creation</span>
-              <span class="f-value empty">&mdash;</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Image title</span>
-              <span class="f-value empty">&mdash;</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Theme</span>
-              <span class="f-value">Utopia</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Edition</span>
-              <span class="f-value">1 / 1</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Collection</span>
-              <span class="f-value empty">&mdash;</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Purity</span>
-              <span class="f-value">100%</span>
-            </div>
-            <div class="cert-field">
-              <span class="f-label">Genesis</span>
-              <span class="f-value">True</span>
-            </div>
+            <div class="cert-field"><span class="f-label">Username</span><span class="f-value">Paxel</span></div>
+            <div class="cert-field"><span class="f-label">Hash</span><span class="f-value hash">0x00806def45b7a266bbdc0ea804675156ce4822ad</span></div>
+            <div class="cert-field"><span class="f-label">Date of creation</span><span class="f-value empty">&mdash;</span></div>
+            <div class="cert-field"><span class="f-label">Image title</span><span class="f-value empty">&mdash;</span></div>
+            <div class="cert-field"><span class="f-label">Theme</span><span class="f-value">Utopia</span></div>
+            <div class="cert-field"><span class="f-label">Edition</span><span class="f-value">1 / 1</span></div>
+            <div class="cert-field"><span class="f-label">Collection</span><span class="f-value empty">&mdash;</span></div>
+            <div class="cert-field"><span class="f-label">Purity</span><span class="f-value">100%</span></div>
+            <div class="cert-field"><span class="f-label">Genesis</span><span class="f-value">True</span></div>
           </div>
-
-          <!-- Footer -->
-          <div class="cert-footer">
-            <span class="cert-footer-badge">PAXEL&#8482; &middot; SLOW ART</span>
-          </div>
-
+          <div class="cert-footer"><span class="cert-footer-badge">PAXEL&#8482; &middot; SLOW ART</span></div>
         </div>
       </div>
     </div>
   </div>
 </section>
-
 <div class="divider"></div>
-
-<!-- ROADMAP -->
 <section class="alt-bg" id="roadmap">
   <div class="wrap">
     <div class="section-head">
@@ -703,30 +412,24 @@ footer .foot-tabs button:hover{color:var(--ink);}
     </div>
     <div class="roadmap-grid">
       <div class="roadmap-card pixel-featured px-border" onclick="showPage('tool')">
-        <span class="r-pill">TRY IT NOW</span>
-        <h4>Pixel tool</h4>
+        <span class="r-pill">TRY IT NOW</span><h4>Pixel tool</h4>
         <p>Pixelate your selected image, choose its resolution, speed of generation and download your pixel art in high quality!</p>
         <button class="pixel-open-btn" onclick="showPage('tool')">Open Pixel tool &rarr;</button>
         <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
       <div class="roadmap-card pixel-featured px-border" onclick="showPage('waterer')" style="border-color:var(--blue);box-shadow:5px 5px 0 var(--blue);">
-        <span class="r-pill" style="background:var(--blue);color:var(--ink);">TRY IT NOW</span>
-        <h4>Pixel waterer</h4>
+        <span class="r-pill" style="background:var(--blue);color:var(--ink);">TRY IT NOW</span><h4>Pixel waterer</h4>
         <p>Upload your image and watch it grow day by day. Reveal today's colors, earn coins and use Holy Water to recover past days!</p>
         <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('waterer')">Open Pixel waterer &rarr;</button>
         <div class="ghost-grid" style="opacity:.45;"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
       <div class="roadmap-card px-border">
-        <span class="r-pill">SOON</span>
-        <h4>Placeholder</h4>
-        <p>Placeholder</p>
+        <span class="r-pill">SOON</span><h4>Placeholder</h4><p>Placeholder</p>
         <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
     </div>
   </div>
 </section>
-
-<!-- CLOSING -->
 <section class="closing">
   <div class="wrap">
     <div class="eyebrow">UPCOMING</div>
@@ -741,74 +444,25 @@ footer .foot-tabs button:hover{color:var(--ink);}
     </div>
     <div class="closing-tags">PIXEL TOOL &middot; PIXEL WATERER &middot; PLACEHOLDER</div>
     <p class="closing-disc">*PAXEL&#8482; is an evolving experiment. Mechanics, fees, and timelines are subject to change as part of its natural evolution.</p>
-  <div class="closing-info" style="margin-top:36px;text-align:left;max-width:560px;margin-left:auto;margin-right:auto;border-top:1px solid #2C3A48;padding-top:28px;display:grid;gap:20px;">
-
-    <div>
-      <div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">About PAXEL&#8482;</div>
-      <p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">PAXEL&#8482; is a digital art project currently under development. Detailed information regarding the legal owner, company registration, and tax details will be published before the official commercial launch.</p>
+    <div style="margin-top:36px;text-align:left;max-width:560px;margin-left:auto;margin-right:auto;border-top:1px solid #2C3A48;padding-top:28px;display:grid;gap:20px;">
+      <div><div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">About PAXEL&#8482;</div><p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">PAXEL&#8482; is a digital art project currently under development. Detailed information regarding the legal owner, company registration, and tax details will be published before the official commercial launch.</p></div>
+      <div><div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">Intellectual Property &amp; User Content</div><p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">All original content, code, and branding of PAXEL&#8482; are protected by intellectual property rights. Regarding files processed through our tool, the user retains all rights to their original and resulting images; we only process them for the purpose of the tool.</p></div>
+      <div><div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">Support</div><p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">Your support via Buy Me a Coffee helps me keep building and evolving PAXEL&#8482;.</p></div>
+      <div><div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">Contact</div><p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">For inquiries or feedback, please reach out to: <a href="mailto:paxel@paxelart.eu" style="color:#46B6E2;text-decoration:underline;text-underline-offset:3px;">paxel@paxelart.eu</a></p></div>
     </div>
-
-    <div>
-      <div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">Intellectual Property &amp; User Content</div>
-      <p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">All original content, code, and branding of PAXEL&#8482; are protected by intellectual property rights. Regarding files processed through our tool, the user retains all rights to their original and resulting images; we only process them for the purpose of the tool.</p>
-    </div>
-
-    <div>
-      <div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">Support</div>
-      <p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">Your support via Buy Me a Coffee helps me keep building and evolving PAXEL&#8482;.</p>
-    </div>
-
-    <div>
-      <div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">Contact</div>
-      <p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">For inquiries or feedback, please reach out to: <a href="mailto:paxel@paxelart.eu" style="color:#46B6E2;text-decoration:underline;text-underline-offset:3px;">paxel@paxelart.eu</a></p>
-    </div>
-
-  </div>
   </div>
 </section>
 <div class="divider"></div>
-
-<!-- LEGAL -->
 <section id="legal" class="alt-bg">
   <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">LEGAL</div>
-      <h2>Legal Information & Privacy</h2>
-      <p>Transparency, privacy, and responsible platform development are important values for PAXEL™. The information below outlines the current legal framework of the project.</p>
-    </div>
+    <div class="section-head"><div class="eyebrow">LEGAL</div><h2>Legal Information &amp; Privacy</h2><p>Transparency, privacy, and responsible platform development are important values for PAXEL&#8482;. The information below outlines the current legal framework of the project.</p></div>
     <div class="roadmap-grid">
-      <div class="roadmap-card px-border">
-        <span class="r-pill">LEGAL NOTICE</span>
-        <h4>Website ownership</h4>
-        <p>PAXEL™ is a digital art and pixel-art project currently under
-          development. Information regarding the legal owner, company
-          registration details, tax identification number, and registered
-          address will be published before commercial launch. Currently, 
-          the project is operating on an experimental and limited basis. 
-          Your support contributes directly to the growth of PAXEL and 
-          assists in covering the operational costs associated with its 
-          development. All original content, design, source code, logos, 
-          and PAXEL branding elements are the intellectual property of 
-          their respective owners and may not be reproduced without prior 
-          authorization. Regarding user-generated content created through 
-          our pixelation tool, the user retains all rights to both the 
-          original and the resulting image and is solely responsible for 
-          the legality of the files they upload to the platform.</p>
-      </div>
-      <div class="roadmap-card px-border">
-        <span class="r-pill">PRIVACY POLICY</span>
-        <h4>Your data</h4>
-        <p>PAXEL™ may collect information such as usernames, email addresses, uploaded artwork, browser information, technical device data, and platform usage statistics when platform services become available. Data is processed solely for platform operation, user support, certificate issuance, security purposes, and service improvement. Personal information is never sold to third parties.</p>
-      </div>
-      <div class="roadmap-card px-border">
-        <span class="r-pill">COOKIES</span>
-        <h4>Coming soon</h4>
-        <p>The Cookie Policy is currently under preparation. Before introducing analytics, user accounts, advertising, personalization features, or other cookie-based technologies, PAXEL™ will publish a complete Cookie Policy explaining the purpose, duration, providers, and management options of all cookies used on the platform.</p>
-      </div>
+      <div class="roadmap-card px-border"><span class="r-pill">LEGAL NOTICE</span><h4>Website ownership</h4><p>PAXEL&#8482; is a digital art and pixel-art project currently under development. Information regarding the legal owner, company registration details, tax identification number, and registered address will be published before commercial launch. Currently, the project is operating on an experimental and limited basis. Your support contributes directly to the growth of PAXEL and assists in covering the operational costs associated with its development. All original content, design, source code, logos, and PAXEL branding elements are the intellectual property of their respective owners and may not be reproduced without prior authorization. Regarding user-generated content created through our pixelation tool, the user retains all rights to both the original and the resulting image and is solely responsible for the legality of the files they upload to the platform.</p></div>
+      <div class="roadmap-card px-border"><span class="r-pill">PRIVACY POLICY</span><h4>Your data</h4><p>PAXEL&#8482; may collect information such as usernames, email addresses, uploaded artwork, browser information, technical device data, and platform usage statistics when platform services become available. Data is processed solely for platform operation, user support, certificate issuance, security purposes, and service improvement. Personal information is never sold to third parties.</p></div>
+      <div class="roadmap-card px-border"><span class="r-pill">COOKIES</span><h4>Coming soon</h4><p>The Cookie Policy is currently under preparation. Before introducing analytics, user accounts, advertising, personalization features, or other cookie-based technologies, PAXEL&#8482; will publish a complete Cookie Policy explaining the purpose, duration, providers, and management options of all cookies used on the platform.</p></div>
     </div>
   </div>
 </section>
-
 <footer class="wrap">
   <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
   <div class="foot-tabs">
@@ -816,23 +470,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <button onclick="showPage('waterer')">Pixel waterer</button>
     <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">Placeholder</button>
     <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
-    <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'">
-      <img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;">
-      Twitter
-    </a>
+    <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
   </div>
   <span class="mono">&copy; 2026</span>
 </footer>
+</div>
 
-</div><!-- /page-home -->
-
-
-<!-- ============================
-     PIXEL TOOL PAGE
-     ============================ -->
+<!-- PIXEL TOOL PAGE -->
 <div class="page" id="page-tool">
 <div class="tool-page">
-
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
@@ -843,24 +489,19 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
     </div>
   </div>
-
   <div class="tool-controls-section">
     <div class="wrap">
       <div class="tool-grid">
-
-        <!-- LEFT: Controls -->
         <div style="display:flex;flex-direction:column;gap:20px;">
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Upload image</div>
             <div class="upload-zone" id="ptUploadZone">
               <input type="file" accept="image/*" id="ptFileInput" onchange="ptHandleFileInput(this)">
-              <div class="upload-zone-icon">&#128247;</div>
-              <p>Drop your image here</p>
-              <span>PNG, JPG, GIF &mdash; any size</span>
-              <img id="ptUploadPreview" class="upload-preview" alt="preview">
+              <div class="upload-zone-icon" id="ptUploadIcon">&#128247;</div>
+              <p id="ptUploadText">Drop your image here</p>
+              <span id="ptUploadSub">PNG, JPG, GIF &mdash; any size</span>
             </div>
           </div>
-
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Format</div>
             <div class="ctrl-row">
@@ -872,40 +513,14 @@ footer .foot-tabs button:hover{color:var(--ink);}
               </div>
             </div>
           </div>
-
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Generation settings</div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Resolution</label>
-              <span class="ctrl-sublabel">Higher = more detail, slower</span>
-              <select class="ctrl-select" id="ptResSelect" onchange="ptOnResChange()"></select>
-            </div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Generation cycles</label>
-              <span class="ctrl-sublabel">Pixel generation takes time to generate! Split the pixel generation. Lower = less times to generate completely</span>
-              <select class="ctrl-select" id="ptDaysSelect" onchange="pt.TOTAL_DIAS=parseInt(this.value);pt.diaActual=0;pt.indiceActual=0;if(pt.img){ptProcesarImagen();}ptUpdateDayStatus();">
-                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-                <option>11</option><option>12</option><option>13</option><option selected>14</option>
-              </select>
-            </div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Speed (ms between ticks)</label>
-              <span class="ctrl-sublabel">Lower = faster generation</span>
-              <input type="range" class="ctrl-range" id="ptSpeedRange" min="1" max="200" value="30"
-                oninput="ptIntervalSpeed=parseInt(this.value);document.getElementById('ptSpeedVal').textContent=this.value+'ms'">
-              <div class="ctrl-range-value" id="ptSpeedVal">30ms</div>
-            </div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Pixels per tick</label>
-              <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
-              <input type="number" class="ctrl-number" id="ptPpcInput" min="1" max="500" value="1"
-                oninput="ptBloquesPorCiclo=parseInt(this.value)||1">
-            </div>
+            <div class="ctrl-row"><label class="ctrl-label">Resolution</label><span class="ctrl-sublabel">Higher = more detail, slower</span><select class="ctrl-select" id="ptResSelect" onchange="ptOnResChange()"></select></div>
+            <div class="ctrl-row"><label class="ctrl-label">Generation cycles</label><span class="ctrl-sublabel">Split the pixel generation. Lower = fewer cycles to complete.</span><select class="ctrl-select" id="ptDaysSelect" onchange="pt.TOTAL_DIAS=parseInt(this.value);pt.diaActual=0;pt.indiceActual=0;if(pt.img){ptProcesarImagen();}ptUpdateDayStatus();"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option selected>14</option></select></div>
+            <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="ptSpeedRange" min="1" max="200" value="30" oninput="ptIntervalSpeed=parseInt(this.value);document.getElementById('ptSpeedVal').textContent=this.value+'ms'"><div class="ctrl-range-value" id="ptSpeedVal">30ms</div></div>
+            <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="ptPpcInput" min="1" max="500" value="1" oninput="ptBloquesPorCiclo=parseInt(this.value)||1"></div>
           </div>
         </div>
-
-        <!-- RIGHT: Canvas -->
         <div class="canvas-panel">
           <div class="canvas-wrap px-border" id="ptCanvasWrap">
             <div class="canvas-empty" id="ptCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN</div>
@@ -917,36 +532,25 @@ footer .foot-tabs button:hover{color:var(--ink);}
             <button class="btn-secondary" id="ptDlBtn" disabled onclick="ptDownloadCanvas()">&#8595; Download HD</button>
           </div>
         </div>
-
       </div>
     </div>
   </div>
-
-
   <footer class="wrap">
     <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
     <div class="foot-tabs">
-      <button onclick="showPage('tool')">Pixel tool</button>
-      <button onclick="showPage('waterer')">Pixel waterer</button>
+      <button onclick="showPage('tool')">Pixel tool</button><button onclick="showPage('waterer')">Pixel waterer</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">Placeholder</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
-      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'">
-        <img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;">
-        Twitter
-      </a>
+      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
     </div>
     <span class="mono">&copy; 2026</span>
   </footer>
 </div>
-</div><!-- /page-tool -->
+</div>
 
-
-<!-- ============================
-     PIXEL WATERER PAGE
-     ============================ -->
+<!-- PIXEL WATERER PAGE -->
 <div class="page" id="page-waterer">
 <div class="tool-page">
-
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
@@ -957,49 +561,58 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
     </div>
   </div>
-
   <div class="tool-controls-section">
     <div class="wrap">
-      <div class="tool-grid">
 
-        <!-- LEFT: Controls -->
-        <div style="display:flex;flex-direction:column;gap:20px;">
+      <!--
+        Toggle bar: button is always visible (col 1+2 span or standalone),
+        hint text aligns above the canvas column.
+        We use a flex bar: button on the left, hint on the right.
+        The hint is nudged to align with the canvas col via a margin that
+        matches the controls col width — set as a CSS var by JS.
+      -->
+      <div class="wt-toggle-bar" id="wtToggleGrid">
+        <button class="btn-toggle-ctrl" id="wtToggleBtn" onclick="wtToggleControls()">
+          <span class="toggle-arrow">&#8592;</span>
+          <span id="wtToggleBtnLabel">Hide controls</span>
+        </button>
+        <span class="wt-toggle-bar-label" id="wtToggleBarHint">Controls visible &mdash; canvas &amp; status panels on the right</span>
+      </div>
 
-          <!-- Upload -->
+      <!--
+        Layout grid.
+        Column order in DOM:
+          1. #wtSidePanelSlot  — invisible normally; left col when ctrl-hidden
+          2. #wtControlsCol    — left col normally; hidden when ctrl-hidden
+          3. #wtCanvasCol      — right col always (canvas stays here)
+        #wtBelowCanvas starts as last child of #wtCanvasCol.
+        When hidden it is moved into #wtSidePanelSlot; when shown back into #wtCanvasCol.
+      -->
+      <div id="wtLayoutGrid">
+
+        <!-- Slot: receives below-canvas panels when controls are hidden -->
+        <div id="wtSidePanelSlot"></div>
+
+        <!-- Left column: four control panels -->
+        <div id="wtControlsCol">
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Upload image</div>
             <div class="upload-zone" id="wtUploadZone">
               <input type="file" accept="image/*" id="wtFileInput" onchange="wtHandleFileInput(this)">
-              <div class="upload-zone-icon">&#127807;</div>
-              <p>Drop your image here</p>
-              <span>PNG, JPG, GIF &mdash; any size</span>
-              <img id="wtUploadPreview" class="upload-preview" alt="preview">
+              <div class="upload-zone-icon" id="wtUploadIcon">&#127807;</div>
+              <p id="wtUploadText">Drop your image here</p>
+              <span id="wtUploadSub">PNG, JPG, GIF &mdash; any size</span>
             </div>
           </div>
-
-          <!-- Color key -->
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Color key</div>
             <div class="wt-legend">
-              <div class="wt-legend-item">
-                <div class="wt-legend-swatch" style="background:var(--wt-hidden);"></div>
-                Special pixel (hidden)
-              </div>
-              <div class="wt-legend-item">
-                <div class="wt-legend-swatch" style="background:var(--wt-special);"></div>
-                Special pixel (revealed)
-              </div>
-              <div class="wt-legend-item">
-                <div class="wt-legend-swatch" style="background:var(--ink);"></div>
-                Normal pixel
-              </div>
+              <div class="wt-legend-item"><div class="wt-legend-swatch" style="background:var(--wt-hidden);"></div>Special pixel (hidden)</div>
+              <div class="wt-legend-item"><div class="wt-legend-swatch" style="background:var(--wt-special);"></div>Special pixel (revealed)</div>
+              <div class="wt-legend-item"><div class="wt-legend-swatch" style="background:var(--ink);"></div>Normal pixel</div>
             </div>
-            <p style="font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:10px;line-height:1.6;">
-              Each day ~30% of newly placed pixels are <strong>special</strong> &mdash; they appear in a neutral disguise until you reveal them. Use <em>Reveal color</em> once per day to uncover them and earn a coin.
-            </p>
+            <p style="font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:10px;line-height:1.6;">Each day ~30% of newly placed pixels are <strong>special</strong> &mdash; they appear in a neutral disguise until you reveal them. Use <em>Reveal color</em> once per day to uncover them and earn a coin.</p>
           </div>
-
-          <!-- Format -->
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Format</div>
             <div class="ctrl-row">
@@ -1011,918 +624,531 @@ footer .foot-tabs button:hover{color:var(--ink);}
               </div>
             </div>
           </div>
-
-          <!-- Generation settings -->
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Generation settings</div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Resolution</label>
-              <span class="ctrl-sublabel">Higher = more detail, slower</span>
-              <select class="ctrl-select" id="wtResSelect" onchange="wtOnResChange()"></select>
-            </div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Duration (days)</label>
-              <span class="ctrl-sublabel">Split pixel generation into N equal parts</span>
-              <select class="ctrl-select" id="wtDaysSelect" onchange="wt.TOTAL_DIAS=parseInt(this.value);wt.diaActual=0;wt.indiceActual=0;if(wt.img){wtProcesarImagen();}wtUpdateUI();">
-                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-                <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-                <option>11</option><option>12</option><option>13</option><option selected>14</option>
-              </select>
-            </div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Speed (ms between ticks)</label>
-              <span class="ctrl-sublabel">Lower = faster generation</span>
-              <input type="range" class="ctrl-range" id="wtSpeedRange" min="1" max="200" value="30"
-                oninput="wt.intervalSpeed=parseInt(this.value);document.getElementById('wtSpeedVal').textContent=this.value+'ms'">
-              <div class="ctrl-range-value" id="wtSpeedVal">30ms</div>
-            </div>
-            <div class="ctrl-row">
-              <label class="ctrl-label">Pixels per tick</label>
-              <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
-              <input type="number" class="ctrl-number" id="wtPpcInput" min="1" max="500" value="1"
-                oninput="wt.bloquesPorCiclo=parseInt(this.value)||1">
-            </div>
+            <div class="ctrl-row"><label class="ctrl-label">Resolution</label><span class="ctrl-sublabel">Higher = more detail, slower</span><select class="ctrl-select" id="wtResSelect" onchange="wtOnResChange()"></select></div>
+            <div class="ctrl-row"><label class="ctrl-label">Duration (days)</label><span class="ctrl-sublabel">Split pixel generation into N equal parts</span><select class="ctrl-select" id="wtDaysSelect" onchange="wt.TOTAL_DIAS=parseInt(this.value);wt.diaActual=0;wt.indiceActual=0;if(wt.img){wtProcesarImagen();}wtUpdateUI();"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option selected>14</option></select></div>
+            <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="wtSpeedRange" min="1" max="200" value="30" oninput="wt.intervalSpeed=parseInt(this.value);document.getElementById('wtSpeedVal').textContent=this.value+'ms'"><div class="ctrl-range-value" id="wtSpeedVal">30ms</div></div>
+            <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="wtPpcInput" min="1" max="500" value="1" oninput="wt.bloquesPorCiclo=parseInt(this.value)||1"></div>
           </div>
-
         </div>
 
-        <!-- RIGHT: Canvas + status + actions -->
-        <div class="canvas-panel">
-
-          <!-- Canvas -->
+        <!-- Right column: canvas always here, below-canvas panels start here -->
+        <div id="wtCanvasCol">
+          <!-- Canvas — never moves -->
           <div class="canvas-wrap px-border" id="wtCanvasWrap">
             <div class="canvas-empty" id="wtCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN</div>
             <div class="p5Container" id="wtP5Container" style="display:none;"></div>
           </div>
 
-          <!-- Day tracker pips -->
-          <div id="wtDayTrack" class="wt-day-track"></div>
-
-          <!-- HUD: coins + pending -->
-          <div class="wt-hud">
-            <div class="wt-hud-card">
-              <div class="wt-hud-label">Day</div>
-              <div class="wt-hud-value" id="wtHudDay">&mdash;</div>
-            </div>
-            <div class="wt-hud-card">
-              <div class="wt-hud-label" style="display:flex;justify-content:space-between;align-items:center;">
-                Coins
-                <button onclick="wtResetCoins()" title="Reset saved coins" style="font-family:var(--font);font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:none;border:none;color:var(--dormant-2);cursor:pointer;padding:0;line-height:1;" onmouseover="this.style.color='var(--ink-soft)'" onmouseout="this.style.color='var(--dormant-2)'">RESET</button>
+          <!--
+            #wtBelowCanvas — moved by JS on toggle.
+            Order of children is preserved because the whole div moves as a unit.
+          -->
+          <div id="wtBelowCanvas">
+            <!-- 1. Day tracker pips -->
+            <div id="wtDayTrack" class="wt-day-track"></div>
+            <!-- 2. HUD -->
+            <div class="wt-hud">
+              <div class="wt-hud-card"><div class="wt-hud-label">Day</div><div class="wt-hud-value" id="wtHudDay">&mdash;</div></div>
+              <div class="wt-hud-card">
+                <div class="wt-hud-label" style="display:flex;justify-content:space-between;align-items:center;">
+                  Coins
+                  <button onclick="wtResetCoins()" title="Reset saved coins" style="font-family:var(--font);font-size:9px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;background:none;border:none;color:var(--dormant-2);cursor:pointer;padding:0;line-height:1;" onmouseover="this.style.color='var(--ink-soft)'" onmouseout="this.style.color='var(--dormant-2)'">RESET</button>
+                </div>
+                <div class="wt-hud-value" style="color:var(--blue-deep);" id="wtHudCoins">0</div>
               </div>
-              <div class="wt-hud-value" style="color:var(--blue-deep);" id="wtHudCoins">0</div>
+              <div class="wt-hud-card"><div class="wt-hud-label">Unrevealed</div><div class="wt-hud-value" id="wtHudPending">0</div></div>
             </div>
-            <div class="wt-hud-card">
-              <div class="wt-hud-label">Unrevealed</div>
-              <div class="wt-hud-value" id="wtHudPending">0</div>
-            </div>
-          </div>
-
-          <!-- Holy Water info bar -->
-          <div style="background:var(--paper-alt);border:2px solid var(--dormant-2);border-radius:4px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span style="font-size:16px;">&#128167;</span>
-              <div>
-                <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
-                <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="wtCostBadge">1</span> coin per unrevealed day</div>
+            <!-- 3. Holy Water info bar -->
+            <div style="background:var(--paper-alt);border:2px solid var(--dormant-2);border-radius:4px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:16px;">&#128167;</span>
+                <div>
+                  <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
+                  <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="wtCostBadge">1</span> coin per unrevealed day</div>
+                </div>
               </div>
+              <div id="wtPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
             </div>
-            <div id="wtPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
-          </div>
+            <!-- 4. Action buttons -->
+            <div class="action-btns">
+              <button class="btn-primary"   id="wtGenBtn"    disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
+              <button class="btn-reveal"    id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
+              <button class="btn-holy"      id="wtHolyBtn"   disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
+              <button class="btn-secondary" id="wtDlBtn"     disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
+            </div>
+          </div><!-- /#wtBelowCanvas -->
 
-          <!-- Action buttons -->
-          <div class="action-btns">
-            <button class="btn-primary" id="wtGenBtn" disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
-            <button class="btn-reveal" id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
-            <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
-            <button class="btn-secondary" id="wtDlBtn" disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
-          </div>
-
-        </div>
-
-      </div>
+        </div><!-- /#wtCanvasCol -->
+      </div><!-- /#wtLayoutGrid -->
     </div>
   </div>
-
-
   <footer class="wrap">
     <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
     <div class="foot-tabs">
-      <button onclick="showPage('tool')">Pixel tool</button>
-      <button onclick="showPage('waterer')">Pixel waterer</button>
+      <button onclick="showPage('tool')">Pixel tool</button><button onclick="showPage('waterer')">Pixel waterer</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('roadmap').scrollIntoView({behavior:'smooth'}),50)">Placeholder</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
-      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'">
-        <img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;">
-        Twitter
-      </a>
+      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
     </div>
     <span class="mono">&copy; 2026</span>
   </footer>
 </div>
-</div><!-- /page-waterer -->
-
+</div>
 
 <script>
-// ============================================================
+// ── Upload zone status helpers ──
+function setUploadLoading(prefix){
+  const icon=document.getElementById(prefix+'UploadIcon');
+  const text=document.getElementById(prefix+'UploadText');
+  const sub =document.getElementById(prefix+'UploadSub');
+  const zone=document.getElementById(prefix+'UploadZone');
+  if(icon) icon.textContent='\u21BA'; // ↺
+  if(text){ text.textContent='Loading\u2026'; text.style.color='var(--ink-soft)'; }
+  if(sub)  sub.style.opacity='0';
+  if(zone) zone.classList.add(prefix+'-uploading');
+}
+function setUploadLoaded(prefix, iconChar){
+  const icon=document.getElementById(prefix+'UploadIcon');
+  const text=document.getElementById(prefix+'UploadText');
+  const sub =document.getElementById(prefix+'UploadSub');
+  const zone=document.getElementById(prefix+'UploadZone');
+  if(zone) zone.classList.remove(prefix+'-uploading');
+  if(icon) icon.textContent=iconChar;
+  if(text){ text.textContent='Your image has been loaded'; text.style.color='var(--blue-deep)'; }
+  if(sub){ sub.textContent='Change file to replace'; sub.style.opacity='1'; }
+  if(zone){ zone.style.borderColor='var(--blue)'; zone.style.borderStyle='solid'; }
+}
+function setUploadReset(prefix, iconChar){
+  const icon=document.getElementById(prefix+'UploadIcon');
+  const text=document.getElementById(prefix+'UploadText');
+  const sub =document.getElementById(prefix+'UploadSub');
+  if(icon) icon.textContent=iconChar;
+  if(text){ text.textContent='Drop your image here'; text.style.color=''; }
+  if(sub){ sub.textContent='PNG, JPG, GIF \u2014 any size'; sub.style.opacity='1'; }
+  const zone=document.getElementById(prefix+'UploadZone');
+  if(zone){ zone.style.borderColor=''; zone.style.borderStyle=''; }
+}
+
 // PAGE ROUTING
-// ============================================================
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.querySelectorAll('.tab[id^="tab-"]').forEach(t => t.classList.remove('active-tab'));
-  const t = document.getElementById('tab-' + id);
-  if (t) t.classList.add('active-tab');
-  window.scrollTo(0, 0);
-  if (id === 'tool' && !ptP5Instance) ptInitP5();
-  if (id === 'waterer' && !wtP5Instance) wtInitP5();
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.tab[id^="tab-"]').forEach(t=>t.classList.remove('active-tab'));
+  const t=document.getElementById('tab-'+id); if(t) t.classList.add('active-tab');
+  window.scrollTo(0,0);
+  if(id==='tool'    && !ptP5Instance) ptInitP5();
+  if(id==='waterer' && !wtP5Instance) wtInitP5();
 }
 
 // ============================================================
-// PIXEL TOOL — p5.js instance
+// PIXEL TOOL
 // ============================================================
-let ptP5Instance = null;
-let ptPxSketch = null;
+let ptP5Instance=null, ptPxSketch=null;
+let pt={img:null,bloquesADibujar:[],indiceActual:0,diaActual:0,construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,canvasW:600,canvasH:600};
+let ptIntervalSpeed=30, ptBloquesPorCiclo=1, ptCurrentInterval=null;
 
-let pt = {
-  img: null,
-  bloquesADibujar: [],
-  indiceActual: 0,
-  diaActual: 0,
-  construyendo: false,
-  TOTAL_DIAS: 14,
-  COLS: 32,
-  ROWS: 32,
-  canvasW: 600,
-  canvasH: 600,
-};
-let ptIntervalSpeed = 30;
-let ptBloquesPorCiclo = 1;
-let ptCurrentInterval = null;
-
-function ptInitP5() {
-  const sketch = function(p) {
-    ptPxSketch = p;
-    p.setup = function() {
-      let cnv = p.createCanvas(pt.canvasW, pt.canvasH);
-      cnv.parent('ptP5Container');
-      p.pixelDensity(5);
-      p.background(0);
-    };
-    p.draw = function() {
-      if (!pt.img) return;
-      let w = p.width / pt.COLS;
-      let h = p.height / pt.ROWS;
-      for (let b of pt.bloquesADibujar) {
-        if (b.activo) {
-          p.fill(b.color[0], b.color[1], b.color[2]);
-          p.noStroke();
-          p.rect(b.columna * w, b.fila * h, w, h);
-        }
-      }
-    };
+function ptInitP5(){
+  const sk=function(p){
+    ptPxSketch=p;
+    p.setup=function(){ let c=p.createCanvas(pt.canvasW,pt.canvasH); c.parent('ptP5Container'); p.pixelDensity(5); p.background(0); };
+    p.draw=function(){ if(!pt.img)return; let w=p.width/pt.COLS,h=p.height/pt.ROWS; for(let b of pt.bloquesADibujar){if(b.activo){p.fill(b.color[0],b.color[1],b.color[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}} };
   };
-  ptP5Instance = new p5(sketch);
-  document.getElementById('ptCanvasEmpty').style.display = 'none';
-  document.getElementById('ptP5Container').style.display = 'flex';
+  ptP5Instance=new p5(sk);
+  document.getElementById('ptCanvasEmpty').style.display='none';
+  document.getElementById('ptP5Container').style.display='flex';
 }
 
-function ptHandleFileInput(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  const reader = new FileReader();
-  const prev = document.getElementById('ptUploadPreview');
-  prev.src = URL.createObjectURL(file);
-  prev.style.display = 'block';
-  reader.onload = function(e) {
-    if (!ptP5Instance) ptInitP5();
-    const imgEl = new Image();
-    imgEl.onload = function() {
-      ptPxSketch.loadImage(e.target.result, function(p5img) {
-        pt.img = p5img;
+function ptHandleFileInput(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0], reader=new FileReader();
+  // Show loading state immediately
+  setUploadLoading('pt');
+  reader.onload=function(e){
+    if(!ptP5Instance)ptInitP5();
+    const img=new Image();
+    img.onload=function(){
+      ptPxSketch.loadImage(e.target.result,function(p5img){
+        pt.img=p5img;
         ptProcesarImagen();
+        // Show loaded state after a brief delay so "Loading" is visible
+        setTimeout(()=>setUploadLoaded('pt','\u{1F4F7}'),400);
       });
     };
-    imgEl.src = e.target.result;
+    img.src=e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-function ptProcesarImagen() {
-  if (!pt.img || !ptPxSketch) return;
-  ptPxSketch.background(255);
-  pt.bloquesADibujar = [];
-  pt.indiceActual = 0;
-  pt.diaActual = 0;
-  if (ptCurrentInterval) { clearInterval(ptCurrentInterval); ptCurrentInterval = null; }
-  pt.construyendo = false;
-  document.getElementById('ptDlBtn').disabled = true;
-  document.getElementById('ptCanvasEmpty').style.display = 'none';
-  document.getElementById('ptP5Container').style.display = 'flex';
+function ptProcesarImagen(){
+  if(!pt.img||!ptPxSketch)return;
+  ptPxSketch.background(255); pt.bloquesADibujar=[]; pt.indiceActual=0; pt.diaActual=0;
+  if(ptCurrentInterval){clearInterval(ptCurrentInterval);ptCurrentInterval=null;} pt.construyendo=false;
+  document.getElementById('ptDlBtn').disabled=true;
+  document.getElementById('ptCanvasEmpty').style.display='none';
+  document.getElementById('ptP5Container').style.display='flex';
   pt.img.loadPixels();
-  let celdaW = pt.img.width / pt.COLS;
-  let celdaH = pt.img.height / pt.ROWS;
-  for (let y = 0; y < pt.ROWS; y++) {
-    for (let x = 0; x < pt.COLS; x++) {
-      let cx = Math.floor(x * celdaW + celdaW / 2);
-      let cy = Math.floor(y * celdaH + celdaH / 2);
-      let idx = (cx + cy * pt.img.width) * 4;
-      pt.bloquesADibujar.push({
-        columna: x, fila: y,
-        color: [pt.img.pixels[idx], pt.img.pixels[idx+1], pt.img.pixels[idx+2]],
-        activo: false,
-      });
-    }
-  }
-  for (let i = pt.bloquesADibujar.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [pt.bloquesADibujar[i], pt.bloquesADibujar[j]] = [pt.bloquesADibujar[j], pt.bloquesADibujar[i]];
-  }
-  const genBtn = document.getElementById('ptGenBtn');
-  genBtn.disabled = false;
-  genBtn.textContent = 'Generate Day 1';
-  ptUpdateDayStatus();
+  let cW=pt.img.width/pt.COLS, cH=pt.img.height/pt.ROWS;
+  for(let y=0;y<pt.ROWS;y++) for(let x=0;x<pt.COLS;x++){let cx=Math.floor(x*cW+cW/2),cy=Math.floor(y*cH+cH/2),idx=(cx+cy*pt.img.width)*4; pt.bloquesADibujar.push({columna:x,fila:y,color:[pt.img.pixels[idx],pt.img.pixels[idx+1],pt.img.pixels[idx+2]],activo:false});}
+  for(let i=pt.bloquesADibujar.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[pt.bloquesADibujar[i],pt.bloquesADibujar[j]]=[pt.bloquesADibujar[j],pt.bloquesADibujar[i]];}
+  const g=document.getElementById('ptGenBtn'); g.disabled=false; g.textContent='Generate Day 1'; ptUpdateDayStatus();
 }
 
-function ptIniciarConstruccionDia() {
-  if (pt.construyendo || pt.diaActual >= pt.TOTAL_DIAS) return;
-  pt.construyendo = true;
-  pt.diaActual++;
-  document.getElementById('ptGenBtn').disabled = true;
-  let pixelesRestantes = pt.bloquesADibujar.length - pt.indiceActual;
-  let diasRestantes = pt.TOTAL_DIAS - pt.diaActual + 1;
-  let pixelesHoy = Math.ceil(pixelesRestantes / diasRestantes);
-  let pixelesContados = 0;
+function ptIniciarConstruccionDia(){
+  if(pt.construyendo||pt.diaActual>=pt.TOTAL_DIAS)return;
+  pt.construyendo=true; pt.diaActual++; document.getElementById('ptGenBtn').disabled=true;
+  let pR=pt.bloquesADibujar.length-pt.indiceActual, dR=pt.TOTAL_DIAS-pt.diaActual+1, pH=Math.ceil(pR/dR), pc=0;
   ptUpdateDayStatus();
-  ptCurrentInterval = setInterval(() => {
-    for (let i = 0; i < ptBloquesPorCiclo; i++) {
-      if (pixelesContados < pixelesHoy && pt.indiceActual < pt.bloquesADibujar.length) {
-        pt.bloquesADibujar[pt.indiceActual].activo = true;
-        pt.indiceActual++;
-        pixelesContados++;
-      }
-    }
-    if (pixelesContados >= pixelesHoy || pt.indiceActual >= pt.bloquesADibujar.length) {
-      clearInterval(ptCurrentInterval); ptCurrentInterval = null;
-      pt.construyendo = false;
-      ptActualizarBoton();
-    }
-  }, ptIntervalSpeed);
+  ptCurrentInterval=setInterval(()=>{ for(let i=0;i<ptBloquesPorCiclo;i++){if(pc<pH&&pt.indiceActual<pt.bloquesADibujar.length){pt.bloquesADibujar[pt.indiceActual].activo=true;pt.indiceActual++;pc++;}} if(pc>=pH||pt.indiceActual>=pt.bloquesADibujar.length){clearInterval(ptCurrentInterval);ptCurrentInterval=null;pt.construyendo=false;ptActualizarBoton();} },ptIntervalSpeed);
 }
 
-function ptActualizarBoton() {
-  const genBtn = document.getElementById('ptGenBtn');
-  const dlBtn = document.getElementById('ptDlBtn');
-  ptUpdateDayStatus();
-  if (pt.diaActual < pt.TOTAL_DIAS) {
-    genBtn.disabled = false;
-    genBtn.textContent = 'Generate Day ' + (pt.diaActual + 1);
+function ptActualizarBoton(){
+  const g=document.getElementById('ptGenBtn'),d=document.getElementById('ptDlBtn'); ptUpdateDayStatus();
+  if(pt.diaActual<pt.TOTAL_DIAS){g.disabled=false;g.textContent='Generate Day '+(pt.diaActual+1);}
+  else{g.disabled=true;g.textContent='COMPLETE!';d.disabled=false;}
+}
+
+function ptUpdateDayStatus(){
+  const el=document.getElementById('ptDayStatus'); if(!pt.img){el.innerHTML='';return;}
+  if(pt.diaActual===0) el.innerHTML='Ready to generate &mdash; Day 1 of '+pt.TOTAL_DIAS;
+  else if(pt.diaActual>=pt.TOTAL_DIAS) el.innerHTML='<span class="day-highlight">&#10003; Complete!</span> &mdash; All '+pt.TOTAL_DIAS+' days generated';
+  else el.innerHTML='Day <span class="day-highlight">'+pt.diaActual+'</span> of '+pt.TOTAL_DIAS+' generated';
+}
+
+function ptDownloadCanvas(){
+  if(!ptPxSketch)return;
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let h=''; for(let i=0;i<8;i++) h+=chars[Math.floor(Math.random()*chars.length)];
+  ptPxSketch.saveCanvas('paxel_'+h,'png');
+}
+
+function ptSetFmt(tipo,w,h,btn){
+  document.querySelectorAll('#page-tool .fmt-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
+  pt.canvasW=w; pt.canvasH=h;
+  const wrap=document.getElementById('ptCanvasWrap'); wrap.style.aspectRatio=w+'/'+h;
+  if(ptP5Instance&&ptPxSketch){ ptPxSketch.resizeCanvas(w,h); if(pt.img){ptPxSketch.background(255);pt.bloquesADibujar=[];pt.indiceActual=0;pt.diaActual=0;ptUpdateDayStatus();} document.getElementById('ptDlBtn').disabled=true; }
+  const sel=document.getElementById('ptResSelect'); sel.innerHTML='';
+  let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
+  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);}); ptOnResChange();
+}
+
+function ptOnResChange(){ const v=document.getElementById('ptResSelect').value; if(!v)return; const p=v.split('x'); pt.COLS=parseInt(p[0]); pt.ROWS=parseInt(p[1]); if(pt.img)ptProcesarImagen(); }
+
+// ============================================================
+// PIXEL WATERER — toggle
+// ============================================================
+let wtCtrlHidden=false;
+
+function wtToggleControls(){
+  wtCtrlHidden = !wtCtrlHidden;
+
+  const grid        = document.getElementById('wtLayoutGrid');
+  // toggleGrid removed — toggle bar is a simple flex bar, always visible
+  const slot        = document.getElementById('wtSidePanelSlot');
+  const ctrlCol     = document.getElementById('wtControlsCol');
+  const canvasCol   = document.getElementById('wtCanvasCol');
+  const belowCanvas = document.getElementById('wtBelowCanvas');
+  const btn         = document.getElementById('wtToggleBtn');
+  const btnLabel    = document.getElementById('wtToggleBtnLabel');
+  const barHint     = document.getElementById('wtToggleBarHint');
+
+  const FADE_MS  = 280;
+  const SLIDE_MS = 350;
+
+  if(wtCtrlHidden){
+    // ── HIDE controls ──
+
+    // 1. Snapshot canvas col width BEFORE layout change
+    const canvasColW = canvasCol.getBoundingClientRect().width;
+    grid.style.setProperty('--wt-canvas-col-w', canvasColW + 'px');
+
+    // 2. Slide #wtBelowCanvas out to the right
+    belowCanvas.style.setProperty('--wt-slide-from', '60px');
+    belowCanvas.classList.add('wt-sliding');
+
+    // 3. Fade out the controls column
+    ctrlCol.classList.add('wt-collapsing');
+
+    // 4. After fade: swap DOM, switch grids, slide panel in from left
+    setTimeout(() => {
+      slot.appendChild(belowCanvas);
+      grid.classList.add('ctrl-hidden');
+      btn.classList.add('ctrl-hidden');
+      btnLabel.textContent = 'Show controls';
+      barHint.textContent  = 'Controls hidden — status panels on the left';
+
+      void belowCanvas.getBoundingClientRect();
+
+      belowCanvas.style.setProperty('--wt-slide-from', '-60px');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        belowCanvas.classList.remove('wt-sliding');
+      }));
+    }, FADE_MS);
+
   } else {
-    genBtn.disabled = true;
-    genBtn.textContent = 'COMPLETE!';
-    dlBtn.disabled = false;
+    // ── SHOW controls ──
+
+    // 1. Slide #wtBelowCanvas out to the left
+    belowCanvas.style.setProperty('--wt-slide-from', '-60px');
+    belowCanvas.classList.add('wt-sliding');
+
+    setTimeout(() => {
+      grid.style.removeProperty('--wt-canvas-col-w');
+
+      canvasCol.appendChild(belowCanvas);
+      grid.classList.remove('ctrl-hidden');
+      ctrlCol.classList.remove('wt-collapsing');
+      btn.classList.remove('ctrl-hidden');
+      btnLabel.textContent = 'Hide controls';
+      barHint.textContent  = 'Controls visible — canvas & status panels on the right';
+
+      void belowCanvas.getBoundingClientRect();
+
+      belowCanvas.style.setProperty('--wt-slide-from', '60px');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        belowCanvas.classList.remove('wt-sliding');
+      }));
+    }, FADE_MS);
   }
-}
 
-function ptUpdateDayStatus() {
-  const el = document.getElementById('ptDayStatus');
-  if (!pt.img) { el.innerHTML = ''; return; }
-  if (pt.diaActual === 0) {
-    el.innerHTML = 'Ready to generate &mdash; Day 1 of ' + pt.TOTAL_DIAS;
-  } else if (pt.diaActual >= pt.TOTAL_DIAS) {
-    el.innerHTML = '<span class="day-highlight">&#10003; Complete!</span> &mdash; All ' + pt.TOTAL_DIAS + ' days generated';
-  } else {
-    el.innerHTML = 'Day <span class="day-highlight">' + pt.diaActual + '</span> of ' + pt.TOTAL_DIAS + ' generated';
-  }
-}
-
-function ptDownloadCanvas() {
-  if (!ptPxSketch) return;
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let hash = '';
-  for (let i = 0; i < 8; i++) hash += chars[Math.floor(Math.random() * chars.length)];
-  ptPxSketch.saveCanvas('paxel_' + hash, 'png');
-}
-
-function ptSetFmt(tipo, w, h, btn) {
-  document.querySelectorAll('#page-tool .fmt-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  pt.canvasW = w; pt.canvasH = h;
-  const wrap = document.getElementById('ptCanvasWrap');
-  wrap.style.aspectRatio = w + '/' + h;
-  if (ptP5Instance && ptPxSketch) {
-    ptPxSketch.resizeCanvas(w, h);
-    if (pt.img) { ptPxSketch.background(255); pt.bloquesADibujar = []; pt.indiceActual = 0; pt.diaActual = 0; ptUpdateDayStatus(); }
-    document.getElementById('ptDlBtn').disabled = true;
-  }
-  const sel = document.getElementById('ptResSelect');
-  sel.innerHTML = '';
-  let opts = tipo === '1:1' ? ['16x16','32x32','64x64','128x128'] : (tipo === '3:4' ? ['12x16','24x32','48x64','96x128'] : ['16x12','32x24','64x48','128x96']);
-  opts.forEach((o,i) => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; if (i===1) opt.selected = true; sel.appendChild(opt); });
-  ptOnResChange();
-}
-
-function ptOnResChange() {
-  const val = document.getElementById('ptResSelect').value;
-  if (!val) return;
-  const parts = val.split('x');
-  pt.COLS = parseInt(parts[0]); pt.ROWS = parseInt(parts[1]);
-  if (pt.img) ptProcesarImagen();
+  setTimeout(wtRecalcCanvasHeight, FADE_MS + SLIDE_MS);
 }
 
 // ============================================================
-// PIXEL WATERER — p5.js instance
+// PIXEL WATERER — p5.js
 // ============================================================
-let wtP5Instance = null;
-let wtPxSketch = null;
+let wtP5Instance=null, wtPxSketch=null;
+const WT_HIDDEN=[207,117,0];
+let wt={img:null,bloquesADibujar:[],indiceActual:0,diaActual:0,construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,canvasW:600,canvasH:600,intervalSpeed:30,bloquesPorCiclo:1,monedas:0,diasRevelados:[],diasReveladosNativos:[],costoHolyWater:1,costoMaximoAlcanzado:1};
+let wtCurrentInterval=null;
 
-// Gold and purple as RGB
-// Hidden special pixels use the orange disguise colour
-const WT_HIDDEN_A = [207, 117, 0]; // orange
-const WT_HIDDEN_B = [207, 117, 0]; // orange
-let wt = {
-  img: null,
-  bloquesADibujar: [],
-  indiceActual: 0,
-  diaActual: 0,
-  construyendo: false,
-  TOTAL_DIAS: 14,
-  COLS: 32,
-  ROWS: 32,
-  canvasW: 600,
-  canvasH: 600,
-  intervalSpeed: 30,
-  bloquesPorCiclo: 1,
-  monedas: 0,
-  diasRevelados: [],
-  costoHolyWater: 1,
-  costoMaximoAlcanzado: 1,
-};
-let wtCurrentInterval = null;
-
-function wtInitP5() {
-  const sketch = function(p) {
-    wtPxSketch = p;
-    p.setup = function() {
-      let cnv = p.createCanvas(wt.canvasW, wt.canvasH);
-      cnv.parent('wtP5Container');
-      p.pixelDensity(5);
-      p.background(0);
-    };
-    p.draw = function() {
-      if (!wt.img) return;
-      let w = p.width / wt.COLS;
-      let h = p.height / wt.ROWS;
-      for (let b of wt.bloquesADibujar) {
-        if (b.activo) {
-          p.fill(b.colorActual[0], b.colorActual[1], b.colorActual[2]);
-          p.noStroke();
-          p.rect(b.columna * w, b.fila * h, w, h);
-        }
-      }
-    };
+function wtInitP5(){
+  const sk=function(p){
+    wtPxSketch=p;
+    p.setup=function(){ let c=p.createCanvas(wt.canvasW,wt.canvasH); c.parent('wtP5Container'); p.pixelDensity(5); p.background(0); };
+    p.draw=function(){ if(!wt.img)return; let w=p.width/wt.COLS,h=p.height/wt.ROWS; for(let b of wt.bloquesADibujar){if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}} };
   };
-  wtP5Instance = new p5(sketch);
-  document.getElementById('wtCanvasEmpty').style.display = 'none';
-  document.getElementById('wtP5Container').style.display = 'flex';
+  wtP5Instance=new p5(sk);
+  document.getElementById('wtCanvasEmpty').style.display='none';
+  document.getElementById('wtP5Container').style.display='flex';
 }
 
-function wtHandleFileInput(input) {
-  if (!input.files || !input.files[0]) return;
-  const file = input.files[0];
-  const reader = new FileReader();
-  const prev = document.getElementById('wtUploadPreview');
-  prev.src = URL.createObjectURL(file);
-  prev.style.display = 'block';
-  reader.onload = function(e) {
-    if (!wtP5Instance) wtInitP5();
-    const imgEl = new Image();
-    imgEl.onload = function() {
-      wtPxSketch.loadImage(e.target.result, function(p5img) {
-        wt.img = p5img;
+function wtHandleFileInput(input){
+  if(!input.files||!input.files[0])return;
+  const file=input.files[0], reader=new FileReader();
+  // Show loading state immediately
+  setUploadLoading('wt');
+  reader.onload=function(e){
+    if(!wtP5Instance)wtInitP5();
+    const img=new Image();
+    img.onload=function(){
+      wtPxSketch.loadImage(e.target.result,function(p5img){
+        wt.img=p5img;
         wtProcesarImagen();
+        // Show loaded state after a brief delay so "Loading" is visible
+        setTimeout(()=>setUploadLoaded('wt','\u{1F33F}'),400);
       });
     };
-    imgEl.src = e.target.result;
+    img.src=e.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-function wtProcesarImagen() {
-  if (!wt.img || !wtPxSketch) return;
-  wtPxSketch.background(255);
-  wt.bloquesADibujar = [];
-  wt.indiceActual = 0;
-  wt.diaActual = 0;
-  wt.diasRevelados = [];
-  wt.diasReveladosNativos = [];
-  // Coins persist across images and page reloads
-  wt.monedas = wtLoadCoins();
-  wt.costoMaximoAlcanzado = 1;
-  wt.costoHolyWater = 1;
-  if (wtCurrentInterval) { clearInterval(wtCurrentInterval); wtCurrentInterval = null; }
-  wt.construyendo = false;
-
-  document.getElementById('wtDlBtn').disabled = true;
-  document.getElementById('wtCanvasEmpty').style.display = 'none';
-  document.getElementById('wtP5Container').style.display = 'flex';
-
+function wtProcesarImagen(){
+  if(!wt.img||!wtPxSketch)return;
+  wtPxSketch.background(255); wt.bloquesADibujar=[]; wt.indiceActual=0; wt.diaActual=0;
+  wt.diasRevelados=[]; wt.diasReveladosNativos=[]; wt.monedas=wtLoadCoins(); wt.costoMaximoAlcanzado=1; wt.costoHolyWater=1;
+  if(wtCurrentInterval){clearInterval(wtCurrentInterval);wtCurrentInterval=null;} wt.construyendo=false;
+  document.getElementById('wtDlBtn').disabled=true;
+  document.getElementById('wtCanvasEmpty').style.display='none';
+  document.getElementById('wtP5Container').style.display='flex';
   wt.img.loadPixels();
-  let celdaW = wt.img.width / wt.COLS;
-  let celdaH = wt.img.height / wt.ROWS;
-
-  for (let y = 0; y < wt.ROWS; y++) {
-    for (let x = 0; x < wt.COLS; x++) {
-      let cx = Math.floor(x * celdaW + celdaW / 2);
-      let cy = Math.floor(y * celdaH + celdaH / 2);
-      let idx = (cx + cy * wt.img.width) * 4;
-      let r = wt.img.pixels[idx], g = wt.img.pixels[idx+1], b = wt.img.pixels[idx+2];
-
-      // Special pixels are disguised as orange; revealed = true colour
-      let esEspecial = Math.random() < 0.3;
-      let colorFinal = esEspecial ? (Math.random() < 0.5 ? WT_HIDDEN_A.slice() : WT_HIDDEN_B.slice()) : [r, g, b];
-
-      wt.bloquesADibujar.push({
-        columna: x, fila: y,
-        colorOriginal: [r, g, b],
-        colorActual: colorFinal,
-        esEspecial: esEspecial,
-        activo: false,
-        parte: 0
-      });
-    }
+  let cW=wt.img.width/wt.COLS, cH=wt.img.height/wt.ROWS;
+  for(let y=0;y<wt.ROWS;y++) for(let x=0;x<wt.COLS;x++){
+    let cx=Math.floor(x*cW+cW/2),cy=Math.floor(y*cH+cH/2),idx=(cx+cy*wt.img.width)*4;
+    let r=wt.img.pixels[idx],g=wt.img.pixels[idx+1],b=wt.img.pixels[idx+2];
+    let es=Math.random()<0.3, ca=es?WT_HIDDEN.slice():[r,g,b];
+    wt.bloquesADibujar.push({columna:x,fila:y,colorOriginal:[r,g,b],colorActual:ca,esEspecial:es,activo:false,parte:0});
   }
+  for(let i=wt.bloquesADibujar.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[wt.bloquesADibujar[i],wt.bloquesADibujar[j]]=[wt.bloquesADibujar[j],wt.bloquesADibujar[i]];}
+  const g=document.getElementById('wtGenBtn'); g.disabled=false; g.textContent='Generate Day 1'; wtUpdateUI();
+}
 
-  // Fisher-Yates shuffle
-  for (let i = wt.bloquesADibujar.length - 1; i > 0; i--) {
-    let j = Math.floor(Math.random() * (i + 1));
-    [wt.bloquesADibujar[i], wt.bloquesADibujar[j]] = [wt.bloquesADibujar[j], wt.bloquesADibujar[i]];
-  }
-
-  document.getElementById('wtGenBtn').disabled = false;
-  document.getElementById('wtGenBtn').textContent = 'Generate Day 1';
+function wtIniciarConstruccionDia(){
+  if(wt.construyendo||wt.diaActual>=wt.TOTAL_DIAS)return;
+  wt.construyendo=true; wt.diaActual++; document.getElementById('wtGenBtn').disabled=true;
+  let pR=wt.bloquesADibujar.length-wt.indiceActual, dR=wt.TOTAL_DIAS-wt.diaActual+1, pH=Math.ceil(pR/dR), pc=0;
   wtUpdateUI();
+  wtCurrentInterval=setInterval(()=>{ for(let i=0;i<wt.bloquesPorCiclo;i++){if(pc<pH&&wt.indiceActual<wt.bloquesADibujar.length){wt.bloquesADibujar[wt.indiceActual].activo=true;wt.bloquesADibujar[wt.indiceActual].parte=wt.diaActual;wt.indiceActual++;pc++;}} if(pc>=pH||wt.indiceActual>=wt.bloquesADibujar.length){clearInterval(wtCurrentInterval);wtCurrentInterval=null;wt.construyendo=false;wtActualizarBotones();} },wt.intervalSpeed);
 }
 
-function wtIniciarConstruccionDia() {
-  if (wt.construyendo || wt.diaActual >= wt.TOTAL_DIAS) return;
-  wt.construyendo = true;
-  wt.diaActual++;
-  document.getElementById('wtGenBtn').disabled = true;
-
-  let pixelesRestantes = wt.bloquesADibujar.length - wt.indiceActual;
-  let diasRestantes = wt.TOTAL_DIAS - wt.diaActual + 1;
-  let pixelesHoy = Math.ceil(pixelesRestantes / diasRestantes);
-  let pixelesContados = 0;
-
-  wtUpdateUI();
-
-  wtCurrentInterval = setInterval(() => {
-    for (let i = 0; i < wt.bloquesPorCiclo; i++) {
-      if (pixelesContados < pixelesHoy && wt.indiceActual < wt.bloquesADibujar.length) {
-        wt.bloquesADibujar[wt.indiceActual].activo = true;
-        wt.bloquesADibujar[wt.indiceActual].parte = wt.diaActual;
-        wt.indiceActual++;
-        pixelesContados++;
-      }
-    }
-    if (pixelesContados >= pixelesHoy || wt.indiceActual >= wt.bloquesADibujar.length) {
-      clearInterval(wtCurrentInterval); wtCurrentInterval = null;
-      wt.construyendo = false;
-      wtActualizarBotones();
-    }
-  }, wt.intervalSpeed);
+function wtAnimarRevelado(bloques,cb){
+  if(!bloques.length){if(cb)cb();return;} wt.construyendo=true; let ind=0;
+  let timer=setInterval(()=>{ for(let i=0;i<wt.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}} if(ind>=bloques.length){clearInterval(timer);wt.construyendo=false;if(cb)cb();wtUpdateUI();} },wt.intervalSpeed);
 }
 
-function wtAnimarRevelado(bloques, callback) {
-  if (bloques.length === 0) { if (callback) callback(); return; }
-  wt.construyendo = true;
-  let indice = 0;
-  let timer = setInterval(() => {
-    for (let i = 0; i < wt.bloquesPorCiclo; i++) {
-      if (indice < bloques.length) {
-        bloques[indice].colorActual = bloques[indice].colorOriginal.slice();
-        bloques[indice].esEspecial = false;
-        indice++;
-      }
-    }
-    if (indice >= bloques.length) {
-      clearInterval(timer);
-      wt.construyendo = false;
-      if (callback) callback();
-      wtUpdateUI();
-    }
-  }, wt.intervalSpeed);
-}
-
-function wtRevelarColorActual() {
-  if (wt.diasRevelados.includes(wt.diaActual)) return;
-  wt.monedas++;
-  wtSaveCoins(wt.monedas);
-  if (!wt.diasReveladosNativos) wt.diasReveladosNativos = [];
+function wtRevelarColorActual(){
+  if(wt.diasRevelados.includes(wt.diaActual)||wt.construyendo) return;
+  wt.monedas++; wtSaveCoins(wt.monedas);
   wt.diasReveladosNativos.push(wt.diaActual);
-  document.getElementById('wtRevealBtn').disabled = true;
-  let bloquesARevelar = wt.bloquesADibujar.filter(b => b.activo && b.parte === wt.diaActual && b.esEspecial);
-  wtAnimarRevelado(bloquesARevelar, () => {
+  document.getElementById('wtRevealBtn').disabled=true;
+  let bl=wt.bloquesADibujar.filter(b=>b.activo&&b.parte===wt.diaActual&&b.esEspecial);
+  wtAnimarRevelado(bl,()=>{
     wt.diasRevelados.push(wt.diaActual);
-    document.getElementById('wtRevealBtn').textContent = 'Color revealed ✓';
+    document.getElementById('wtRevealBtn').textContent='Color revealed \u2713';
+    if(wt.diaActual>=wt.TOTAL_DIAS) document.getElementById('wtDlBtn').disabled=false;
     wtUpdateUI();
-    if (wt.diaActual >= wt.TOTAL_DIAS) document.getElementById('wtDlBtn').disabled = false;
   });
 }
 
-function wtUsarHolyWater() {
-  let diaASubsanar = -1;
-  for (let i = 1; i <= wt.diaActual; i++) {
-    if (!wt.diasRevelados.includes(i)) { diaASubsanar = i; break; }
-  }
-  if (diaASubsanar === -1 || wt.monedas < wt.costoHolyWater) return;
+function wtUsarHolyWater(){
+  // Guard: ignore clicks while an animation is already running
+  if(wt.construyendo) return;
 
-  let bloquesDeEsaParte = wt.bloquesADibujar.filter(b => b.activo && b.parte === diaASubsanar);
-  wt.monedas -= wt.costoHolyWater;
+  // Find the oldest unrevealed day
+  let d=-1;
+  for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i)){d=i;break;}}
+
+  // Nothing to fix, or not enough coins
+  if(d===-1||wt.monedas<wt.costoHolyWater) return;
+
+  // Deduct cost and disable button BEFORE starting animation
+  // so rapid clicks cannot trigger multiple deductions
+  wt.monedas-=wt.costoHolyWater;
   wtSaveCoins(wt.monedas);
+  document.getElementById('wtHolyBtn').disabled=true;
 
-  wtAnimarRevelado(bloquesDeEsaParte, () => {
-    wt.diasRevelados.push(diaASubsanar);
+  let bl=wt.bloquesADibujar.filter(b=>b.activo&&b.parte===d);
+  wtAnimarRevelado(bl,()=>{
+    wt.diasRevelados.push(d);
+    if(d===wt.diaActual){
+      document.getElementById('wtRevealBtn').textContent='Color revealed \u2713';
+      document.getElementById('wtRevealBtn').disabled=true;
+    }
+    if(wt.diaActual>=wt.TOTAL_DIAS&&wtTodosRevelados())
+      document.getElementById('wtDlBtn').disabled=false;
+    // Re-evaluate button state now that this day is resolved
     wtUpdateUI();
-    if (diaASubsanar === wt.diaActual) {
-      document.getElementById('wtRevealBtn').textContent = 'Color revealed ✓';
-      document.getElementById('wtRevealBtn').disabled = true;
-    }
-    if (wt.diaActual >= wt.TOTAL_DIAS && wtTodosRevelados()) {
-      document.getElementById('wtDlBtn').disabled = false;
-    }
   });
 }
 
-function wtTodosRevelados() {
-  for (let i = 1; i <= wt.diaActual; i++) {
-    if (!wt.diasRevelados.includes(i)) return false;
-  }
-  return true;
-}
+function wtTodosRevelados(){ for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))return false;} return true; }
 
-function wtActualizarBotones() {
-  const genBtn = document.getElementById('wtGenBtn');
-  if (wt.diaActual < wt.TOTAL_DIAS) {
-    genBtn.disabled = false;
-    genBtn.textContent = 'Generate Day ' + (wt.diaActual + 1);
-  } else {
-    genBtn.disabled = true;
-    genBtn.textContent = 'COMPLETE!';
-    if (wtTodosRevelados()) document.getElementById('wtDlBtn').disabled = false;
-  }
-  // Reset reveal button for new day
-  const revBtn = document.getElementById('wtRevealBtn');
-  if (!wt.diasRevelados.includes(wt.diaActual)) {
-    revBtn.disabled = false;
-    revBtn.textContent = '◎ Reveal color';
-  }
+function wtActualizarBotones(){
+  const g=document.getElementById('wtGenBtn');
+  if(wt.diaActual<wt.TOTAL_DIAS){g.disabled=false;g.textContent='Generate Day '+(wt.diaActual+1);}
+  else{g.disabled=true;g.textContent='COMPLETE!';if(wtTodosRevelados())document.getElementById('wtDlBtn').disabled=false;}
+  const r=document.getElementById('wtRevealBtn'); if(!wt.diasRevelados.includes(wt.diaActual)){r.disabled=false;r.textContent='\u25CE Reveal color';}
   wtUpdateUI();
 }
 
-function wtUpdateUI() {
-  // Update Holy Water cost
-  if (wt.diaActual >= 8) wt.costoMaximoAlcanzado = 2;
-  wt.costoHolyWater = wt.costoMaximoAlcanzado;
-
-  // Count pending (generated but not revealed)
-  let pendientes = 0;
-  for (let i = 1; i <= wt.diaActual; i++) {
-    if (!wt.diasRevelados.includes(i)) pendientes++;
-  }
-
-  // HUD
-  document.getElementById('wtHudDay').textContent = wt.diaActual === 0 ? '—' : wt.diaActual + ' / ' + wt.TOTAL_DIAS;
-  document.getElementById('wtHudCoins').textContent = wt.monedas;
-  document.getElementById('wtHudPending').textContent = pendientes;
-  document.getElementById('wtCostBadge').textContent = wt.costoHolyWater;
-
-  // Pending info
-  const pendInfo = document.getElementById('wtPendingInfo');
-  if (pendientes > 0) {
-    pendInfo.innerHTML = '<span>' + pendientes + '</span> day' + (pendientes > 1 ? 's' : '') + ' unrevealed';
-  } else {
-    pendInfo.innerHTML = wt.diaActual > 0 ? 'All days revealed &#10003;' : '';
-  }
-
-  // Holy Water button
-  const holyBtn = document.getElementById('wtHolyBtn');
-  document.getElementById('wtHolyCount').textContent = pendientes;
-  holyBtn.disabled = (wt.monedas < wt.costoHolyWater || pendientes === 0);
-
-  // Day tracker pips
-  const track = document.getElementById('wtDayTrack');
-  track.innerHTML = '';
-  for (let i = 1; i <= wt.TOTAL_DIAS; i++) {
-    const pip = document.createElement('div');
-    pip.className = 'wt-day-pip';
-    pip.textContent = i;
-    if (i === wt.diaActual && !wt.diasRevelados.includes(i) && wt.diaActual > 0) pip.classList.add('active');
-    else if (wt.diasRevelados.includes(i)) pip.classList.add('revealed');
-    else if (i < wt.diaActual && !wt.diasRevelados.includes(i)) pip.classList.add('unrevealed');
+function wtUpdateUI(){
+  if(wt.diaActual>=8)wt.costoMaximoAlcanzado=2; wt.costoHolyWater=wt.costoMaximoAlcanzado;
+  let p=0; for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))p++;}
+  document.getElementById('wtHudDay').textContent=wt.diaActual===0?'\u2014':wt.diaActual+' / '+wt.TOTAL_DIAS;
+  document.getElementById('wtHudCoins').textContent=wt.monedas;
+  document.getElementById('wtHudPending').textContent=p;
+  document.getElementById('wtCostBadge').textContent=wt.costoHolyWater;
+  const pi=document.getElementById('wtPendingInfo');
+  if(p>0)pi.innerHTML='<span>'+p+'</span> day'+(p>1?'s':'')+' unrevealed'; else pi.innerHTML=wt.diaActual>0?'All days revealed \u2713':'';
+  document.getElementById('wtHolyCount').textContent=p;
+  document.getElementById('wtHolyBtn').disabled=(wt.monedas<wt.costoHolyWater||p===0);
+  const track=document.getElementById('wtDayTrack'); track.innerHTML='';
+  for(let i=1;i<=wt.TOTAL_DIAS;i++){
+    const pip=document.createElement('div'); pip.className='wt-day-pip'; pip.textContent=i;
+    if(i===wt.diaActual&&!wt.diasRevelados.includes(i)&&wt.diaActual>0)pip.classList.add('active');
+    else if(wt.diasRevelados.includes(i))pip.classList.add('revealed');
+    else if(i<wt.diaActual&&!wt.diasRevelados.includes(i))pip.classList.add('unrevealed');
     track.appendChild(pip);
   }
 }
 
-// ── Coin persistence (localStorage) ──
-const WT_COINS_KEY = 'paxel_wt_coins';
+const WT_COINS_KEY='paxel_wt_coins';
+function wtSaveCoins(n){try{localStorage.setItem(WT_COINS_KEY,String(Math.max(0,n)));}catch(e){}}
+function wtLoadCoins(){try{const s=localStorage.getItem(WT_COINS_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<0?0:n;}catch(e){return 0;}}
+function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}wt.monedas=0;wtUpdateUI();}
 
-function wtSaveCoins(amount) {
-  try { localStorage.setItem(WT_COINS_KEY, String(Math.max(0, amount))); } catch(e) {}
-}
+function wtGenerateHash(len){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+function wtCalcPurity(){if(wt.TOTAL_DIAS===0)return'0%';return Math.round(((wt.diasReveladosNativos||[]).length/wt.TOTAL_DIAS)*100)+'%';}
 
-function wtLoadCoins() {
-  try {
-    const stored = localStorage.getItem(WT_COINS_KEY);
-    const n = stored !== null ? parseInt(stored, 10) : 0;
-    return isNaN(n) || n < 0 ? 0 : n;
-  } catch(e) { return 0; }
-}
-
-function wtResetCoins() {
-  try { localStorage.removeItem(WT_COINS_KEY); } catch(e) {}
-  wt.monedas = 0;
-  wtUpdateUI();
-}
-
-function wtGenerateHash(len) {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let r = '';
-  for (let i = 0; i < len; i++) r += chars[Math.floor(Math.random() * chars.length)];
-  return r;
-}
-
-function wtCalcPurity() {
-  // Purity = % of days where user clicked Reveal Color on the same day
-  // Holy Water fixes don't count — only native reveals count
-  // wt.diasReveladosNativos tracks days revealed WITHOUT holy water
-  if (wt.TOTAL_DIAS === 0) return '0%';
-  const natural = (wt.diasReveladosNativos || []).length;
-  const pct = Math.round((natural / wt.TOTAL_DIAS) * 100);
-  return pct + '%';
-}
-
-async function wtDownloadCanvas() {
-  if (!wtPxSketch) return;
-
-  const hash = wtGenerateHash(8);
-  const longHash = '0x' + Array.from({length: 40}, () => '0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
-  const isoDate = new Date().toISOString().split('T')[0];
-  const purity = wtCalcPurity();
-
-  // --- Download PNG ---
-  wtPxSketch.saveCanvas('paxel_waterer_' + hash, 'png');
-  await new Promise(r => setTimeout(r, 300));
-
-  const { jsPDF } = window.jspdf;
-  const PW = 210, PH = 297;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-  // ── Colours matching PAXEL CSS vars ──
-  const INK      = [16,  19,  26];
-  const INK_SOFT = [75,  85,  99];
-  const BLUE_D   = [30, 143, 190];
-  const PAPER_ALT= [245, 245, 245];
-  const DORMANT  = [231, 226, 211];
-  const DORMANT2 = [216, 209, 188];
-  const EBEBEB   = [235, 235, 235];
-  const ECE8DE   = [236, 232, 222];
-  const WHITE    = [255, 255, 255];
-
-  const ML = 14;  // left margin
-  const MR = 14;  // right margin
-  const CW = PW - ML - MR;  // content width
-
-  // ── White background ──
-  doc.setFillColor(...WHITE);
-  doc.rect(0, 0, PW, PH, 'F');
-
-  // ════════════════════════════════════════
-  // HEADER — paper-alt bg with banner logo top-left
-  // ════════════════════════════════════════
-  const HDR_H = 22;
-  doc.setFillColor(...PAPER_ALT);
-  doc.rect(0, 0, PW, HDR_H, 'F');
-
-  // Header bottom border (dormant)
-  doc.setDrawColor(...DORMANT);
-  doc.setLineWidth(0.5);
-  doc.line(0, HDR_H, PW, HDR_H);
-
-  // Logo banner — top-left corner, drapes below header
-  // PNG is roughly square visually at top, banner shape extends down
-  // We want the logo portion to be square (~20x20mm) at the top
-  const LOGO_W  = 20;
-  const LOGO_H  = 28;  // taller than header to show the banner drape
-  doc.addImage(
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANcAAAHCCAMAAABLz6wbAAAAn1BMVEVMaXEBAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQABAQCFhoYBAQD09PQiIiFkZWTZ2dmhoqK9vb19fn4JCQgZGhlsbW1TVFQyMzJcXFxDQ0M6OzoqKioRERB0dXVLTEvn5+eTlJSam5uMjY2vr6/ExMSmp6ff4ODLy8u4uLjHx8errKy2t7fc3NyfoKDJyclXipQDAAAAEHRSTlMAoGAg8NAwQMAQkHCwgOBQKuVoxQAAAAlwSFlzAAAmcgAAJnIBISuX7gAACBdJREFUeJztnGl31DgQRZ1AdkKmgSwEQtiGsAwMs/z/3zYQIqndLrtkuUr2y7z7KbQdqy851JFvTDfNPWVvdR/ZpxcU9MKCXlhEr6e/3Q+e0QsKemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCotTr5uyOL1/OunwQvuOjcN5ZOpxe+zi0nHhpQ6/TJ0OcC99xJp2YDqfXzoRvTstJl6YXvehFL3rRi153/HHa5VvcHvwTv/ounHeadhmL85Lexnk8ms47lS4j/QzpRS960Yte9KIXvXy8pEsPu9KLXvSiF73oRa//jZfE55hjPsfXfh/8DgyvtIlLPzl60Yte9KIXvejl7/XX4HMpyetv6bmU9M7T746+C+f9GY9+quU1/Fe5tlOUDks/uQX3qAS96JUDvfoWopcAveh1i7fXh7hluJEOw3op0Itet9CrbyF6CdCLXrfQq82NkB4k/o1ffZYuIzWPWf/fTWK4TCm//3KDXn3Qqyb06oNeNaFXH/fL69N54Nv5EF8Frw/pcLpgei1zR+HjNaVHrf12KJ34JPOCmdCrDb3oRS8derWhF6rXV2GXkd4arpeE9LwNvehFL3rRi1708veSPlckPdQped2kE9cuGBEf9KjvNel5Gzfo1YZe9LKEXm3oRS9L6NWGXvSyhF5t6EUvS+jVhl6oXsOkMiV+zm2CXvSiF73oRS960QsMemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AsLemFBLyzohQW9sKAXFvTCgl5Y0AuLObwuKqwxg9fF5bX/IjN4Xa1Wr9wXqe91/WOV5y+8V6nu9ep2mUvvf2O1vV48/7XOG+d1KntdXK7ueO27UGWvN6vIS9eF6npdJy3n2VHV6+Vqnbees6OmV5gZAc+1KnpdvF1t4Dg7Kno9DTrb+/6zo57X6yBz2Bw8Dl+7zY5qXnFm7DdNs/swDEWv2VHL60XQenzww6vZDn+8dFqvktdFGIUPd5tbjoPYlc+Clbzi9mm7ueOR7+yo43UVJI6DVnOwE1575rFiFa84Mx41iTQ73jksWcPrWdDaOVjzak7i7HAYihW83m3OjMCR4+zw90q3XCfNBlvhyHvzVf294sw42tRamx3mIcfd631461sdraZ5EGeH9YbK2+uVPDMCe16zw9kr3nI9fCBprW2ojEOOr1eaGXuy1trssI3Avl4x02z3aTVNnB2mGypXr5hppJkRh6LL7PD0itunnQGtHxuqcJplyHH0SjNDHIXC7DBc3M8rZZrdYa2mOQxn2oUcP6+UaTStprEPOW5eMdMMzYyAfcjx8mplGh3zkOPktZFpdKxDjo9XJ9PoxNlhczPm49XNNDq2IcfFK95yHeZrGYccDy8x0+iYhhwHr55Mo2MZcuy9ejONjmEENvcayDQ6diHH3EtIu/nYhRxrr8FMo2MWcoy9lEyjYxVybL3UTKMTI/C0kGPqlZFpdGxCjqlXzDTdtDsCk9lh6ZWVaXRMQo6hV5oZk7RsQo6dV3am0TEIOWZeIzKNTpwdxSHHzGtMptGZHHKsvEZlGp0Yckpnh5HXyEyjMzXk2HjFmZGbaXQmhhwTr4JMozMt5Jh4lWQanUkhx8KrKNPopJuxgtlh4FWYaXSmhJzpXjHtlt5y9TMh5Ez2mpBpdMpDzlSvSZlGpzjkTPWalGl0iiPwRK+JmUanNORM8ypOu/kUhpxJXgaZRqcs5EzxMsk0OkUhZ4qXTaZRKYrAE7yMMk2GWMHsKPeanHbzKQg5xV6GmUZnfMgp9TLNNDqjQ06pl22m0Rn7NF+hl3Gm0Rkbcsq8Mp/As2RkyCnycsg0OuNCTomXS6bRGRVySrx8Mo3OmAhc4OWUaXTGhJzxXuZpN58Rs2O0l2Om0ckPOWO9XDONTnbIGenlnGl0YgRWQs5IL+dMo5MbcsZ5xUxjnXbzeZAXgUd5Vcg0OnkhZ4zXuxqZRicr5IzwqpRpdHJCzgivSplGJyfk5HtVyzQZYnrIyfaqmGl0YsjpnR25XlUzjY4acjK90syYZfvURQs5mV61M42OEnLyvKpnGh0l5GR5zZBpdOLNmBiBc7xmyTQ6gyEnwyum3XluufoZCjkZXnNlGp2BkKN7zZZpdAZCjuo1Y6bR6Q85mtesmUanN+QoXjOl3Xz6Qs6w1+yZRqcn5Ax7zZ5pdHpCzqDXAjKNjvw035DXIjKNjhhyBrwWkml0pJDT77WYTKMjhJx+r8VkGh0h5PR6LSjT6HSf5uvzWlSm0emEnB6vKk/gWbIZcmSvxWUanY2QI3stL9PotEOO6LXATKPTjsCS1yIzjU4r5AheC0u7+azPjq7XYjONzlrI6XotN9PopJDT8VpwptFJn6/1fsMrfqT/EjONTpwdqw2vwLLSbj4nw154MyNwPOi12Eyj82jAa7mZRifdjHW8lpxpdNZnR8sL45arnz3ZC3dmBI5Er8VnGp0twWv5mUYnzo7khXTL1U8IOdELfWYEdtteKJlGZ7vlBT8KE1trXoC3XP3sRK/7MTMCP0POrRdWptHZ/eWFlml0tn964W+fuhzuN7v3amYEjv4DsXaHRtYxejsAAAAASUVORK5CYII=',
-    'PNG', ML, 0, LOGO_W, LOGO_H
-  );
-
-  // Title "Certificate of Authenticity" — vertically centred in header, to the right of logo
-  const TITLE_X = ML + LOGO_W + 6;
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(...INK);
-  doc.text('Certificate of Authenticity', TITLE_X, HDR_H * 0.62);
-
-  // ════════════════════════════════════════
-  // ART IMAGE — centred, generous padding, black border
-  // Matches .cert-art-wrap padding: 32px top, 24px bottom
-  // ════════════════════════════════════════
-  const ART_PT  = 12;
-  const ART_SZ  = 80;
-  const ART_X   = (PW - ART_SZ) / 2;
-  const ART_Y   = HDR_H + ART_PT;
-
-  try {
-    const container = document.getElementById('wtP5Container');
-    const rawCanvas = container ? container.querySelector('canvas') : null;
-    const p5canvas  = rawCanvas || wtPxSketch.elt;
-    const offscreen = document.createElement('canvas');
-    offscreen.width  = wt.canvasW;
-    offscreen.height = wt.canvasH;
-    const ctx = offscreen.getContext('2d');
-    ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(p5canvas, 0, 0, offscreen.width, offscreen.height);
-    doc.addImage(offscreen.toDataURL('image/png'), 'PNG', ART_X, ART_Y, ART_SZ, ART_SZ);
-    doc.setDrawColor(...INK);
-    doc.setLineWidth(0.7);
-    doc.rect(ART_X, ART_Y, ART_SZ, ART_SZ);
-  } catch(e) { console.error('PDF img:', e); }
-
-  // ════════════════════════════════════════
-  // FIELDS — fill from below image to just above footer
-  // ════════════════════════════════════════
-  const FTR_H   = 18;
-  const FTR_Y   = PH - FTR_H;
-  const FLD_TOP = ART_Y + ART_SZ + 8;
-  const FLD_H   = FTR_Y - FLD_TOP;
-
-  const fields = [
-    ['Username',         'N/A',    'empty'],
-    ['Hash',             longHash, 'hash' ],
-    ['Date of creation', isoDate,  'value'],
-    ['Image title',      'N/A',    'empty'],
-    ['Theme',            'N/A',    'empty'],
-    ['Edition',          'N/A',    'empty'],
-    ['Collection',       'N/A',    'empty'],
-    ['Purity',           purity,   'value'],
-    ['Genesis',          'N/A',    'empty'],
-  ];
-
-  const ROW_H  = FLD_H / fields.length;
-  const FL     = ML;
-  const FR     = PW - MR;
-  // label col = 38.5% of content width (mirrors 1fr vs 1.6fr grid)
-  const FV     = FL + CW * 0.385;
-
-  fields.forEach(([label, value, type], i) => {
-    const rowTop = FLD_TOP + i * ROW_H;
-    const textY  = rowTop + ROW_H * 0.60;
-
-    // Row divider — full width, #EBEBEB
-    if (i > 0) {
-      doc.setDrawColor(...EBEBEB);
-      doc.setLineWidth(0.35);
-      doc.line(FL, rowTop, FR, rowTop);
-    }
-
-    // LABEL — 10px bold uppercase, ink-soft
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(6.5);
-    doc.setTextColor(...INK_SOFT);
-    doc.text(label.toUpperCase(), FL, textY);
-
-    // VALUE
-    if (type === 'empty') {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(...DORMANT2);
-      doc.text('\u2014', FV, textY);
-    } else if (type === 'hash') {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(6.5);
-      doc.setTextColor(...BLUE_D);
-      const lines = doc.splitTextToSize(value, FR - FV);
-      doc.text(lines, FV, textY);
-    } else {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(...INK);
-      doc.text(String(value), FV, textY);
-    }
+async function wtDownloadCanvas(){
+  if(!wtPxSketch)return;
+  const hash=wtGenerateHash(8), longHash='0x'+Array.from({length:40},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join(''), isoDate=new Date().toISOString().split('T')[0], purity=wtCalcPurity();
+  wtPxSketch.saveCanvas('paxel_waterer_'+hash,'png');
+  await new Promise(r=>setTimeout(r,300));
+  const{jsPDF}=window.jspdf, PW=210,PH=297, doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const INK=[16,19,26],INK_SOFT=[75,85,99],BLUE_D=[30,143,190],PAPER_ALT=[245,245,245],DORMANT2=[216,209,188],EBEBEB=[235,235,235],ECE8DE=[236,232,222],WHITE=[255,255,255];
+  const ML=14,MR=14,CW=PW-ML-MR;
+  doc.setFillColor(...WHITE);doc.rect(0,0,PW,PH,'F');
+  const HDR_H=22; doc.setFillColor(...PAPER_ALT);doc.rect(0,0,PW,HDR_H,'F');
+  doc.setDrawColor(...DORMANT2);doc.setLineWidth(0.5);doc.line(0,HDR_H,PW,HDR_H);
+  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);
+  doc.text('Certificate of Authenticity',ML,HDR_H*0.62);
+  const ART_PT=12,ART_SZ=80,ART_X=(PW-ART_SZ)/2,ART_Y=HDR_H+ART_PT;
+  try{
+    const cont=document.getElementById('wtP5Container'),raw=cont?cont.querySelector('canvas'):null,p5c=raw||wtPxSketch.elt;
+    const off=document.createElement('canvas');off.width=wt.canvasW;off.height=wt.canvasH;
+    const ctx=off.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(p5c,0,0,off.width,off.height);
+    doc.addImage(off.toDataURL('image/png'),'PNG',ART_X,ART_Y,ART_SZ,ART_SZ);
+    doc.setDrawColor(...INK);doc.setLineWidth(0.7);doc.rect(ART_X,ART_Y,ART_SZ,ART_SZ);
+  }catch(e){console.error('PDF img:',e);}
+  const FTR_H=18,FTR_Y=PH-FTR_H,FLD_TOP=ART_Y+ART_SZ+8,FLD_H=FTR_Y-FLD_TOP;
+  const fields=[['Username','N/A','empty'],['Hash',longHash,'hash'],['Date of creation',isoDate,'value'],['Image title','N/A','empty'],['Theme','N/A','empty'],['Edition','N/A','empty'],['Collection','N/A','empty'],['Purity',purity,'value'],['Genesis','N/A','empty']];
+  const ROW_H=FLD_H/fields.length,FL=ML,FR=PW-MR,FV=FL+CW*0.385;
+  fields.forEach(([label,value,type],i)=>{
+    const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.60;
+    if(i>0){doc.setDrawColor(...EBEBEB);doc.setLineWidth(0.35);doc.line(FL,rT,FR,rT);}
+    doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(...INK_SOFT);doc.text(label.toUpperCase(),FL,tY);
+    if(type==='empty'){doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...DORMANT2);doc.text('\u2014',FV,tY);}
+    else if(type==='hash'){doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(...BLUE_D);const lines=doc.splitTextToSize(value,FR-FV);doc.text(lines,FV,tY);}
+    else{doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(...INK);doc.text(String(value),FV,tY);}
   });
-
-  // ════════════════════════════════════════
-  // FOOTER — white bg, paxelart.eu btn left, "PAXEL™ · SLOW ART" right
-  // ════════════════════════════════════════
-
-  // "paxelart.eu" button — #EBEBEB fill, #ece8de border, black text
-  const BTN_W = 34, BTN_H = 10;
-  const BTN_X = ML;
-  const BTN_Y = FTR_Y + (FTR_H - BTN_H) / 2;
-
-  doc.setFillColor(...EBEBEB);
-  doc.setDrawColor(...ECE8DE);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(BTN_X, BTN_Y, BTN_W, BTN_H, 2, 2, 'FD');
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(7.5);
-  doc.setTextColor(...INK);
-  doc.textWithLink('paxelart.eu', BTN_X + BTN_W / 2, BTN_Y + BTN_H * 0.65, {
-    url: 'https://paxelart.eu/',
-    align: 'center'
-  });
-
-  // "PAXEL™ · SLOW ART" — right-aligned bold, ink colour
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(9);
-  doc.setTextColor(...INK);
-  doc.text('PAXEL\u2122 \u00B7 SLOW ART', FR, BTN_Y + BTN_H * 0.65, { align: 'right' });
-
-  doc.save('paxel_precertificate_' + hash + '.pdf');
+  const BTN_W=34,BTN_H=10,BTN_X=ML,BTN_Y=FTR_Y+(FTR_H-BTN_H)/2;
+  doc.setFillColor(...EBEBEB);doc.setDrawColor(...ECE8DE);doc.setLineWidth(0.5);doc.roundedRect(BTN_X,BTN_Y,BTN_W,BTN_H,2,2,'FD');
+  doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...INK);
+  doc.textWithLink('paxelart.eu',BTN_X+BTN_W/2,BTN_Y+BTN_H*0.65,{url:'https://paxelart.eu/',align:'center'});
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.text('PAXEL\u2122 \u00B7 SLOW ART',FR,BTN_Y+BTN_H*0.65,{align:'right'});
+  doc.save('paxel_precertificate_'+hash+'.pdf');
 }
 
-function wtSetFmt(tipo, w, h, btn) {
-  document.querySelectorAll('#page-waterer .fmt-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  wt.canvasW = w; wt.canvasH = h;
-  const wrap = document.getElementById('wtCanvasWrap');
-  wrap.style.aspectRatio = w + '/' + h;
-  if (wtP5Instance && wtPxSketch) {
-    wtPxSketch.resizeCanvas(w, h);
-    if (wt.img) { wtPxSketch.background(255); wt.bloquesADibujar = []; wt.indiceActual = 0; wt.diaActual = 0; wtUpdateUI(); }
-    document.getElementById('wtDlBtn').disabled = true;
-  }
-  const sel = document.getElementById('wtResSelect');
-  sel.innerHTML = '';
-  let opts = tipo === '1:1' ? ['16x16','32x32','64x64','128x128'] : (tipo === '3:4' ? ['12x16','24x32','48x64','96x128'] : ['16x12','32x24','64x48','128x96']);
-  opts.forEach((o,i) => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; if (i===1) opt.selected = true; sel.appendChild(opt); });
-  wtOnResChange();
+function wtSetFmt(tipo,w,h,btn){
+  document.querySelectorAll('#page-waterer .fmt-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
+  wt.canvasW=w; wt.canvasH=h;
+  const wrap=document.getElementById('wtCanvasWrap'); wrap.style.aspectRatio=w+'/'+h;
+  if(wtP5Instance&&wtPxSketch){ wtPxSketch.resizeCanvas(w,h); if(wt.img){wtPxSketch.background(255);wt.bloquesADibujar=[];wt.indiceActual=0;wt.diaActual=0;wtUpdateUI();} document.getElementById('wtDlBtn').disabled=true; }
+  const sel=document.getElementById('wtResSelect'); sel.innerHTML='';
+  let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
+  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);}); wtOnResChange();
+  wtRecalcCanvasHeight();
 }
 
-function wtOnResChange() {
-  const val = document.getElementById('wtResSelect').value;
-  if (!val) return;
-  const parts = val.split('x');
-  wt.COLS = parseInt(parts[0]); wt.ROWS = parseInt(parts[1]);
-  if (wt.img) wtProcesarImagen();
+function wtOnResChange(){ const v=document.getElementById('wtResSelect').value; if(!v)return; const p=v.split('x'); wt.COLS=parseInt(p[0]); wt.ROWS=parseInt(p[1]); if(wt.img)wtProcesarImagen(); }
+
+function wtRecalcCanvasHeight(){
+  const wrap=document.getElementById('wtCanvasWrap'); if(!wrap)return;
+  // Remove any inline height so aspect-ratio drives the layout naturally.
+  // The canvas column width is locked via CSS custom property when controls
+  // are hidden, so the canvas never changes size during toggling.
+  wrap.style.height='';
 }
 
-// ============================================================
 // INIT
-// ============================================================
-window.addEventListener('DOMContentLoaded', () => {
-  // Pixel tool
-  ptSetFmt('1:1', 600, 600, document.getElementById('pt-fmt-1-1'));
-  // Pixel waterer
-  wtSetFmt('1:1', 600, 600, document.getElementById('wt-fmt-1-1'));
-  wt.monedas = wtLoadCoins(); // restore persisted coins
-  wtUpdateUI();
-
-  // Drag & drop — Pixel tool
-  const ptZone = document.getElementById('ptUploadZone');
-  if (ptZone) {
-    ptZone.addEventListener('dragover', e => { e.preventDefault(); ptZone.classList.add('dragover'); });
-    ptZone.addEventListener('dragleave', () => ptZone.classList.remove('dragover'));
-    ptZone.addEventListener('drop', e => {
-      e.preventDefault(); ptZone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const input = document.getElementById('ptFileInput');
-        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
-        ptHandleFileInput(input);
-      }
-    });
-  }
-
-  // Drag & drop — Pixel waterer
-  const wtZone = document.getElementById('wtUploadZone');
-  if (wtZone) {
-    wtZone.addEventListener('dragover', e => { e.preventDefault(); wtZone.classList.add('dragover'); });
-    wtZone.addEventListener('dragleave', () => wtZone.classList.remove('dragover'));
-    wtZone.addEventListener('drop', e => {
-      e.preventDefault(); wtZone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const input = document.getElementById('wtFileInput');
-        const dt = new DataTransfer(); dt.items.add(file); input.files = dt.files;
-        wtHandleFileInput(input);
-      }
-    });
-  }
+window.addEventListener('DOMContentLoaded',()=>{
+  ptSetFmt('1:1',600,600,document.getElementById('pt-fmt-1-1'));
+  wtSetFmt('1:1',600,600,document.getElementById('wt-fmt-1-1'));
+  wt.monedas=wtLoadCoins(); wtUpdateUI();
+  const ptZ=document.getElementById('ptUploadZone');
+  if(ptZ){ ptZ.addEventListener('dragover',e=>{e.preventDefault();ptZ.classList.add('dragover');}); ptZ.addEventListener('dragleave',()=>ptZ.classList.remove('dragover')); ptZ.addEventListener('drop',e=>{e.preventDefault();ptZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('ptFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;ptHandleFileInput(inp);}}); }
+  const wtZ=document.getElementById('wtUploadZone');
+  if(wtZ){ wtZ.addEventListener('dragover',e=>{e.preventDefault();wtZ.classList.add('dragover');}); wtZ.addEventListener('dragleave',()=>wtZ.classList.remove('dragover')); wtZ.addEventListener('drop',e=>{e.preventDefault();wtZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('wtFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;wtHandleFileInput(inp);}}); }
 });
 
-window.addEventListener('resize', () => {
-  ['ptCanvasWrap','wtCanvasWrap'].forEach(id => {
-    const wrap = document.getElementById(id);
-    if (!wrap) return;
-    const wrapWidth = wrap.offsetWidth;
-    const ratio = id === 'ptCanvasWrap' ? pt.canvasH / pt.canvasW : wt.canvasH / wt.canvasW;
-    if (wrapWidth > 0) wrap.style.height = Math.round(wrapWidth * ratio) + 'px';
-  });
+window.addEventListener('resize',()=>{
+  // aspect-ratio handles canvas sizing natively — nothing to override.
+  // wtRecalcCanvasHeight clears any stale inline height.
+  wtRecalcCanvasHeight();
 });
 </script>
 </body>
