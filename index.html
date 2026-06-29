@@ -218,7 +218,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
   gap:12px;
   flex-wrap:wrap;
 }
-.wt-toggle-bar-label{font-size:12px;font-weight:700;color:var(--ink-soft);letter-spacing:.04em;transition:opacity .28s ease;}
+/* .wt-toggle-bar-label removed — hint text no longer shown */
 .btn-toggle-ctrl{
   font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
   padding:8px 16px;border:2.5px solid var(--ink);border-radius:3px;background:var(--paper-alt);
@@ -242,10 +242,16 @@ footer .foot-tabs button:hover{color:var(--ink);}
   Hidden:   slot=minmax(240px,auto), controls=0px (collapsed), canvas=locked-px
   This way canvasCol is always in column 3 — never wraps to a new row.
 */
+/*
+  3 explicit columns so #wtCanvasCol (col 3) never drops to a second row.
+  Slot (col 1) is 0px wide. Gap is 40px between all cols, but we cancel the
+  gap after the slot with a negative right-margin on #wtSidePanelSlot so the
+  effective layout matches .tool-grid (1fr 1fr, gap 40px) exactly.
+*/
 #wtLayoutGrid{
   display:grid;
   grid-template-columns:0px 1fr 1fr;
-  gap:0 40px;
+  gap:40px;
   align-items:start;
 }
 #wtLayoutGrid.ctrl-hidden{
@@ -289,20 +295,25 @@ footer .foot-tabs button:hover{color:var(--ink);}
   transform:translateX(var(--wt-slide-from, 60px));
 }
 
-/* Slot: always in DOM (col 1), zero-width and hidden by default */
+/* Slot: always in DOM (col 1 = 0px), invisible and non-interactive by default.
+   margin-right:-40px cancels the grid gap so col2 starts where .tool-grid col1 would. */
 #wtSidePanelSlot{
   display:flex;
   flex-direction:column;
   gap:16px;
   overflow:hidden;
   width:0;
+  min-width:0;
+  margin-right:-40px;
   opacity:0;
   pointer-events:none;
   transition:opacity .28s ease;
 }
-/* When controls are hidden, slot becomes the active left column */
+/* When controls are hidden: slot is wide, gap is restored via margin reset */
 #wtLayoutGrid.ctrl-hidden #wtSidePanelSlot{
   width:auto;
+  min-width:0;
+  margin-right:0;
   opacity:1;
   pointer-events:auto;
 }
@@ -337,9 +348,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <p class="lede">Paxel Art is an upcoming project consisting in slowly rendering your pixel art day after day, until it settles into a piece nobody else will ever own. Check out our latest tools below or on the tabs to try out our Paxel prototypes to get the gist!</p>
       <div class="hero-actions">
         <a href="#gallery" class="btn-ghost">See what Paxel is about &darr;</a>
-        <div class="tool-promo-chip" onclick="showPage('tool')">
-          <span class="tool-promo-icon">&#9632;</span>
-          <div><div class="tool-promo-title">Try the Pixel tool!</div><div class="tool-promo-sub">Turn any photo into pixel art &rarr;</div></div>
+        <div class="tool-promo-chip" onclick="showPage('waterer')">
+          <span class="tool-promo-icon">&#127807;</span>
+          <div><div class="tool-promo-title">Try the Pixel Waterer!</div><div class="tool-promo-sub">Watch your image grow day by day &rarr;</div></div>
         </div>
       </div>
     </div>
@@ -576,7 +587,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <span class="toggle-arrow">&#8592;</span>
           <span id="wtToggleBtnLabel">Hide controls</span>
         </button>
-        <span class="wt-toggle-bar-label" id="wtToggleBarHint">Controls visible &mdash; canvas &amp; status panels on the right</span>
       </div>
 
       <!--
@@ -851,7 +861,6 @@ function wtToggleControls(){
   const belowCanvas = document.getElementById('wtBelowCanvas');
   const btn         = document.getElementById('wtToggleBtn');
   const btnLabel    = document.getElementById('wtToggleBtnLabel');
-  const barHint     = document.getElementById('wtToggleBarHint');
 
   const FADE_MS  = 280;
   const SLIDE_MS = 350;
@@ -876,7 +885,6 @@ function wtToggleControls(){
       grid.classList.add('ctrl-hidden');
       btn.classList.add('ctrl-hidden');
       btnLabel.textContent = 'Show controls';
-      barHint.textContent  = 'Controls hidden — status panels on the left';
 
       void belowCanvas.getBoundingClientRect();
 
@@ -901,7 +909,6 @@ function wtToggleControls(){
       ctrlCol.classList.remove('wt-collapsing');
       btn.classList.remove('ctrl-hidden');
       btnLabel.textContent = 'Hide controls';
-      barHint.textContent  = 'Controls visible — canvas & status panels on the right';
 
       void belowCanvas.getBoundingClientRect();
 
