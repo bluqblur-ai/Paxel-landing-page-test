@@ -964,13 +964,79 @@ const WT_COINS_KEY='paxel_wt_coins';
 function wtSaveCoins(n){try{localStorage.setItem(WT_COINS_KEY,String(Math.max(0,n)));}catch(e){}}
 function wtLoadCoins(){try{const s=localStorage.getItem(WT_COINS_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<0?0:n;}catch(e){return 0;}}
 function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}wt.monedas=0;wtUpdateUI();}
+
+// ── Certificate serial number counter ──
+// Format: PRE:X-YYYYYYYYY  where X=1..999, Y=000000001..999999999
+// Stored in localStorage as a single integer (total count across both segments).
+// Max value: 999 * 999999999 = 998999000001 (fits in JS Number safely)
+const CERT_KEY='paxel_cert_count';
+function wtLoadCertCount(){
+  try{const s=localStorage.getItem(CERT_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<1?0:n;}
+  catch(e){return 0;}
+}
+function wtSaveCertCount(n){
+  try{localStorage.setItem(CERT_KEY,String(n));}catch(e){}
+}
+function wtNextCertSerial(){
+  // Increment counter (1-based: first certificate = count 1)
+  const count=wtLoadCertCount()+1;
+  wtSaveCertCount(count);
+  // Derive X (prefix 1..999) and Y (suffix 000000001..999999999)
+  const MAX_Y=999999999;
+  const prefix=Math.min(999,Math.floor((count-1)/MAX_Y)+1);
+  const suffix=((count-1)%MAX_Y)+1;
+  // Zero-pad suffix to 9 digits
+  const suffixStr=String(suffix).padStart(9,'0');
+  return 'PRE:'+prefix+'-'+suffixStr;
+}
 function wtGenerateHash(len){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+
+// ── Certificate serial counter ──
+// Format: PRE:X-YYYYYYYYY  where X goes 1-999 and Y goes 000000001-999999999
+// Persisted in localStorage as a single integer (the total count).
+const WT_SERIAL_KEY='paxel_cert_serial';
+const WT_SERIAL_MAX=999*999999999; // absolute maximum
+
+function wtLoadSerialCount(){
+  try{
+    const v=parseInt(localStorage.getItem(WT_SERIAL_KEY)||'0',10);
+    return isNaN(v)||v<0?0:v;
+  }catch(e){return 0;}
+}
+
+function wtSaveSerialCount(n){
+  try{localStorage.setItem(WT_SERIAL_KEY,String(n));}catch(e){}
+}
+
+function wtFormatSerial(n){
+  // n is 0-based total count; serial starts at 1
+  const serial=n+1;
+  const maxSeq=999999999;
+  const prefix=Math.ceil(serial/maxSeq);           // 1, 2, ... 999
+  const seq=serial-((prefix-1)*maxSeq);            // 1 ... 999999999
+  const seqStr=String(seq).padStart(9,'0');
+  return'PRE:'+prefix+'-'+seqStr;
+}
+
+function wtNextCertSerial(){
+  // Read current count, format, then increment and save
+  let count=wtLoadSerialCount();
+  if(count>=WT_SERIAL_MAX) count=0; // wrap at absolute limit
+  const serial=wtFormatSerial(count);
+  wtSaveSerialCount(count+1);
+  return serial;
+}
+
+function wtGetCurrentSerialCount(){
+  return wtLoadSerialCount();
+}
+
 function wtCalcPurity(){if(wt.TOTAL_DIAS===0)return'0%';return Math.round(((wt.diasReveladosNativos||[]).length/wt.TOTAL_DIAS)*100)+'%';}
 
 async function wtDownloadCanvas(){
   if(!wtPxSketch)return;
   const hash=wtGenerateHash(8);
-  const longHash='0x'+Array.from({length:40},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  const longHash=wtNextCertSerial(); // incremental serial: PRE:X-YYYYYYYYY
   const isoDate=new Date().toISOString().split('T')[0];
   const purity=wtCalcPurity();
 
@@ -1075,7 +1141,7 @@ async function wtDownloadCanvas(){
     ['GENESIS','\u2014','empty'],
   ];
   fields.forEach(([label,value,type],i)=>{
-    const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.62;
+    const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.57;
     if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(FL,rT,FR,rT);}
     doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...LABEL);
     doc.text(label,FL,tY);
@@ -1083,9 +1149,9 @@ async function wtDownloadCanvas(){
       doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...EMPTY);
       doc.text(value,FV,tY);
     }else if(type==='hash'){
-      doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...BLUE);
-      const lines=doc.splitTextToSize(value,FR-FV-2);
-      doc.text(lines,FV,tY-(lines.length>1?2:0));
+      // PRE:X-YYYYYYYYY — short serial, render at full value size in blue
+      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...BLUE);
+      doc.text(String(value),FV,tY);
     }else{
       doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...INK);
       doc.text(String(value),FV,tY);
@@ -1098,9 +1164,9 @@ async function wtDownloadCanvas(){
   const BTN_W=32,BTN_BX=FL,BTN_BY=fRowY;
   doc.setFillColor(...BTN_BG);doc.setDrawColor(...BTN_BD);doc.setLineWidth(0.3);
   doc.roundedRect(BTN_BX,BTN_BY,BTN_W,BTN_H,3,3,'FD');
-  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(...INK);
   doc.text('paxelart.eu',BTN_BX+BTN_W/2,BTN_BY+BTN_H*0.62,{align:'center'});
-  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(...INK);
   doc.text('PAXEL \u00B7 Slow art system',FR,BTN_BY+BTN_H*0.62,{align:'right'});
 
   // PDF as base64
