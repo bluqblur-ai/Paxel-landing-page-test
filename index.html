@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 :root{
   --blue:#46B6E2;--blue-deep:#1E8FBE;--ink:#10131A;--ink-soft:#4B5563;
@@ -973,9 +974,20 @@ async function wtDownloadCanvas(){
   const isoDate=new Date().toISOString().split('T')[0];
   const purity=wtCalcPurity();
 
-  wtPxSketch.saveCanvas('paxel_waterer_'+hash,'png');
-  await new Promise(r=>setTimeout(r,350));
+  // ── Build PNG blob from canvas ──
+  const cont=document.getElementById('wtP5Container');
+  const raw=cont?cont.querySelector('canvas'):null;
+  const p5c=raw||wtPxSketch.elt;
+  const off=document.createElement('canvas');
+  off.width=wt.canvasW; off.height=wt.canvasH;
+  const ctx=off.getContext('2d'); ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(p5c,0,0,off.width,off.height);
 
+  // PNG as base64 string (strip data: prefix for JSZip)
+  const pngDataUrl=off.toDataURL('image/png');
+  const pngB64=pngDataUrl.split(',')[1];
+
+  // ── Build PDF blob ──
   const{jsPDF}=window.jspdf;
   if(!jsPDF){console.error('jsPDF not loaded');return;}
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
@@ -989,30 +1001,27 @@ async function wtDownloadCanvas(){
 
   doc.setFillColor(...WHITE);doc.rect(0,0,PW,PH,'F');
 
-  // ── Layout ──
   const LOGO_SZ=14,LOGO_PAD=5,HDR_H=LOGO_SZ+2*LOGO_PAD;
   const ART_GAP=10;
   const ratio=wt.canvasH/wt.canvasW;
   const ART_W=90,ART_H=Math.round(ART_W*ratio);
   const ART_X=(PW-ART_W)/2,artTop=HDR_H+ART_GAP;
   const artMidY=artTop+ART_H/2;
-
   const BAN_W=36,BAN_X=ML-2,BAN_NOTCH=10,midBan=BAN_X+BAN_W/2;
   const banBotY=artMidY,banTipY=banBotY-BAN_NOTCH;
 
-  // ── Header ──
+  // Header
   doc.setFillColor(...GREY_BG);doc.rect(0,0,PW,HDR_H,'F');
   doc.setDrawColor(...RULE);doc.setLineWidth(0.35);doc.line(0,HDR_H,PW,HDR_H);
   doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...INK);
   doc.text('Pre-Certificate of Authenticity',PW/2,HDR_H*0.60,{align:'center'});
 
-  // ── Banner fill ──
+  // Banner fill
   doc.setFillColor(...DARK_GREY);
   doc.rect(BAN_X,0,BAN_W,banTipY,'F');
   doc.triangle(BAN_X,banTipY,midBan,banTipY,BAN_X,banBotY,'F');
   doc.triangle(midBan,banTipY,BAN_X+BAN_W,banTipY,BAN_X+BAN_W,banBotY,'F');
-
-  // Banner outline — thin black
+  // Banner outline
   doc.setDrawColor(...BLACK);doc.setLineWidth(0.6);
   doc.line(BAN_X,0,BAN_X+BAN_W,0);
   doc.line(BAN_X,0,BAN_X,banBotY);
@@ -1020,51 +1029,33 @@ async function wtDownloadCanvas(){
   doc.line(BAN_X,banBotY,midBan,banTipY);
   doc.line(midBan,banTipY,BAN_X+BAN_W,banBotY);
 
-  // ── Logo: horizontally centred in banner, top with padding ──
-  const LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2;
-  const LOGO_Y=LOGO_PAD;   // y=0 is top in jsPDF, so top padding from page top
+  // Logo: centred horizontally in banner, top with padding
+  const LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2,LOGO_Y=LOGO_PAD;
   const logoB64='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHoAAAB6CAMAAABHh7fWAAAAP1BMVEVMaXH09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PS2t9jZAAAAFHRSTlMAkBBg4DAgwECATNCgdJdXcMicPAXD2DIAAAAJcEhZcwAAJnIAACZyASErl+4AAAE8SURBVGiB7dttb4IwGIVhEIHW6dyL//+3qsn2HBLOCtPpkuY+n0j7tBd8aUrFpk9f2e3SPEMzz8bUJXWrbWMGB3eZejyVks3o5ArVrbZkBovL0NDQVdMv4zyHWHw+4+po6katYbfQrjJHr+pGUzd5VmhoaOg6aMf424GGhoZ+CO3Sxm6vjbZtccSf0doM6/mhoaGhV9BvxSM70e/uyE6T68X3aOpeo7dbWMMbQz9pRwoNDV0zPcSC1D+bXgg0NDT0le7NtsnlI65aR7v92tLPqe6GXBber+8LNDR0LXSXv3PIpewNPahbE6rNfVnin/X3O9LJq60KTysnhIaGrpvemzVMox9Ku7jTQmhoaOgVtPvUrSvSvQonE0bsAZul7zotvCXQ0NDQ0NDQ0NA/0uVob2r/fKFAQ0ND/wd9BhO45R4QkzFUAAAAAElFTkSuQmCC';
   doc.addImage(logoB64,'PNG',LOGO_X,LOGO_Y,LOGO_SZ,LOGO_SZ);
 
-  // ── Art image ──
+  // Art image (correct aspect ratio)
   doc.setFillColor(70,182,226);doc.rect(ART_X,artTop,ART_W,ART_H,'F');
-  try{
-    const cont=document.getElementById('wtP5Container');
-    const raw=cont?cont.querySelector('canvas'):null,p5c=raw||wtPxSketch.elt;
-    const off=document.createElement('canvas');off.width=wt.canvasW;off.height=wt.canvasH;
-    const ctx=off.getContext('2d');ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(p5c,0,0,off.width,off.height);
-    doc.addImage(off.toDataURL('image/png'),'PNG',ART_X,artTop,ART_W,ART_H);
-  }catch(e){console.error('PDF art:',e);}
-  // Thin art border
-  doc.setDrawColor(...INK);doc.setLineWidth(0.3);
-  doc.rect(ART_X,artTop,ART_W,ART_H);
+  doc.addImage(pngDataUrl,'PNG',ART_X,artTop,ART_W,ART_H);
+  doc.setDrawColor(...INK);doc.setLineWidth(0.3);doc.rect(ART_X,artTop,ART_W,ART_H);
 
-  // ── Fields ──
+  // Fields
   const BTN_H=9,FTR_PAD=4,FTR_TOTAL=FTR_PAD+BTN_H+FTR_PAD;
   const FLD_TOP=artTop+ART_H+5,FLD_BOT=PH-FTR_TOTAL;
   const N=9,ROW_H=(FLD_BOT-FLD_TOP)/N;
-
   doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_TOP,FR,FLD_TOP);
-
   const fields=[
-    ['USERNAME','\u2014','empty'],
-    ['HASH',longHash,'hash'],
-    ['DATE OF CREATION',isoDate,'value'],
-    ['IMAGE TITLE','\u2014','empty'],
-    ['THEME','\u2014','empty'],
-    ['EDITION','\u2014','empty'],
-    ['COLLECTION','\u2014','empty'],
-    ['PURITY',purity,'value'],
+    ['USERNAME','\u2014','empty'],['HASH',longHash,'hash'],
+    ['DATE OF CREATION',isoDate,'value'],['IMAGE TITLE','\u2014','empty'],
+    ['THEME','\u2014','empty'],['EDITION','\u2014','empty'],
+    ['COLLECTION','\u2014','empty'],['PURITY',purity,'value'],
     ['GENESIS','\u2014','empty'],
   ];
   fields.forEach(([label,value,type],i)=>{
     const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.62;
     if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(FL,rT,FR,rT);}
-    // Label
     doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...LABEL);
     doc.text(label,FL,tY);
-    // Value
     if(type==='empty'){
       doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...EMPTY);
       doc.text(value,FV,tY);
@@ -1077,10 +1068,9 @@ async function wtDownloadCanvas(){
       doc.text(String(value),FV,tY);
     }
   });
-
   doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_BOT,FR,FLD_BOT);
 
-  // ── Footer ──
+  // Footer
   const fRowY=PH-FTR_TOTAL+FTR_PAD;
   const BTN_W=32,BTN_BX=FL,BTN_BY=fRowY;
   doc.setFillColor(...BTN_BG);doc.setDrawColor(...BTN_BD);doc.setLineWidth(0.3);
@@ -1090,7 +1080,20 @@ async function wtDownloadCanvas(){
   doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
   doc.text('PAXEL \u00B7 Slow art system',FR,BTN_BY+BTN_H*0.62,{align:'right'});
 
-  doc.save('paxel_certificate_'+hash+'.pdf');
+  // PDF as base64 string
+  const pdfB64=doc.output('datauristring').split(',')[1];
+
+  // ── Pack both into a ZIP and trigger single download ──
+  const zip=new JSZip();
+  zip.file('paxel_'+hash+'.png', pngB64, {base64:true});
+  zip.file('paxel_certificate_'+hash+'.pdf', pdfB64, {base64:true});
+  const zipBlob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+  const url=URL.createObjectURL(zipBlob);
+  const a=document.createElement('a');
+  a.href=url; a.download='paxel_'+hash+'.zip';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 function wtSetFmt(tipo,w,h,btn){
