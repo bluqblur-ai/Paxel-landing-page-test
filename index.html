@@ -974,7 +974,7 @@ async function wtDownloadCanvas(){
   const isoDate=new Date().toISOString().split('T')[0];
   const purity=wtCalcPurity();
 
-  // ── Build PNG blob from canvas ──
+  // Capture canvas as PNG once
   const cont=document.getElementById('wtP5Container');
   const raw=cont?cont.querySelector('canvas'):null;
   const p5c=raw||wtPxSketch.elt;
@@ -982,12 +982,10 @@ async function wtDownloadCanvas(){
   off.width=wt.canvasW; off.height=wt.canvasH;
   const ctx=off.getContext('2d'); ctx.imageSmoothingEnabled=false;
   ctx.drawImage(p5c,0,0,off.width,off.height);
-
-  // PNG as base64 string (strip data: prefix for JSZip)
   const pngDataUrl=off.toDataURL('image/png');
   const pngB64=pngDataUrl.split(',')[1];
 
-  // ── Build PDF blob ──
+  // Build PDF
   const{jsPDF}=window.jspdf;
   if(!jsPDF){console.error('jsPDF not loaded');return;}
   const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
@@ -1001,40 +999,65 @@ async function wtDownloadCanvas(){
 
   doc.setFillColor(...WHITE);doc.rect(0,0,PW,PH,'F');
 
-  const LOGO_SZ=14,LOGO_PAD=5,HDR_H=LOGO_SZ+2*LOGO_PAD;
-  const ART_GAP=10;
+  // Layout
+  const HDR_H=24,ART_GAP=10;
   const ratio=wt.canvasH/wt.canvasW;
   const ART_W=90,ART_H=Math.round(ART_W*ratio);
   const ART_X=(PW-ART_W)/2,artTop=HDR_H+ART_GAP;
   const artMidY=artTop+ART_H/2;
   const BAN_W=36,BAN_X=ML-2,BAN_NOTCH=10,midBan=BAN_X+BAN_W/2;
-  const banBotY=artMidY,banTipY=banBotY-BAN_NOTCH;
+  // ∧ shape (jsPDF y=0 at top, increases downward):
+  // corners at artMidY (lower on page), tip at banTipY = artMidY - BAN_NOTCH (higher)
+  const banBotY=artMidY, banTipY=banBotY-BAN_NOTCH;
 
-  // Header
+  // Header grey band
   doc.setFillColor(...GREY_BG);doc.rect(0,0,PW,HDR_H,'F');
   doc.setDrawColor(...RULE);doc.setLineWidth(0.35);doc.line(0,HDR_H,PW,HDR_H);
   doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...INK);
   doc.text('Pre-Certificate of Authenticity',PW/2,HDR_H*0.60,{align:'center'});
 
-  // Banner fill
+  // ── Banner: use jsPDF's lines() to draw a single closed filled polygon ──
+  // lines() takes array of [dx,dy] segments from a start point.
+  // Path: (BAN_X,0) → (+BAN_W,0) → (0,+banBotY) → (-BAN_W/2,-(BAN_NOTCH)) → (-BAN_W/2,+BAN_NOTCH) → close
+  // Actually jsPDF lines() signature: lines(lines, x, y, scale, style, closed)
+  // Each line entry: [x1,y1, x2,y2, x3,y3] for bezier or [x1,y1] for straight
   doc.setFillColor(...DARK_GREY);
-  doc.rect(BAN_X,0,BAN_W,banTipY,'F');
-  doc.triangle(BAN_X,banTipY,midBan,banTipY,BAN_X,banBotY,'F');
-  doc.triangle(midBan,banTipY,BAN_X+BAN_W,banTipY,BAN_X+BAN_W,banBotY,'F');
-  // Banner outline
+  doc.lines(
+    [
+      [BAN_W, 0],               // top-right
+      [0, banBotY],             // right edge down to right corner
+      [-(BAN_W/2), -(BAN_NOTCH)], // right corner up to ∧ tip
+      [-(BAN_W/2), BAN_NOTCH],  // ∧ tip down to left corner
+      // close() handles the return to start
+    ],
+    BAN_X, 0,   // start point (top-left)
+    [1,1],      // scale
+    'F',        // fill only — no stroke here
+    true        // closed
+  );
+  // Same path for stroke only (outline)
   doc.setDrawColor(...BLACK);doc.setLineWidth(0.6);
-  doc.line(BAN_X,0,BAN_X+BAN_W,0);
-  doc.line(BAN_X,0,BAN_X,banBotY);
-  doc.line(BAN_X+BAN_W,0,BAN_X+BAN_W,banBotY);
-  doc.line(BAN_X,banBotY,midBan,banTipY);
-  doc.line(midBan,banTipY,BAN_X+BAN_W,banBotY);
+  doc.lines(
+    [
+      [BAN_W, 0],
+      [0, banBotY],
+      [-(BAN_W/2), -(BAN_NOTCH)],
+      [-(BAN_W/2), BAN_NOTCH],
+    ],
+    BAN_X, 0,
+    [1,1],
+    'S',        // stroke only
+    true
+  );
 
-  // Logo: centred horizontally in banner, top with padding
-  const LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2,LOGO_Y=LOGO_PAD;
+  // ── Logo: moderate size, well padded, centred in banner ──
+  const LOGO_PAD=7, LOGO_SZ=BAN_W-2*LOGO_PAD;  // 36-14=22mm
+  const LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2;          // horizontally centred
+  const LOGO_Y=(HDR_H-LOGO_SZ)/2+5;                 // vertically centred in header
   const logoB64='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHoAAAB6CAMAAABHh7fWAAAAP1BMVEVMaXH09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PS2t9jZAAAAFHRSTlMAkBBg4DAgwECATNCgdJdXcMicPAXD2DIAAAAJcEhZcwAAJnIAACZyASErl+4AAAE8SURBVGiB7dttb4IwGIVhEIHW6dyL//+3qsn2HBLOCtPpkuY+n0j7tBd8aUrFpk9f2e3SPEMzz8bUJXWrbWMGB3eZejyVks3o5ArVrbZkBovL0NDQVdMv4zyHWHw+4+po6katYbfQrjJHr+pGUzd5VmhoaOg6aMf424GGhoZ+CO3Sxm6vjbZtccSf0doM6/mhoaGhV9BvxSM70e/uyE6T68X3aOpeo7dbWMMbQz9pRwoNDV0zPcSC1D+bXgg0NDT0le7NtsnlI65aR7v92tLPqe6GXBber+8LNDR0LXSXv3PIpewNPahbE6rNfVnin/X3O9LJq60KTysnhIaGrpvemzVMox9Ku7jTQmhoaOgVtPvUrSvSvQonE0bsAZul7zotvCXQ0NDQ0NDQ0NA/0uVob2r/fKFAQ0ND/wd9BhO45R4QkzFUAAAAAElFTkSuQmCC';
   doc.addImage(logoB64,'PNG',LOGO_X,LOGO_Y,LOGO_SZ,LOGO_SZ);
 
-  // Art image (correct aspect ratio)
+  // Art image
   doc.setFillColor(70,182,226);doc.rect(ART_X,artTop,ART_W,ART_H,'F');
   doc.addImage(pngDataUrl,'PNG',ART_X,artTop,ART_W,ART_H);
   doc.setDrawColor(...INK);doc.setLineWidth(0.3);doc.rect(ART_X,artTop,ART_W,ART_H);
@@ -1080,10 +1103,10 @@ async function wtDownloadCanvas(){
   doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
   doc.text('PAXEL \u00B7 Slow art system',FR,BTN_BY+BTN_H*0.62,{align:'right'});
 
-  // PDF as base64 string
+  // PDF as base64
   const pdfB64=doc.output('datauristring').split(',')[1];
 
-  // ── Pack both into a ZIP and trigger single download ──
+  // Pack PNG + PDF into a single ZIP
   const zip=new JSZip();
   zip.file('paxel_'+hash+'.png', pngB64, {base64:true});
   zip.file('paxel_certificate_'+hash+'.pdf', pdfB64, {base64:true});
