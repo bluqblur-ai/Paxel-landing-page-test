@@ -159,19 +159,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .ctrl-number{font-family:var(--font);font-size:14px;font-weight:700;padding:9px 12px;border:2.5px solid var(--ink);border-radius:3px;width:90px;background:#fff;}
 .upload-zone{border:3px dashed var(--dormant-2);border-radius:4px;padding:32px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;background:#fff;position:relative;}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--blue);background:#F0F9FD;}
-.upload-zone-icon{font-size:28px;margin-bottom:10px;transition:transform .3s ease;}
-.upload-zone.wt-uploading .upload-zone-icon,
-.upload-zone.pt-uploading .upload-zone-icon{
-  display:inline-block;
-  animation:spin-icon .7s linear infinite;
-}
-@keyframes spin-icon{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-.upload-zone p{transition:color .25s ease;}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.upload-zone-icon{font-size:28px;margin-bottom:10px;}
-.upload-zone p{font-size:14px;font-weight:800;color:var(--ink);}
+.upload-zone-icon{font-size:28px;margin-bottom:10px;transition:transform .3s ease;display:block;}
+.upload-zone.wt-uploading .upload-zone-icon,.upload-zone.pt-uploading .upload-zone-icon{animation:spin-icon .7s linear infinite;}
+@keyframes spin-icon{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.upload-zone p{font-size:14px;font-weight:800;color:var(--ink);transition:color .25s ease;}
 .upload-zone span{font-size:12px;color:var(--ink-soft);font-weight:500;}
-/* .upload-preview removed — preview images no longer shown in upload zones */
 .canvas-panel{display:flex;flex-direction:column;gap:16px;}
 .canvas-wrap{background:var(--blue);border:3px solid var(--ink);border-radius:4px;overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:5px 5px 0 var(--ink);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 .canvas-wrap .p5Container{width:100%;height:100%;display:flex;align-items:stretch;}
@@ -186,7 +179,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .btn-secondary:disabled{opacity:.4;cursor:not-allowed;}
 .day-status{font-family:var(--font);font-size:13px;font-weight:700;color:var(--ink-soft);letter-spacing:.04em;text-align:center;padding:10px;}
 .day-status .day-highlight{color:var(--blue-deep);font-size:17px;font-weight:800;}
-/* WATERER */
 .wt-hud{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;}
 .wt-hud-card{flex:1;min-width:120px;background:#fff;border:3px solid var(--ink);border-radius:4px;padding:14px 18px;display:flex;flex-direction:column;gap:4px;}
 .wt-hud-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
@@ -207,128 +199,101 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .wt-day-pip.active{background:var(--ink);color:#fff;}
 
 /* ============================
-   WATERER — TOGGLE CONTROLS
-   ============================ */
-/* Toggle bar — simple flex, button always visible */
-.wt-toggle-bar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:16px;
-  gap:12px;
-  flex-wrap:wrap;
+   WATERER — TOGGLE + LAYOUT
+   ============================
+   The waterer uses the same .tool-grid as Pixel Tool (1fr 1fr, gap 40px).
+   Col 1 = #wtControlsCol — contains toggle button at top, then ctrl panels.
+   Col 2 = #wtCanvasCol   — contains canvas + #wtBelowCanvas.
+
+   When controls are hidden:
+   - #wtControlsCol fades out (opacity→0, visibility:hidden) then display:none
+   - #wtSidePanelSlot appears in col 1 (absolute overlay → becomes flow item)
+   - #wtBelowCanvas moves via JS into #wtSidePanelSlot
+   - Canvas col width is locked via --wt-canvas-col-w before the swap
+
+   The toggle button always stays visible because it lives inside #wtControlsCol
+   which only collapses after a fade, and immediately re-shows when needed.
+   Actually: toggle button is OUTSIDE the grid at the top of .wrap, always visible.
+*/
+
+/* Toggle button — sits above the grid, always visible */
+.wt-toggle-btn-row{
+  margin-bottom:20px;
 }
-/* .wt-toggle-bar-label removed — hint text no longer shown */
 .btn-toggle-ctrl{
   font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
   padding:8px 16px;border:2.5px solid var(--ink);border-radius:3px;background:var(--paper-alt);
   color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;
-  transition:background .2s,color .2s;white-space:nowrap;flex-shrink:0;
+  transition:background .2s,color .2s;white-space:nowrap;
 }
 .btn-toggle-ctrl:hover{background:var(--ink);color:#fff;}
-/* Arrow rotates 180deg when hidden */
 .toggle-arrow{font-size:14px;line-height:1;display:inline-block;transition:transform .35s cubic-bezier(.4,0,.2,1);}
 .btn-toggle-ctrl.ctrl-hidden .toggle-arrow{transform:rotate(180deg);}
 
 /*
-  LAYOUT GRID
-  Default:  [controls 1fr] [canvas 1fr]
-  Hidden:   [slot auto]    [canvas locked-px]
-  CSS grid itself is not animated — we animate the children instead.
-*/
-/*
-  Always 3 columns: [slot] [controls] [canvas]
-  Normally: slot=0px (invisible), controls=1fr, canvas=1fr
-  Hidden:   slot=minmax(240px,auto), controls=0px (collapsed), canvas=locked-px
-  This way canvasCol is always in column 3 — never wraps to a new row.
-*/
-/*
-  3 explicit columns so #wtCanvasCol (col 3) never drops to a second row.
-  Slot (col 1) is 0px wide. Gap is 40px between all cols, but we cancel the
-  gap after the slot with a negative right-margin on #wtSidePanelSlot so the
-  effective layout matches .tool-grid (1fr 1fr, gap 40px) exactly.
+  Waterer layout grid — identical to .tool-grid.
+  #wtSidePanelSlot is NOT a grid child normally (display:none).
+  When ctrl-hidden, #wtControlsCol becomes display:none and
+  #wtSidePanelSlot gets display:flex, taking its place as col 1.
+  Grid stays 1fr 1fr always — no column count changes.
 */
 #wtLayoutGrid{
   display:grid;
-  grid-template-columns:0px 1fr 1fr;
+  grid-template-columns:1fr 1fr;
   gap:40px;
   align-items:start;
 }
-#wtLayoutGrid.ctrl-hidden{
-  grid-template-columns:minmax(240px,auto) 0px var(--wt-canvas-col-w,1fr);
-}
-@media(max-width:900px){
-  #wtLayoutGrid{grid-template-columns:1fr!important;}
-  #wtLayoutGrid.ctrl-hidden{grid-template-columns:1fr!important;}
-}
+@media(max-width:900px){#wtLayoutGrid{grid-template-columns:1fr;}}
 
-/* ── Controls column ──
-   The grid column itself collapses to 0px via grid-template-columns change.
-   We only animate opacity + visibility so content fades while the grid squeezes it.
-   overflow:hidden clips the content as the column shrinks.
-*/
+/* Col 1: controls */
 #wtControlsCol{
   display:flex;flex-direction:column;gap:20px;
-  overflow:hidden;
-  opacity:1;
-  visibility:visible;
-  transition:opacity .28s ease, visibility .28s ease;
-  will-change:opacity;
+  opacity:1;visibility:visible;
+  transition:opacity .28s ease,visibility .28s ease;
 }
-#wtControlsCol.wt-collapsing{
-  opacity:0;
-  visibility:hidden;
-}
+#wtControlsCol.wt-collapsing{opacity:0;visibility:hidden;}
 
+/* Col 2: canvas — always right, never moves */
 #wtCanvasCol{display:flex;flex-direction:column;gap:16px;min-width:0;}
-#wtBelowCanvas{display:flex;flex-direction:column;gap:16px;}
 
-/* ── Below-canvas panel transition ──
-   When it moves between columns it gets a slide+fade animation via a class.
-   Direction is controlled by a CSS custom property --wt-slide-from set by JS.
-*/
+/* Below-canvas panels */
 #wtBelowCanvas{
-  transition:opacity .32s ease, transform .35s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;gap:16px;
+  transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1);
 }
-#wtBelowCanvas.wt-sliding{
-  opacity:0;
-  transform:translateX(var(--wt-slide-from, 60px));
-}
+#wtBelowCanvas.wt-sliding{opacity:0;transform:translateX(var(--wt-slide-from,60px));}
 
-/* Slot: always in DOM (col 1 = 0px), invisible and non-interactive by default.
-   margin-right:-40px cancels the grid gap so col2 starts where .tool-grid col1 would. */
+/*
+  Slot: hidden by default, shown in col 1 when controls are hidden.
+  Uses same display:flex as #wtControlsCol so it occupies col 1.
+*/
 #wtSidePanelSlot{
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  overflow:hidden;
-  width:0;
-  min-width:0;
-  margin-right:-40px;
+  display:none;
+  flex-direction:column;gap:16px;
   opacity:0;
-  pointer-events:none;
   transition:opacity .28s ease;
 }
-/* When controls are hidden: slot is wide, gap is restored via margin reset */
-#wtLayoutGrid.ctrl-hidden #wtSidePanelSlot{
-  width:auto;
-  min-width:0;
-  margin-right:0;
+#wtSidePanelSlot.wt-slot-visible{
+  display:flex;
   opacity:1;
-  pointer-events:auto;
 }
+
+/* When hidden: lock canvas col width so it never changes size */
+#wtLayoutGrid.ctrl-hidden{
+  grid-template-columns:1fr var(--wt-canvas-col-w,1fr);
+}
+@media(max-width:900px){#wtLayoutGrid.ctrl-hidden{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-
 <nav class="nav">
   <div class="wrap nav-inner">
     <div class="logo" onclick="showPage('home')"><img src="paxel-recto.png" alt="PAXEL" width="200"></div>
     <div class="tabs">
-      <button class="tab active-tab" id="tab-home"    onclick="showPage('home')">Home</button>
-      <button class="tab"            id="tab-tool"    onclick="showPage('tool')">Pixel tool</button>
-      <button class="tab"            id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
-      <span  class="tab soon">Placeholder <span class="pill">SOON</span></span>
+      <button class="tab active-tab" id="tab-home" onclick="showPage('home')">Home</button>
+      <button class="tab" id="tab-tool" onclick="showPage('tool')">Pixel tool</button>
+      <button class="tab" id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
+      <span class="tab soon">Placeholder <span class="pill">SOON</span></span>
     </div>
     <div class="bmc-btn">
       <a href="https://www.buymeacoffee.com/paxel" target="_blank" rel="noopener">
@@ -366,11 +331,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <div class="divider"></div>
 <section class="alt-bg" id="gallery">
   <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">THEMES</div>
-      <h2>Periodic themes every 14 days.</h2>
-      <p>Each PAXEL cycle opens around a new theme &mdash; from sweeping landscapes like <em>Utopia</em> to intimate human moments like <em>Happiness</em> and stark contrasts like <em>Darkness</em>. Every theme shapes the palette, the mood and the kind of scene that slowly emerges from the noise. No two themes repeat, and no two canvases within a theme ever settle the same way.</p>
-    </div>
+    <div class="section-head"><div class="eyebrow">THEMES</div><h2>Periodic themes every 14 days.</h2><p>Each PAXEL cycle opens around a new theme &mdash; from sweeping landscapes like <em>Utopia</em> to intimate human moments like <em>Happiness</em> and stark contrasts like <em>Darkness</em>. Every theme shapes the palette, the mood and the kind of scene that slowly emerges from the noise. No two themes repeat, and no two canvases within a theme ever settle the same way.</p></div>
     <div class="gallery-grid">
       <div class="art-card px-border"><img src="utopia-still.jpg" alt="Utopia" width="100%"><div class="art-card-info"><div class="name">Utopia</div><div class="meta">FINISHED PIECE</div></div></div>
       <div class="art-card px-border"><img src="felicidad-still.jpg" alt="Happiness" width="100%"><div class="art-card-info"><div class="name">Happiness</div><div class="meta">FINISHED PIECE</div></div></div>
@@ -416,11 +377,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <div class="divider"></div>
 <section class="alt-bg" id="roadmap">
   <div class="wrap">
-    <div class="section-head">
-      <div class="eyebrow">WHAT&rsquo;S NEXT</div>
-      <h2>Built for more, one piece at a time.</h2>
-      <p>PAXEL is an evolving experiment. These spaces are being built next.</p>
-    </div>
+    <div class="section-head"><div class="eyebrow">WHAT&rsquo;S NEXT</div><h2>Built for more, one piece at a time.</h2><p>PAXEL is an evolving experiment. These spaces are being built next.</p></div>
     <div class="roadmap-grid">
       <div class="roadmap-card pixel-featured px-border" onclick="showPage('tool')">
         <span class="r-pill">TRY IT NOW</span><h4>Pixel tool</h4>
@@ -575,14 +532,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-controls-section">
     <div class="wrap">
 
-      <!--
-        Toggle bar: button is always visible (col 1+2 span or standalone),
-        hint text aligns above the canvas column.
-        We use a flex bar: button on the left, hint on the right.
-        The hint is nudged to align with the canvas col via a margin that
-        matches the controls col width — set as a CSS var by JS.
-      -->
-      <div class="wt-toggle-bar" id="wtToggleGrid">
+      <!-- Toggle button row — OUTSIDE the grid, always visible, flush left -->
+      <div class="wt-toggle-btn-row">
         <button class="btn-toggle-ctrl" id="wtToggleBtn" onclick="wtToggleControls()">
           <span class="toggle-arrow">&#8592;</span>
           <span id="wtToggleBtnLabel">Hide controls</span>
@@ -590,20 +541,22 @@ footer .foot-tabs button:hover{color:var(--ink);}
       </div>
 
       <!--
-        Layout grid.
-        Column order in DOM:
-          1. #wtSidePanelSlot  — invisible normally; left col when ctrl-hidden
-          2. #wtControlsCol    — left col normally; hidden when ctrl-hidden
-          3. #wtCanvasCol      — right col always (canvas stays here)
-        #wtBelowCanvas starts as last child of #wtCanvasCol.
-        When hidden it is moved into #wtSidePanelSlot; when shown back into #wtCanvasCol.
+        Layout grid — same as .tool-grid: 2 cols, 1fr 1fr, gap 40px.
+        Children in DOM:
+          1. #wtSidePanelSlot  — display:none normally; becomes col 1 when ctrl-hidden
+          2. #wtControlsCol    — col 1 normally; display:none when ctrl-hidden
+          3. #wtCanvasCol      — col 2 always
+        Because #wtSidePanelSlot is display:none normally, it takes no space
+        and #wtControlsCol becomes the first visible child = col 1.
+        When hidden: slot becomes display:flex (col 1), controlsCol becomes display:none.
+        Grid stays 1fr 1fr throughout — col widths never change.
       -->
       <div id="wtLayoutGrid">
 
-        <!-- Slot: receives below-canvas panels when controls are hidden -->
+        <!-- Slot: invisible normally, col 1 when controls hidden -->
         <div id="wtSidePanelSlot"></div>
 
-        <!-- Left column: four control panels -->
+        <!-- Controls: col 1 normally -->
         <div id="wtControlsCol">
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Upload image</div>
@@ -641,24 +594,16 @@ footer .foot-tabs button:hover{color:var(--ink);}
             <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="wtSpeedRange" min="1" max="200" value="30" oninput="wt.intervalSpeed=parseInt(this.value);document.getElementById('wtSpeedVal').textContent=this.value+'ms'"><div class="ctrl-range-value" id="wtSpeedVal">30ms</div></div>
             <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="wtPpcInput" min="1" max="500" value="1" oninput="wt.bloquesPorCiclo=parseInt(this.value)||1"></div>
           </div>
-        </div>
+        </div><!-- /#wtControlsCol -->
 
-        <!-- Right column: canvas always here, below-canvas panels start here -->
+        <!-- Canvas col: always col 2 -->
         <div id="wtCanvasCol">
-          <!-- Canvas — never moves -->
           <div class="canvas-wrap px-border" id="wtCanvasWrap">
             <div class="canvas-empty" id="wtCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN</div>
             <div class="p5Container" id="wtP5Container" style="display:none;"></div>
           </div>
-
-          <!--
-            #wtBelowCanvas — moved by JS on toggle.
-            Order of children is preserved because the whole div moves as a unit.
-          -->
           <div id="wtBelowCanvas">
-            <!-- 1. Day tracker pips -->
             <div id="wtDayTrack" class="wt-day-track"></div>
-            <!-- 2. HUD -->
             <div class="wt-hud">
               <div class="wt-hud-card"><div class="wt-hud-label">Day</div><div class="wt-hud-value" id="wtHudDay">&mdash;</div></div>
               <div class="wt-hud-card">
@@ -670,7 +615,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
               </div>
               <div class="wt-hud-card"><div class="wt-hud-label">Unrevealed</div><div class="wt-hud-value" id="wtHudPending">0</div></div>
             </div>
-            <!-- 3. Holy Water info bar -->
             <div style="background:var(--paper-alt);border:2px solid var(--dormant-2);border-radius:4px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
               <div style="display:flex;align-items:center;gap:8px;">
                 <span style="font-size:16px;">&#128167;</span>
@@ -681,16 +625,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
               </div>
               <div id="wtPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
             </div>
-            <!-- 4. Action buttons -->
             <div class="action-btns">
-              <button class="btn-primary"   id="wtGenBtn"    disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
-              <button class="btn-reveal"    id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
-              <button class="btn-holy"      id="wtHolyBtn"   disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
-              <button class="btn-secondary" id="wtDlBtn"     disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
+              <button class="btn-primary" id="wtGenBtn" disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
+              <button class="btn-reveal" id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
+              <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
+              <button class="btn-secondary" id="wtDlBtn" disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
             </div>
           </div><!-- /#wtBelowCanvas -->
-
         </div><!-- /#wtCanvasCol -->
+
       </div><!-- /#wtLayoutGrid -->
     </div>
   </div>
@@ -706,39 +649,28 @@ footer .foot-tabs button:hover{color:var(--ink);}
   </footer>
 </div>
 </div>
-
 <script>
-// ── Upload zone status helpers ──
+// Upload zone status helpers
 function setUploadLoading(prefix){
   const icon=document.getElementById(prefix+'UploadIcon');
   const text=document.getElementById(prefix+'UploadText');
-  const sub =document.getElementById(prefix+'UploadSub');
+  const sub=document.getElementById(prefix+'UploadSub');
   const zone=document.getElementById(prefix+'UploadZone');
-  if(icon) icon.textContent='\u21BA'; // ↺
-  if(text){ text.textContent='Loading\u2026'; text.style.color='var(--ink-soft)'; }
-  if(sub)  sub.style.opacity='0';
-  if(zone) zone.classList.add(prefix+'-uploading');
+  if(icon)icon.textContent='\u21BA';
+  if(text){text.textContent='Loading\u2026';text.style.color='var(--ink-soft)';}
+  if(sub)sub.style.opacity='0';
+  if(zone)zone.classList.add(prefix+'-uploading');
 }
-function setUploadLoaded(prefix, iconChar){
+function setUploadLoaded(prefix,iconChar){
   const icon=document.getElementById(prefix+'UploadIcon');
   const text=document.getElementById(prefix+'UploadText');
-  const sub =document.getElementById(prefix+'UploadSub');
+  const sub=document.getElementById(prefix+'UploadSub');
   const zone=document.getElementById(prefix+'UploadZone');
-  if(zone) zone.classList.remove(prefix+'-uploading');
-  if(icon) icon.textContent=iconChar;
-  if(text){ text.textContent='Your image has been loaded'; text.style.color='var(--blue-deep)'; }
-  if(sub){ sub.textContent='Change file to replace'; sub.style.opacity='1'; }
-  if(zone){ zone.style.borderColor='var(--blue)'; zone.style.borderStyle='solid'; }
-}
-function setUploadReset(prefix, iconChar){
-  const icon=document.getElementById(prefix+'UploadIcon');
-  const text=document.getElementById(prefix+'UploadText');
-  const sub =document.getElementById(prefix+'UploadSub');
-  if(icon) icon.textContent=iconChar;
-  if(text){ text.textContent='Drop your image here'; text.style.color=''; }
-  if(sub){ sub.textContent='PNG, JPG, GIF \u2014 any size'; sub.style.opacity='1'; }
-  const zone=document.getElementById(prefix+'UploadZone');
-  if(zone){ zone.style.borderColor=''; zone.style.borderStyle=''; }
+  if(zone)zone.classList.remove(prefix+'-uploading');
+  if(icon)icon.textContent=iconChar;
+  if(text){text.textContent='Your image has been loaded';text.style.color='var(--blue-deep)';}
+  if(sub){sub.textContent='Change file to replace';sub.style.opacity='1';}
+  if(zone){zone.style.borderColor='var(--blue)';zone.style.borderStyle='solid';}
 }
 
 // PAGE ROUTING
@@ -746,24 +678,24 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   document.querySelectorAll('.tab[id^="tab-"]').forEach(t=>t.classList.remove('active-tab'));
-  const t=document.getElementById('tab-'+id); if(t) t.classList.add('active-tab');
+  const t=document.getElementById('tab-'+id);if(t)t.classList.add('active-tab');
   window.scrollTo(0,0);
-  if(id==='tool'    && !ptP5Instance) ptInitP5();
-  if(id==='waterer' && !wtP5Instance) wtInitP5();
+  if(id==='tool'&&!ptP5Instance)ptInitP5();
+  if(id==='waterer'&&!wtP5Instance)wtInitP5();
 }
 
 // ============================================================
 // PIXEL TOOL
 // ============================================================
-let ptP5Instance=null, ptPxSketch=null;
+let ptP5Instance=null,ptPxSketch=null;
 let pt={img:null,bloquesADibujar:[],indiceActual:0,diaActual:0,construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,canvasW:600,canvasH:600};
-let ptIntervalSpeed=30, ptBloquesPorCiclo=1, ptCurrentInterval=null;
+let ptIntervalSpeed=30,ptBloquesPorCiclo=1,ptCurrentInterval=null;
 
 function ptInitP5(){
   const sk=function(p){
     ptPxSketch=p;
-    p.setup=function(){ let c=p.createCanvas(pt.canvasW,pt.canvasH); c.parent('ptP5Container'); p.pixelDensity(5); p.background(0); };
-    p.draw=function(){ if(!pt.img)return; let w=p.width/pt.COLS,h=p.height/pt.ROWS; for(let b of pt.bloquesADibujar){if(b.activo){p.fill(b.color[0],b.color[1],b.color[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}} };
+    p.setup=function(){let c=p.createCanvas(pt.canvasW,pt.canvasH);c.parent('ptP5Container');p.pixelDensity(5);p.background(0);};
+    p.draw=function(){if(!pt.img)return;let w=p.width/pt.COLS,h=p.height/pt.ROWS;for(let b of pt.bloquesADibujar){if(b.activo){p.fill(b.color[0],b.color[1],b.color[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}}};
   };
   ptP5Instance=new p5(sk);
   document.getElementById('ptCanvasEmpty').style.display='none';
@@ -772,20 +704,12 @@ function ptInitP5(){
 
 function ptHandleFileInput(input){
   if(!input.files||!input.files[0])return;
-  const file=input.files[0], reader=new FileReader();
-  // Show loading state immediately
+  const file=input.files[0],reader=new FileReader();
   setUploadLoading('pt');
   reader.onload=function(e){
     if(!ptP5Instance)ptInitP5();
     const img=new Image();
-    img.onload=function(){
-      ptPxSketch.loadImage(e.target.result,function(p5img){
-        pt.img=p5img;
-        ptProcesarImagen();
-        // Show loaded state after a brief delay so "Loading" is visible
-        setTimeout(()=>setUploadLoaded('pt','\u{1F4F7}'),400);
-      });
-    };
+    img.onload=function(){ptPxSketch.loadImage(e.target.result,function(p5img){pt.img=p5img;ptProcesarImagen();setTimeout(()=>setUploadLoaded('pt','\u{1F4F7}'),400);});};
     img.src=e.target.result;
   };
   reader.readAsDataURL(file);
@@ -793,57 +717,57 @@ function ptHandleFileInput(input){
 
 function ptProcesarImagen(){
   if(!pt.img||!ptPxSketch)return;
-  ptPxSketch.background(255); pt.bloquesADibujar=[]; pt.indiceActual=0; pt.diaActual=0;
-  if(ptCurrentInterval){clearInterval(ptCurrentInterval);ptCurrentInterval=null;} pt.construyendo=false;
+  ptPxSketch.background(255);pt.bloquesADibujar=[];pt.indiceActual=0;pt.diaActual=0;
+  if(ptCurrentInterval){clearInterval(ptCurrentInterval);ptCurrentInterval=null;}pt.construyendo=false;
   document.getElementById('ptDlBtn').disabled=true;
   document.getElementById('ptCanvasEmpty').style.display='none';
   document.getElementById('ptP5Container').style.display='flex';
   pt.img.loadPixels();
-  let cW=pt.img.width/pt.COLS, cH=pt.img.height/pt.ROWS;
-  for(let y=0;y<pt.ROWS;y++) for(let x=0;x<pt.COLS;x++){let cx=Math.floor(x*cW+cW/2),cy=Math.floor(y*cH+cH/2),idx=(cx+cy*pt.img.width)*4; pt.bloquesADibujar.push({columna:x,fila:y,color:[pt.img.pixels[idx],pt.img.pixels[idx+1],pt.img.pixels[idx+2]],activo:false});}
+  let cW=pt.img.width/pt.COLS,cH=pt.img.height/pt.ROWS;
+  for(let y=0;y<pt.ROWS;y++)for(let x=0;x<pt.COLS;x++){let cx=Math.floor(x*cW+cW/2),cy=Math.floor(y*cH+cH/2),idx=(cx+cy*pt.img.width)*4;pt.bloquesADibujar.push({columna:x,fila:y,color:[pt.img.pixels[idx],pt.img.pixels[idx+1],pt.img.pixels[idx+2]],activo:false});}
   for(let i=pt.bloquesADibujar.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[pt.bloquesADibujar[i],pt.bloquesADibujar[j]]=[pt.bloquesADibujar[j],pt.bloquesADibujar[i]];}
-  const g=document.getElementById('ptGenBtn'); g.disabled=false; g.textContent='Generate Day 1'; ptUpdateDayStatus();
+  const g=document.getElementById('ptGenBtn');g.disabled=false;g.textContent='Generate Day 1';ptUpdateDayStatus();
 }
 
 function ptIniciarConstruccionDia(){
   if(pt.construyendo||pt.diaActual>=pt.TOTAL_DIAS)return;
-  pt.construyendo=true; pt.diaActual++; document.getElementById('ptGenBtn').disabled=true;
-  let pR=pt.bloquesADibujar.length-pt.indiceActual, dR=pt.TOTAL_DIAS-pt.diaActual+1, pH=Math.ceil(pR/dR), pc=0;
+  pt.construyendo=true;pt.diaActual++;document.getElementById('ptGenBtn').disabled=true;
+  let pR=pt.bloquesADibujar.length-pt.indiceActual,dR=pt.TOTAL_DIAS-pt.diaActual+1,pH=Math.ceil(pR/dR),pc=0;
   ptUpdateDayStatus();
-  ptCurrentInterval=setInterval(()=>{ for(let i=0;i<ptBloquesPorCiclo;i++){if(pc<pH&&pt.indiceActual<pt.bloquesADibujar.length){pt.bloquesADibujar[pt.indiceActual].activo=true;pt.indiceActual++;pc++;}} if(pc>=pH||pt.indiceActual>=pt.bloquesADibujar.length){clearInterval(ptCurrentInterval);ptCurrentInterval=null;pt.construyendo=false;ptActualizarBoton();} },ptIntervalSpeed);
+  ptCurrentInterval=setInterval(()=>{for(let i=0;i<ptBloquesPorCiclo;i++){if(pc<pH&&pt.indiceActual<pt.bloquesADibujar.length){pt.bloquesADibujar[pt.indiceActual].activo=true;pt.indiceActual++;pc++;}}if(pc>=pH||pt.indiceActual>=pt.bloquesADibujar.length){clearInterval(ptCurrentInterval);ptCurrentInterval=null;pt.construyendo=false;ptActualizarBoton();}},ptIntervalSpeed);
 }
 
 function ptActualizarBoton(){
-  const g=document.getElementById('ptGenBtn'),d=document.getElementById('ptDlBtn'); ptUpdateDayStatus();
+  const g=document.getElementById('ptGenBtn'),d=document.getElementById('ptDlBtn');ptUpdateDayStatus();
   if(pt.diaActual<pt.TOTAL_DIAS){g.disabled=false;g.textContent='Generate Day '+(pt.diaActual+1);}
   else{g.disabled=true;g.textContent='COMPLETE!';d.disabled=false;}
 }
 
 function ptUpdateDayStatus(){
-  const el=document.getElementById('ptDayStatus'); if(!pt.img){el.innerHTML='';return;}
-  if(pt.diaActual===0) el.innerHTML='Ready to generate &mdash; Day 1 of '+pt.TOTAL_DIAS;
-  else if(pt.diaActual>=pt.TOTAL_DIAS) el.innerHTML='<span class="day-highlight">&#10003; Complete!</span> &mdash; All '+pt.TOTAL_DIAS+' days generated';
+  const el=document.getElementById('ptDayStatus');if(!pt.img){el.innerHTML='';return;}
+  if(pt.diaActual===0)el.innerHTML='Ready to generate &mdash; Day 1 of '+pt.TOTAL_DIAS;
+  else if(pt.diaActual>=pt.TOTAL_DIAS)el.innerHTML='<span class="day-highlight">&#10003; Complete!</span> &mdash; All '+pt.TOTAL_DIAS+' days generated';
   else el.innerHTML='Day <span class="day-highlight">'+pt.diaActual+'</span> of '+pt.TOTAL_DIAS+' generated';
 }
 
 function ptDownloadCanvas(){
   if(!ptPxSketch)return;
   const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let h=''; for(let i=0;i<8;i++) h+=chars[Math.floor(Math.random()*chars.length)];
+  let h='';for(let i=0;i<8;i++)h+=chars[Math.floor(Math.random()*chars.length)];
   ptPxSketch.saveCanvas('paxel_'+h,'png');
 }
 
 function ptSetFmt(tipo,w,h,btn){
-  document.querySelectorAll('#page-tool .fmt-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
-  pt.canvasW=w; pt.canvasH=h;
-  const wrap=document.getElementById('ptCanvasWrap'); wrap.style.aspectRatio=w+'/'+h;
-  if(ptP5Instance&&ptPxSketch){ ptPxSketch.resizeCanvas(w,h); if(pt.img){ptPxSketch.background(255);pt.bloquesADibujar=[];pt.indiceActual=0;pt.diaActual=0;ptUpdateDayStatus();} document.getElementById('ptDlBtn').disabled=true; }
-  const sel=document.getElementById('ptResSelect'); sel.innerHTML='';
+  document.querySelectorAll('#page-tool .fmt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
+  pt.canvasW=w;pt.canvasH=h;
+  const wrap=document.getElementById('ptCanvasWrap');wrap.style.aspectRatio=w+'/'+h;
+  if(ptP5Instance&&ptPxSketch){ptPxSketch.resizeCanvas(w,h);if(pt.img){ptPxSketch.background(255);pt.bloquesADibujar=[];pt.indiceActual=0;pt.diaActual=0;ptUpdateDayStatus();}document.getElementById('ptDlBtn').disabled=true;}
+  const sel=document.getElementById('ptResSelect');sel.innerHTML='';
   let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
-  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);}); ptOnResChange();
+  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});ptOnResChange();
 }
 
-function ptOnResChange(){ const v=document.getElementById('ptResSelect').value; if(!v)return; const p=v.split('x'); pt.COLS=parseInt(p[0]); pt.ROWS=parseInt(p[1]); if(pt.img)ptProcesarImagen(); }
+function ptOnResChange(){const v=document.getElementById('ptResSelect').value;if(!v)return;const p=v.split('x');pt.COLS=parseInt(p[0]);pt.ROWS=parseInt(p[1]);if(pt.img)ptProcesarImagen();}
 
 // ============================================================
 // PIXEL WATERER — toggle
@@ -851,81 +775,70 @@ function ptOnResChange(){ const v=document.getElementById('ptResSelect').value; 
 let wtCtrlHidden=false;
 
 function wtToggleControls(){
-  wtCtrlHidden = !wtCtrlHidden;
-
-  const grid        = document.getElementById('wtLayoutGrid');
-  // toggleGrid removed — toggle bar is a simple flex bar, always visible
-  const slot        = document.getElementById('wtSidePanelSlot');
-  const ctrlCol     = document.getElementById('wtControlsCol');
-  const canvasCol   = document.getElementById('wtCanvasCol');
-  const belowCanvas = document.getElementById('wtBelowCanvas');
-  const btn         = document.getElementById('wtToggleBtn');
-  const btnLabel    = document.getElementById('wtToggleBtnLabel');
-
-  const FADE_MS  = 280;
-  const SLIDE_MS = 350;
+  wtCtrlHidden=!wtCtrlHidden;
+  const grid=document.getElementById('wtLayoutGrid');
+  const slot=document.getElementById('wtSidePanelSlot');
+  const ctrlCol=document.getElementById('wtControlsCol');
+  const canvasCol=document.getElementById('wtCanvasCol');
+  const belowCanvas=document.getElementById('wtBelowCanvas');
+  const btn=document.getElementById('wtToggleBtn');
+  const btnLabel=document.getElementById('wtToggleBtnLabel');
+  const FADE=280,SLIDE=350;
 
   if(wtCtrlHidden){
-    // ── HIDE controls ──
+    // Lock canvas col width before any layout change
+    const cw=canvasCol.getBoundingClientRect().width;
+    grid.style.setProperty('--wt-canvas-col-w',cw+'px');
 
-    // 1. Snapshot canvas col width BEFORE layout change
-    const canvasColW = canvasCol.getBoundingClientRect().width;
-    grid.style.setProperty('--wt-canvas-col-w', canvasColW + 'px');
-
-    // 2. Slide #wtBelowCanvas out to the right
-    belowCanvas.style.setProperty('--wt-slide-from', '60px');
+    // Slide below-canvas out to the right
+    belowCanvas.style.setProperty('--wt-slide-from','60px');
     belowCanvas.classList.add('wt-sliding');
-
-    // 3. Fade out the controls column
+    // Fade out controls
     ctrlCol.classList.add('wt-collapsing');
 
-    // 4. After fade: swap DOM, switch grids, slide panel in from left
-    setTimeout(() => {
+    setTimeout(()=>{
+      // Hide controls col, show slot
+      ctrlCol.style.display='none';
+      slot.classList.add('wt-slot-visible');
+      // Move panels to slot
       slot.appendChild(belowCanvas);
       grid.classList.add('ctrl-hidden');
       btn.classList.add('ctrl-hidden');
-      btnLabel.textContent = 'Show controls';
-
+      btnLabel.textContent='Show controls';
+      // Force reflow then slide in from left
       void belowCanvas.getBoundingClientRect();
-
-      belowCanvas.style.setProperty('--wt-slide-from', '-60px');
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        belowCanvas.classList.remove('wt-sliding');
-      }));
-    }, FADE_MS);
+      belowCanvas.style.setProperty('--wt-slide-from','-60px');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>belowCanvas.classList.remove('wt-sliding')));
+    },FADE);
 
   } else {
-    // ── SHOW controls ──
-
-    // 1. Slide #wtBelowCanvas out to the left
-    belowCanvas.style.setProperty('--wt-slide-from', '-60px');
+    // Slide below-canvas out to the left
+    belowCanvas.style.setProperty('--wt-slide-from','-60px');
     belowCanvas.classList.add('wt-sliding');
 
-    setTimeout(() => {
+    setTimeout(()=>{
+      // Restore layout
       grid.style.removeProperty('--wt-canvas-col-w');
-
+      slot.classList.remove('wt-slot-visible');
       canvasCol.appendChild(belowCanvas);
-      grid.classList.remove('ctrl-hidden');
+      ctrlCol.style.display='';
       ctrlCol.classList.remove('wt-collapsing');
+      grid.classList.remove('ctrl-hidden');
       btn.classList.remove('ctrl-hidden');
-      btnLabel.textContent = 'Hide controls';
-
+      btnLabel.textContent='Hide controls';
+      // Force reflow then slide in from right
       void belowCanvas.getBoundingClientRect();
-
-      belowCanvas.style.setProperty('--wt-slide-from', '60px');
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        belowCanvas.classList.remove('wt-sliding');
-      }));
-    }, FADE_MS);
+      belowCanvas.style.setProperty('--wt-slide-from','60px');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>belowCanvas.classList.remove('wt-sliding')));
+    },FADE);
   }
-
-  setTimeout(wtRecalcCanvasHeight, FADE_MS + SLIDE_MS);
+  setTimeout(wtRecalcCanvasHeight,FADE+SLIDE);
 }
 
 // ============================================================
 // PIXEL WATERER — p5.js
 // ============================================================
-let wtP5Instance=null, wtPxSketch=null;
+let wtP5Instance=null,wtPxSketch=null;
 const WT_HIDDEN=[207,117,0];
 let wt={img:null,bloquesADibujar:[],indiceActual:0,diaActual:0,construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,canvasW:600,canvasH:600,intervalSpeed:30,bloquesPorCiclo:1,monedas:0,diasRevelados:[],diasReveladosNativos:[],costoHolyWater:1,costoMaximoAlcanzado:1};
 let wtCurrentInterval=null;
@@ -933,8 +846,8 @@ let wtCurrentInterval=null;
 function wtInitP5(){
   const sk=function(p){
     wtPxSketch=p;
-    p.setup=function(){ let c=p.createCanvas(wt.canvasW,wt.canvasH); c.parent('wtP5Container'); p.pixelDensity(5); p.background(0); };
-    p.draw=function(){ if(!wt.img)return; let w=p.width/wt.COLS,h=p.height/wt.ROWS; for(let b of wt.bloquesADibujar){if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}} };
+    p.setup=function(){let c=p.createCanvas(wt.canvasW,wt.canvasH);c.parent('wtP5Container');p.pixelDensity(5);p.background(0);};
+    p.draw=function(){if(!wt.img)return;let w=p.width/wt.COLS,h=p.height/wt.ROWS;for(let b of wt.bloquesADibujar){if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}}};
   };
   wtP5Instance=new p5(sk);
   document.getElementById('wtCanvasEmpty').style.display='none';
@@ -943,20 +856,12 @@ function wtInitP5(){
 
 function wtHandleFileInput(input){
   if(!input.files||!input.files[0])return;
-  const file=input.files[0], reader=new FileReader();
-  // Show loading state immediately
+  const file=input.files[0],reader=new FileReader();
   setUploadLoading('wt');
   reader.onload=function(e){
     if(!wtP5Instance)wtInitP5();
     const img=new Image();
-    img.onload=function(){
-      wtPxSketch.loadImage(e.target.result,function(p5img){
-        wt.img=p5img;
-        wtProcesarImagen();
-        // Show loaded state after a brief delay so "Loading" is visible
-        setTimeout(()=>setUploadLoaded('wt','\u{1F33F}'),400);
-      });
-    };
+    img.onload=function(){wtPxSketch.loadImage(e.target.result,function(p5img){wt.img=p5img;wtProcesarImagen();setTimeout(()=>setUploadLoaded('wt','\u{1F33F}'),400);});};
     img.src=e.target.result;
   };
   reader.readAsDataURL(file);
@@ -964,106 +869,89 @@ function wtHandleFileInput(input){
 
 function wtProcesarImagen(){
   if(!wt.img||!wtPxSketch)return;
-  wtPxSketch.background(255); wt.bloquesADibujar=[]; wt.indiceActual=0; wt.diaActual=0;
-  wt.diasRevelados=[]; wt.diasReveladosNativos=[]; wt.monedas=wtLoadCoins(); wt.costoMaximoAlcanzado=1; wt.costoHolyWater=1;
-  if(wtCurrentInterval){clearInterval(wtCurrentInterval);wtCurrentInterval=null;} wt.construyendo=false;
+  wtPxSketch.background(255);wt.bloquesADibujar=[];wt.indiceActual=0;wt.diaActual=0;
+  wt.diasRevelados=[];wt.diasReveladosNativos=[];wt.monedas=wtLoadCoins();wt.costoMaximoAlcanzado=1;wt.costoHolyWater=1;
+  if(wtCurrentInterval){clearInterval(wtCurrentInterval);wtCurrentInterval=null;}wt.construyendo=false;
   document.getElementById('wtDlBtn').disabled=true;
   document.getElementById('wtCanvasEmpty').style.display='none';
   document.getElementById('wtP5Container').style.display='flex';
   wt.img.loadPixels();
-  let cW=wt.img.width/wt.COLS, cH=wt.img.height/wt.ROWS;
-  for(let y=0;y<wt.ROWS;y++) for(let x=0;x<wt.COLS;x++){
+  let cW=wt.img.width/wt.COLS,cH=wt.img.height/wt.ROWS;
+  for(let y=0;y<wt.ROWS;y++)for(let x=0;x<wt.COLS;x++){
     let cx=Math.floor(x*cW+cW/2),cy=Math.floor(y*cH+cH/2),idx=(cx+cy*wt.img.width)*4;
     let r=wt.img.pixels[idx],g=wt.img.pixels[idx+1],b=wt.img.pixels[idx+2];
-    let es=Math.random()<0.3, ca=es?WT_HIDDEN.slice():[r,g,b];
+    let es=Math.random()<0.3,ca=es?WT_HIDDEN.slice():[r,g,b];
     wt.bloquesADibujar.push({columna:x,fila:y,colorOriginal:[r,g,b],colorActual:ca,esEspecial:es,activo:false,parte:0});
   }
   for(let i=wt.bloquesADibujar.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[wt.bloquesADibujar[i],wt.bloquesADibujar[j]]=[wt.bloquesADibujar[j],wt.bloquesADibujar[i]];}
-  const g=document.getElementById('wtGenBtn'); g.disabled=false; g.textContent='Generate Day 1'; wtUpdateUI();
+  const g=document.getElementById('wtGenBtn');g.disabled=false;g.textContent='Generate Day 1';wtUpdateUI();
 }
 
 function wtIniciarConstruccionDia(){
   if(wt.construyendo||wt.diaActual>=wt.TOTAL_DIAS)return;
-  wt.construyendo=true; wt.diaActual++; document.getElementById('wtGenBtn').disabled=true;
-  let pR=wt.bloquesADibujar.length-wt.indiceActual, dR=wt.TOTAL_DIAS-wt.diaActual+1, pH=Math.ceil(pR/dR), pc=0;
+  wt.construyendo=true;wt.diaActual++;document.getElementById('wtGenBtn').disabled=true;
+  let pR=wt.bloquesADibujar.length-wt.indiceActual,dR=wt.TOTAL_DIAS-wt.diaActual+1,pH=Math.ceil(pR/dR),pc=0;
   wtUpdateUI();
-  wtCurrentInterval=setInterval(()=>{ for(let i=0;i<wt.bloquesPorCiclo;i++){if(pc<pH&&wt.indiceActual<wt.bloquesADibujar.length){wt.bloquesADibujar[wt.indiceActual].activo=true;wt.bloquesADibujar[wt.indiceActual].parte=wt.diaActual;wt.indiceActual++;pc++;}} if(pc>=pH||wt.indiceActual>=wt.bloquesADibujar.length){clearInterval(wtCurrentInterval);wtCurrentInterval=null;wt.construyendo=false;wtActualizarBotones();} },wt.intervalSpeed);
+  wtCurrentInterval=setInterval(()=>{for(let i=0;i<wt.bloquesPorCiclo;i++){if(pc<pH&&wt.indiceActual<wt.bloquesADibujar.length){wt.bloquesADibujar[wt.indiceActual].activo=true;wt.bloquesADibujar[wt.indiceActual].parte=wt.diaActual;wt.indiceActual++;pc++;}}if(pc>=pH||wt.indiceActual>=wt.bloquesADibujar.length){clearInterval(wtCurrentInterval);wtCurrentInterval=null;wt.construyendo=false;wtActualizarBotones();}},wt.intervalSpeed);
 }
 
 function wtAnimarRevelado(bloques,cb){
-  if(!bloques.length){if(cb)cb();return;} wt.construyendo=true; let ind=0;
-  let timer=setInterval(()=>{ for(let i=0;i<wt.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}} if(ind>=bloques.length){clearInterval(timer);wt.construyendo=false;if(cb)cb();wtUpdateUI();} },wt.intervalSpeed);
+  if(!bloques.length){if(cb)cb();return;}wt.construyendo=true;let ind=0;
+  let timer=setInterval(()=>{for(let i=0;i<wt.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}}if(ind>=bloques.length){clearInterval(timer);wt.construyendo=false;if(cb)cb();wtUpdateUI();}},wt.intervalSpeed);
 }
 
 function wtRevelarColorActual(){
-  if(wt.diasRevelados.includes(wt.diaActual)||wt.construyendo) return;
-  wt.monedas++; wtSaveCoins(wt.monedas);
-  wt.diasReveladosNativos.push(wt.diaActual);
+  if(wt.diasRevelados.includes(wt.diaActual)||wt.construyendo)return;
+  wt.monedas++;wtSaveCoins(wt.monedas);wt.diasReveladosNativos.push(wt.diaActual);
   document.getElementById('wtRevealBtn').disabled=true;
   let bl=wt.bloquesADibujar.filter(b=>b.activo&&b.parte===wt.diaActual&&b.esEspecial);
   wtAnimarRevelado(bl,()=>{
     wt.diasRevelados.push(wt.diaActual);
     document.getElementById('wtRevealBtn').textContent='Color revealed \u2713';
-    if(wt.diaActual>=wt.TOTAL_DIAS) document.getElementById('wtDlBtn').disabled=false;
+    if(wt.diaActual>=wt.TOTAL_DIAS)document.getElementById('wtDlBtn').disabled=false;
     wtUpdateUI();
   });
 }
 
 function wtUsarHolyWater(){
-  // Guard: ignore clicks while an animation is already running
-  if(wt.construyendo) return;
-
-  // Find the oldest unrevealed day
-  let d=-1;
-  for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i)){d=i;break;}}
-
-  // Nothing to fix, or not enough coins
-  if(d===-1||wt.monedas<wt.costoHolyWater) return;
-
-  // Deduct cost and disable button BEFORE starting animation
-  // so rapid clicks cannot trigger multiple deductions
-  wt.monedas-=wt.costoHolyWater;
-  wtSaveCoins(wt.monedas);
+  if(wt.construyendo)return;
+  let d=-1;for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i)){d=i;break;}}
+  if(d===-1||wt.monedas<wt.costoHolyWater)return;
+  wt.monedas-=wt.costoHolyWater;wtSaveCoins(wt.monedas);
   document.getElementById('wtHolyBtn').disabled=true;
-
   let bl=wt.bloquesADibujar.filter(b=>b.activo&&b.parte===d);
   wtAnimarRevelado(bl,()=>{
     wt.diasRevelados.push(d);
-    if(d===wt.diaActual){
-      document.getElementById('wtRevealBtn').textContent='Color revealed \u2713';
-      document.getElementById('wtRevealBtn').disabled=true;
-    }
-    if(wt.diaActual>=wt.TOTAL_DIAS&&wtTodosRevelados())
-      document.getElementById('wtDlBtn').disabled=false;
-    // Re-evaluate button state now that this day is resolved
+    if(d===wt.diaActual){document.getElementById('wtRevealBtn').textContent='Color revealed \u2713';document.getElementById('wtRevealBtn').disabled=true;}
+    if(wt.diaActual>=wt.TOTAL_DIAS&&wtTodosRevelados())document.getElementById('wtDlBtn').disabled=false;
     wtUpdateUI();
   });
 }
 
-function wtTodosRevelados(){ for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))return false;} return true; }
+function wtTodosRevelados(){for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))return false;}return true;}
 
 function wtActualizarBotones(){
   const g=document.getElementById('wtGenBtn');
   if(wt.diaActual<wt.TOTAL_DIAS){g.disabled=false;g.textContent='Generate Day '+(wt.diaActual+1);}
-  else{g.disabled=true;g.textContent='COMPLETE!';if(wtTodosRevelados())document.getElementById('wtDlBtn').disabled=false;}
-  const r=document.getElementById('wtRevealBtn'); if(!wt.diasRevelados.includes(wt.diaActual)){r.disabled=false;r.textContent='\u25CE Reveal color';}
+  else{g.disabled=true;g.textContent='COMPLETE!';document.getElementById('wtDlBtn').disabled=false;}
+  const r=document.getElementById('wtRevealBtn');if(!wt.diasRevelados.includes(wt.diaActual)){r.disabled=false;r.textContent='\u25CE Reveal color';}
   wtUpdateUI();
 }
 
 function wtUpdateUI(){
-  if(wt.diaActual>=8)wt.costoMaximoAlcanzado=2; wt.costoHolyWater=wt.costoMaximoAlcanzado;
-  let p=0; for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))p++;}
+  if(wt.diaActual>=8)wt.costoMaximoAlcanzado=2;wt.costoHolyWater=wt.costoMaximoAlcanzado;
+  let p=0;for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))p++;}
   document.getElementById('wtHudDay').textContent=wt.diaActual===0?'\u2014':wt.diaActual+' / '+wt.TOTAL_DIAS;
   document.getElementById('wtHudCoins').textContent=wt.monedas;
   document.getElementById('wtHudPending').textContent=p;
   document.getElementById('wtCostBadge').textContent=wt.costoHolyWater;
   const pi=document.getElementById('wtPendingInfo');
-  if(p>0)pi.innerHTML='<span>'+p+'</span> day'+(p>1?'s':'')+' unrevealed'; else pi.innerHTML=wt.diaActual>0?'All days revealed \u2713':'';
+  if(p>0)pi.innerHTML='<span>'+p+'</span> day'+(p>1?'s':'')+' unrevealed';else pi.innerHTML=wt.diaActual>0?'All days revealed \u2713':'';
   document.getElementById('wtHolyCount').textContent=p;
   document.getElementById('wtHolyBtn').disabled=(wt.monedas<wt.costoHolyWater||p===0);
-  const track=document.getElementById('wtDayTrack'); track.innerHTML='';
+  const track=document.getElementById('wtDayTrack');track.innerHTML='';
   for(let i=1;i<=wt.TOTAL_DIAS;i++){
-    const pip=document.createElement('div'); pip.className='wt-day-pip'; pip.textContent=i;
+    const pip=document.createElement('div');pip.className='wt-day-pip';pip.textContent=i;
     if(i===wt.diaActual&&!wt.diasRevelados.includes(i)&&wt.diaActual>0)pip.classList.add('active');
     else if(wt.diasRevelados.includes(i))pip.classList.add('revealed');
     else if(i<wt.diaActual&&!wt.diasRevelados.includes(i))pip.classList.add('unrevealed');
@@ -1075,69 +963,150 @@ const WT_COINS_KEY='paxel_wt_coins';
 function wtSaveCoins(n){try{localStorage.setItem(WT_COINS_KEY,String(Math.max(0,n)));}catch(e){}}
 function wtLoadCoins(){try{const s=localStorage.getItem(WT_COINS_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<0?0:n;}catch(e){return 0;}}
 function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}wt.monedas=0;wtUpdateUI();}
-
 function wtGenerateHash(len){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 function wtCalcPurity(){if(wt.TOTAL_DIAS===0)return'0%';return Math.round(((wt.diasReveladosNativos||[]).length/wt.TOTAL_DIAS)*100)+'%';}
 
 async function wtDownloadCanvas(){
   if(!wtPxSketch)return;
-  const hash=wtGenerateHash(8), longHash='0x'+Array.from({length:40},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join(''), isoDate=new Date().toISOString().split('T')[0], purity=wtCalcPurity();
+  const hash=wtGenerateHash(8);
+  const longHash='0x'+Array.from({length:40},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  const isoDate=new Date().toISOString().split('T')[0];
+  const purity=wtCalcPurity();
+
   wtPxSketch.saveCanvas('paxel_waterer_'+hash,'png');
-  await new Promise(r=>setTimeout(r,300));
-  const{jsPDF}=window.jspdf, PW=210,PH=297, doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-  const INK=[16,19,26],INK_SOFT=[75,85,99],BLUE_D=[30,143,190],PAPER_ALT=[245,245,245],DORMANT2=[216,209,188],EBEBEB=[235,235,235],ECE8DE=[236,232,222],WHITE=[255,255,255];
-  const ML=14,MR=14,CW=PW-ML-MR;
+  await new Promise(r=>setTimeout(r,350));
+
+  const{jsPDF}=window.jspdf;
+  if(!jsPDF){console.error('jsPDF not loaded');return;}
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297;
+
+  const WHITE=[255,255,255],GREY_BG=[240,240,240],DARK_GREY=[74,74,74];
+  const RULE=[214,208,188],LABEL=[136,136,136],BLUE=[30,143,190];
+  const INK=[17,17,17],BTN_BG=[240,240,240],BTN_BD=[187,187,187],EMPTY=[204,204,204];
+  const BLACK=[0,0,0];
+  const ML=14,MR=14,CW=PW-ML-MR,FL=ML,FR=PW-MR,FV=FL+CW*0.38;
+
   doc.setFillColor(...WHITE);doc.rect(0,0,PW,PH,'F');
-  const HDR_H=22; doc.setFillColor(...PAPER_ALT);doc.rect(0,0,PW,HDR_H,'F');
-  doc.setDrawColor(...DORMANT2);doc.setLineWidth(0.5);doc.line(0,HDR_H,PW,HDR_H);
-  doc.setFont('helvetica','bold');doc.setFontSize(14);doc.setTextColor(...INK);
-  doc.text('Certificate of Authenticity',ML,HDR_H*0.62);
-  const ART_PT=12,ART_SZ=80,ART_X=(PW-ART_SZ)/2,ART_Y=HDR_H+ART_PT;
+
+  // ── Layout ──
+  const LOGO_SZ=14,LOGO_PAD=5,HDR_H=LOGO_SZ+2*LOGO_PAD;
+  const ART_GAP=10;
+  const ratio=wt.canvasH/wt.canvasW;
+  const ART_W=90,ART_H=Math.round(ART_W*ratio);
+  const ART_X=(PW-ART_W)/2,artTop=HDR_H+ART_GAP;
+  const artMidY=artTop+ART_H/2;
+
+  const BAN_W=36,BAN_X=ML-2,BAN_NOTCH=10,midBan=BAN_X+BAN_W/2;
+  const banBotY=artMidY,banTipY=banBotY-BAN_NOTCH;
+
+  // ── Header ──
+  doc.setFillColor(...GREY_BG);doc.rect(0,0,PW,HDR_H,'F');
+  doc.setDrawColor(...RULE);doc.setLineWidth(0.35);doc.line(0,HDR_H,PW,HDR_H);
+  doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...INK);
+  doc.text('Pre-Certificate of Authenticity',PW/2,HDR_H*0.60,{align:'center'});
+
+  // ── Banner fill ──
+  doc.setFillColor(...DARK_GREY);
+  doc.rect(BAN_X,0,BAN_W,banTipY,'F');
+  doc.triangle(BAN_X,banTipY,midBan,banTipY,BAN_X,banBotY,'F');
+  doc.triangle(midBan,banTipY,BAN_X+BAN_W,banTipY,BAN_X+BAN_W,banBotY,'F');
+
+  // Banner outline — thin black
+  doc.setDrawColor(...BLACK);doc.setLineWidth(0.6);
+  doc.line(BAN_X,0,BAN_X+BAN_W,0);
+  doc.line(BAN_X,0,BAN_X,banBotY);
+  doc.line(BAN_X+BAN_W,0,BAN_X+BAN_W,banBotY);
+  doc.line(BAN_X,banBotY,midBan,banTipY);
+  doc.line(midBan,banTipY,BAN_X+BAN_W,banBotY);
+
+  // ── Logo: horizontally centred in banner, top with padding ──
+  const LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2;
+  const LOGO_Y=LOGO_PAD;   // y=0 is top in jsPDF, so top padding from page top
+  const logoB64='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHoAAAB6CAMAAABHh7fWAAAAP1BMVEVMaXH09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PS2t9jZAAAAFHRSTlMAkBBg4DAgwECATNCgdJdXcMicPAXD2DIAAAAJcEhZcwAAJnIAACZyASErl+4AAAE8SURBVGiB7dttb4IwGIVhEIHW6dyL//+3qsn2HBLOCtPpkuY+n0j7tBd8aUrFpk9f2e3SPEMzz8bUJXWrbWMGB3eZejyVks3o5ArVrbZkBovL0NDQVdMv4zyHWHw+4+po6katYbfQrjJHr+pGUzd5VmhoaOg6aMf424GGhoZ+CO3Sxm6vjbZtccSf0doM6/mhoaGhV9BvxSM70e/uyE6T68X3aOpeo7dbWMMbQz9pRwoNDV0zPcSC1D+bXgg0NDT0le7NtsnlI65aR7v92tLPqe6GXBber+8LNDR0LXSXv3PIpewNPahbE6rNfVnin/X3O9LJq60KTysnhIaGrpvemzVMox9Ku7jTQmhoaOgVtPvUrSvSvQonE0bsAZul7zotvCXQ0NDQ0NDQ0NA/0uVob2r/fKFAQ0ND/wd9BhO45R4QkzFUAAAAAElFTkSuQmCC';
+  doc.addImage(logoB64,'PNG',LOGO_X,LOGO_Y,LOGO_SZ,LOGO_SZ);
+
+  // ── Art image ──
+  doc.setFillColor(70,182,226);doc.rect(ART_X,artTop,ART_W,ART_H,'F');
   try{
-    const cont=document.getElementById('wtP5Container'),raw=cont?cont.querySelector('canvas'):null,p5c=raw||wtPxSketch.elt;
+    const cont=document.getElementById('wtP5Container');
+    const raw=cont?cont.querySelector('canvas'):null,p5c=raw||wtPxSketch.elt;
     const off=document.createElement('canvas');off.width=wt.canvasW;off.height=wt.canvasH;
-    const ctx=off.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.drawImage(p5c,0,0,off.width,off.height);
-    doc.addImage(off.toDataURL('image/png'),'PNG',ART_X,ART_Y,ART_SZ,ART_SZ);
-    doc.setDrawColor(...INK);doc.setLineWidth(0.7);doc.rect(ART_X,ART_Y,ART_SZ,ART_SZ);
-  }catch(e){console.error('PDF img:',e);}
-  const FTR_H=18,FTR_Y=PH-FTR_H,FLD_TOP=ART_Y+ART_SZ+8,FLD_H=FTR_Y-FLD_TOP;
-  const fields=[['Username','N/A','empty'],['Hash',longHash,'hash'],['Date of creation',isoDate,'value'],['Image title','N/A','empty'],['Theme','N/A','empty'],['Edition','N/A','empty'],['Collection','N/A','empty'],['Purity',purity,'value'],['Genesis','N/A','empty']];
-  const ROW_H=FLD_H/fields.length,FL=ML,FR=PW-MR,FV=FL+CW*0.385;
+    const ctx=off.getContext('2d');ctx.imageSmoothingEnabled=false;
+    ctx.drawImage(p5c,0,0,off.width,off.height);
+    doc.addImage(off.toDataURL('image/png'),'PNG',ART_X,artTop,ART_W,ART_H);
+  }catch(e){console.error('PDF art:',e);}
+  // Thin art border
+  doc.setDrawColor(...INK);doc.setLineWidth(0.3);
+  doc.rect(ART_X,artTop,ART_W,ART_H);
+
+  // ── Fields ──
+  const BTN_H=9,FTR_PAD=4,FTR_TOTAL=FTR_PAD+BTN_H+FTR_PAD;
+  const FLD_TOP=artTop+ART_H+5,FLD_BOT=PH-FTR_TOTAL;
+  const N=9,ROW_H=(FLD_BOT-FLD_TOP)/N;
+
+  doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_TOP,FR,FLD_TOP);
+
+  const fields=[
+    ['USERNAME','\u2014','empty'],
+    ['HASH',longHash,'hash'],
+    ['DATE OF CREATION',isoDate,'value'],
+    ['IMAGE TITLE','\u2014','empty'],
+    ['THEME','\u2014','empty'],
+    ['EDITION','\u2014','empty'],
+    ['COLLECTION','\u2014','empty'],
+    ['PURITY',purity,'value'],
+    ['GENESIS','\u2014','empty'],
+  ];
   fields.forEach(([label,value,type],i)=>{
-    const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.60;
-    if(i>0){doc.setDrawColor(...EBEBEB);doc.setLineWidth(0.35);doc.line(FL,rT,FR,rT);}
-    doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(...INK_SOFT);doc.text(label.toUpperCase(),FL,tY);
-    if(type==='empty'){doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(...DORMANT2);doc.text('\u2014',FV,tY);}
-    else if(type==='hash'){doc.setFont('helvetica','bold');doc.setFontSize(6.5);doc.setTextColor(...BLUE_D);const lines=doc.splitTextToSize(value,FR-FV);doc.text(lines,FV,tY);}
-    else{doc.setFont('helvetica','bold');doc.setFontSize(9.5);doc.setTextColor(...INK);doc.text(String(value),FV,tY);}
+    const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.62;
+    if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(FL,rT,FR,rT);}
+    // Label
+    doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...LABEL);
+    doc.text(label,FL,tY);
+    // Value
+    if(type==='empty'){
+      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...EMPTY);
+      doc.text(value,FV,tY);
+    }else if(type==='hash'){
+      doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...BLUE);
+      const lines=doc.splitTextToSize(value,FR-FV-2);
+      doc.text(lines,FV,tY-(lines.length>1?2:0));
+    }else{
+      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...INK);
+      doc.text(String(value),FV,tY);
+    }
   });
-  const BTN_W=34,BTN_H=10,BTN_X=ML,BTN_Y=FTR_Y+(FTR_H-BTN_H)/2;
-  doc.setFillColor(...EBEBEB);doc.setDrawColor(...ECE8DE);doc.setLineWidth(0.5);doc.roundedRect(BTN_X,BTN_Y,BTN_W,BTN_H,2,2,'FD');
-  doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(...INK);
-  doc.textWithLink('paxelart.eu',BTN_X+BTN_W/2,BTN_Y+BTN_H*0.65,{url:'https://paxelart.eu/',align:'center'});
+
+  doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_BOT,FR,FLD_BOT);
+
+  // ── Footer ──
+  const fRowY=PH-FTR_TOTAL+FTR_PAD;
+  const BTN_W=32,BTN_BX=FL,BTN_BY=fRowY;
+  doc.setFillColor(...BTN_BG);doc.setDrawColor(...BTN_BD);doc.setLineWidth(0.3);
+  doc.roundedRect(BTN_BX,BTN_BY,BTN_W,BTN_H,3,3,'FD');
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.text('paxelart.eu',BTN_BX+BTN_W/2,BTN_BY+BTN_H*0.62,{align:'center'});
   doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
-  doc.text('PAXEL\u2122 \u00B7 SLOW ART',FR,BTN_Y+BTN_H*0.65,{align:'right'});
-  doc.save('paxel_precertificate_'+hash+'.pdf');
+  doc.text('PAXEL \u00B7 Slow art system',FR,BTN_BY+BTN_H*0.62,{align:'right'});
+
+  doc.save('paxel_certificate_'+hash+'.pdf');
 }
 
 function wtSetFmt(tipo,w,h,btn){
-  document.querySelectorAll('#page-waterer .fmt-btn').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected');
-  wt.canvasW=w; wt.canvasH=h;
-  const wrap=document.getElementById('wtCanvasWrap'); wrap.style.aspectRatio=w+'/'+h;
-  if(wtP5Instance&&wtPxSketch){ wtPxSketch.resizeCanvas(w,h); if(wt.img){wtPxSketch.background(255);wt.bloquesADibujar=[];wt.indiceActual=0;wt.diaActual=0;wtUpdateUI();} document.getElementById('wtDlBtn').disabled=true; }
-  const sel=document.getElementById('wtResSelect'); sel.innerHTML='';
+  document.querySelectorAll('#page-waterer .fmt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
+  wt.canvasW=w;wt.canvasH=h;
+  const wrap=document.getElementById('wtCanvasWrap');wrap.style.aspectRatio=w+'/'+h;
+  if(wtP5Instance&&wtPxSketch){wtPxSketch.resizeCanvas(w,h);if(wt.img){wtPxSketch.background(255);wt.bloquesADibujar=[];wt.indiceActual=0;wt.diaActual=0;wtUpdateUI();}document.getElementById('wtDlBtn').disabled=true;}
+  const sel=document.getElementById('wtResSelect');sel.innerHTML='';
   let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
-  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);}); wtOnResChange();
-  wtRecalcCanvasHeight();
+  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});wtOnResChange();
 }
 
-function wtOnResChange(){ const v=document.getElementById('wtResSelect').value; if(!v)return; const p=v.split('x'); wt.COLS=parseInt(p[0]); wt.ROWS=parseInt(p[1]); if(wt.img)wtProcesarImagen(); }
+function wtOnResChange(){const v=document.getElementById('wtResSelect').value;if(!v)return;const p=v.split('x');wt.COLS=parseInt(p[0]);wt.ROWS=parseInt(p[1]);if(wt.img)wtProcesarImagen();}
 
 function wtRecalcCanvasHeight(){
-  const wrap=document.getElementById('wtCanvasWrap'); if(!wrap)return;
-  // Remove any inline height so aspect-ratio drives the layout naturally.
-  // The canvas column width is locked via CSS custom property when controls
-  // are hidden, so the canvas never changes size during toggling.
+  const wrap=document.getElementById('wtCanvasWrap');if(!wrap)return;
   wrap.style.height='';
 }
 
@@ -1145,18 +1114,14 @@ function wtRecalcCanvasHeight(){
 window.addEventListener('DOMContentLoaded',()=>{
   ptSetFmt('1:1',600,600,document.getElementById('pt-fmt-1-1'));
   wtSetFmt('1:1',600,600,document.getElementById('wt-fmt-1-1'));
-  wt.monedas=wtLoadCoins(); wtUpdateUI();
+  wt.monedas=wtLoadCoins();wtUpdateUI();
   const ptZ=document.getElementById('ptUploadZone');
-  if(ptZ){ ptZ.addEventListener('dragover',e=>{e.preventDefault();ptZ.classList.add('dragover');}); ptZ.addEventListener('dragleave',()=>ptZ.classList.remove('dragover')); ptZ.addEventListener('drop',e=>{e.preventDefault();ptZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('ptFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;ptHandleFileInput(inp);}}); }
+  if(ptZ){ptZ.addEventListener('dragover',e=>{e.preventDefault();ptZ.classList.add('dragover');});ptZ.addEventListener('dragleave',()=>ptZ.classList.remove('dragover'));ptZ.addEventListener('drop',e=>{e.preventDefault();ptZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('ptFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;ptHandleFileInput(inp);}});}
   const wtZ=document.getElementById('wtUploadZone');
-  if(wtZ){ wtZ.addEventListener('dragover',e=>{e.preventDefault();wtZ.classList.add('dragover');}); wtZ.addEventListener('dragleave',()=>wtZ.classList.remove('dragover')); wtZ.addEventListener('drop',e=>{e.preventDefault();wtZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('wtFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;wtHandleFileInput(inp);}}); }
+  if(wtZ){wtZ.addEventListener('dragover',e=>{e.preventDefault();wtZ.classList.add('dragover');});wtZ.addEventListener('dragleave',()=>wtZ.classList.remove('dragover'));wtZ.addEventListener('drop',e=>{e.preventDefault();wtZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('wtFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;wtHandleFileInput(inp);}});}
 });
 
-window.addEventListener('resize',()=>{
-  // aspect-ratio handles canvas sizing natively — nothing to override.
-  // wtRecalcCanvasHeight clears any stale inline height.
-  wtRecalcCanvasHeight();
-});
+window.addEventListener('resize',()=>{wtRecalcCanvasHeight();});
 </script>
 </body>
 </html>
