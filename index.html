@@ -115,6 +115,10 @@ section{padding:84px 0;}
 .roadmap-card.pixel-featured{background:#fff;border-color:var(--blue);box-shadow:5px 5px 0 var(--blue);cursor:pointer;transition:transform .2s,box-shadow .2s;}
 .roadmap-card.pixel-featured:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--blue);}
 .roadmap-card.pixel-featured .r-pill{background:var(--blue);color:var(--ink);}
+/* Waterer card — same hover animation as tool card */
+.roadmap-card.pixel-featured-wt{border-color:var(--blue);box-shadow:5px 5px 0 var(--blue);}
+.roadmap-card.pixel-featured-wt:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--blue);}
+.roadmap-card.pixel-featured-wt .r-pill{background:var(--blue);color:var(--ink);}
 .pixel-open-btn{margin-top:18px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;font-family:var(--font);background:var(--ink);color:#fff;border:none;padding:10px 18px;border-radius:3px;cursor:pointer;transition:background .2s;}
 .pixel-open-btn:hover{background:var(--blue-deep);}
 .ghost-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;margin-top:16px;opacity:.45;}
@@ -386,8 +390,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <button class="pixel-open-btn" onclick="showPage('tool')">Open Pixel tool &rarr;</button>
         <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
-      <div class="roadmap-card pixel-featured px-border" onclick="showPage('waterer')" style="border-color:var(--blue);box-shadow:5px 5px 0 var(--blue);">
-        <span class="r-pill" style="background:var(--blue);color:var(--ink);">TRY IT NOW</span><h4>Pixel waterer</h4>
+      <div class="roadmap-card pixel-featured pixel-featured-wt px-border" onclick="showPage('waterer')">
+        <span class="r-pill">TRY IT NOW</span><h4>Pixel waterer</h4>
         <p>Upload your image and watch it grow day by day. Reveal today's colors, earn coins and use Holy Water to recover past days!</p>
         <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('waterer')">Open Pixel waterer &rarr;</button>
         <div class="ghost-grid" style="opacity:.45;"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
@@ -965,70 +969,51 @@ function wtSaveCoins(n){try{localStorage.setItem(WT_COINS_KEY,String(Math.max(0,
 function wtLoadCoins(){try{const s=localStorage.getItem(WT_COINS_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<0?0:n;}catch(e){return 0;}}
 function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}wt.monedas=0;wtUpdateUI();}
 
-// ── Certificate serial number counter ──
-// Format: PRE:X-YYYYYYYYY  where X=1..999, Y=000000001..999999999
-// Stored in localStorage as a single integer (total count across both segments).
-// Max value: 999 * 999999999 = 998999000001 (fits in JS Number safely)
-const CERT_KEY='paxel_cert_count';
-function wtLoadCertCount(){
-  try{const s=localStorage.getItem(CERT_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<1?0:n;}
-  catch(e){return 0;}
-}
-function wtSaveCertCount(n){
-  try{localStorage.setItem(CERT_KEY,String(n));}catch(e){}
-}
-function wtNextCertSerial(){
-  // Increment counter (1-based: first certificate = count 1)
-  const count=wtLoadCertCount()+1;
-  wtSaveCertCount(count);
-  // Derive X (prefix 1..999) and Y (suffix 000000001..999999999)
-  const MAX_Y=999999999;
-  const prefix=Math.min(999,Math.floor((count-1)/MAX_Y)+1);
-  const suffix=((count-1)%MAX_Y)+1;
-  // Zero-pad suffix to 9 digits
-  const suffixStr=String(suffix).padStart(9,'0');
-  return 'PRE:'+prefix+'-'+suffixStr;
-}
 function wtGenerateHash(len){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 
-// ── Certificate serial counter ──
-// Format: PRE:X-YYYYYYYYY  where X goes 1-999 and Y goes 000000001-999999999
-// Persisted in localStorage as a single integer (the total count).
-const WT_SERIAL_KEY='paxel_cert_serial';
-const WT_SERIAL_MAX=999*999999999; // absolute maximum
-
-function wtLoadSerialCount(){
-  try{
-    const v=parseInt(localStorage.getItem(WT_SERIAL_KEY)||'0',10);
-    return isNaN(v)||v<0?0:v;
-  }catch(e){return 0;}
-}
-
-function wtSaveSerialCount(n){
-  try{localStorage.setItem(WT_SERIAL_KEY,String(n));}catch(e){}
-}
+// ── Shared certificate serial counter (window.storage — global across all users) ──
+// Format: PRE:X-YYYYYYYYY  where X=1..999, Y=000000001..999999999
+// Uses window.storage shared key so every user increments the same counter.
+// Falls back to localStorage if window.storage is unavailable.
+const CERT_STORAGE_KEY='paxel_cert_global_count';
+const CERT_MAX_Y=999999999;
 
 function wtFormatSerial(n){
-  // n is 0-based total count; serial starts at 1
-  const serial=n+1;
-  const maxSeq=999999999;
-  const prefix=Math.ceil(serial/maxSeq);           // 1, 2, ... 999
-  const seq=serial-((prefix-1)*maxSeq);            // 1 ... 999999999
-  const seqStr=String(seq).padStart(9,'0');
-  return'PRE:'+prefix+'-'+seqStr;
+  // n is 1-based total count
+  const prefix=Math.min(999,Math.floor((n-1)/CERT_MAX_Y)+1);
+  const seq=((n-1)%CERT_MAX_Y)+1;
+  return'PRE:'+prefix+'-'+String(seq).padStart(9,'0');
 }
 
-function wtNextCertSerial(){
-  // Read current count, format, then increment and save
-  let count=wtLoadSerialCount();
-  if(count>=WT_SERIAL_MAX) count=0; // wrap at absolute limit
-  const serial=wtFormatSerial(count);
-  wtSaveSerialCount(count+1);
-  return serial;
-}
-
-function wtGetCurrentSerialCount(){
-  return wtLoadSerialCount();
+async function wtNextCertSerial(){
+  // ── Try window.storage (shared across all users) ──
+  if(window.storage){
+    try{
+      // Read current count
+      let current=0;
+      try{
+        const res=await window.storage.get(CERT_STORAGE_KEY,true); // shared=true
+        if(res&&res.value) current=Math.max(0,parseInt(res.value,10)||0);
+      }catch(e){ current=0; }
+      const next=current+1;
+      // Save incremented value (shared)
+      await window.storage.set(CERT_STORAGE_KEY,String(next),true);
+      return wtFormatSerial(next);
+    }catch(e){
+      console.warn('window.storage failed, falling back to localStorage',e);
+    }
+  }
+  // ── Fallback: localStorage (local only) ──
+  try{
+    const s=localStorage.getItem(CERT_STORAGE_KEY);
+    const current=s?Math.max(0,parseInt(s,10)||0):0;
+    const next=current+1;
+    localStorage.setItem(CERT_STORAGE_KEY,String(next));
+    return wtFormatSerial(next);
+  }catch(e){
+    // If everything fails, return a timestamp-based serial
+    return wtFormatSerial(Date.now()%CERT_MAX_Y||1);
+  }
 }
 
 function wtCalcPurity(){if(wt.TOTAL_DIAS===0)return'0%';return Math.round(((wt.diasReveladosNativos||[]).length/wt.TOTAL_DIAS)*100)+'%';}
@@ -1036,7 +1021,7 @@ function wtCalcPurity(){if(wt.TOTAL_DIAS===0)return'0%';return Math.round(((wt.d
 async function wtDownloadCanvas(){
   if(!wtPxSketch)return;
   const hash=wtGenerateHash(8);
-  const longHash=wtNextCertSerial(); // incremental serial: PRE:X-YYYYYYYYY
+  const longHash=await wtNextCertSerial(); // shared incremental serial: PRE:X-YYYYYYYYY
   const isoDate=new Date().toISOString().split('T')[0];
   const purity=wtCalcPurity();
 
@@ -1140,21 +1125,36 @@ async function wtDownloadCanvas(){
     ['COLLECTION','\u2014','empty'],['PURITY',purity,'value'],
     ['GENESIS','\u2014','empty'],
   ];
+  // mm-per-pt conversion: 1pt = 0.3528mm
+  // To vertically centre text in a row, baseline = rowTop + ROW_H/2 + fontSize*0.3528*0.35
+  // The 0.35 factor approximates cap-height as ~35% of font size above baseline
+  const ptToMm=0.3528;
+  const labelFS=7, valueFS=11;
+  const labelCapH=labelFS*ptToMm*0.35;  // approx cap-height of label font in mm
+  const valueCapH=valueFS*ptToMm*0.35;  // approx cap-height of value font in mm
+
   fields.forEach(([label,value,type],i)=>{
-    const rT=FLD_TOP+i*ROW_H,tY=rT+ROW_H*0.57;
+    const rT=FLD_TOP+i*ROW_H;           // top of this row
+    const rowMid=rT+ROW_H/2;            // vertical midpoint of row
+
     if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(FL,rT,FR,rT);}
-    doc.setFont('helvetica','bold');doc.setFontSize(7);doc.setTextColor(...LABEL);
-    doc.text(label,FL,tY);
+
+    // Label baseline: centred on rowMid using label font cap-height
+    const labelY=rowMid+labelCapH;
+    doc.setFont('helvetica','bold');doc.setFontSize(labelFS);doc.setTextColor(...LABEL);
+    doc.text(label,FL,labelY);
+
+    // Value baseline: centred on same rowMid using value font cap-height
+    const valueY=rowMid+valueCapH;
     if(type==='empty'){
-      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...EMPTY);
-      doc.text(value,FV,tY);
+      doc.setFont('helvetica','bold');doc.setFontSize(valueFS);doc.setTextColor(...EMPTY);
+      doc.text(value,FV,valueY);
     }else if(type==='hash'){
-      // PRE:X-YYYYYYYYY — short serial, render at full value size in blue
-      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...BLUE);
-      doc.text(String(value),FV,tY);
+      doc.setFont('helvetica','bold');doc.setFontSize(valueFS);doc.setTextColor(...BLUE);
+      doc.text(String(value),FV,valueY);
     }else{
-      doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(...INK);
-      doc.text(String(value),FV,tY);
+      doc.setFont('helvetica','bold');doc.setFontSize(valueFS);doc.setTextColor(...INK);
+      doc.text(String(value),FV,valueY);
     }
   });
   doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_BOT,FR,FLD_BOT);
@@ -1164,9 +1164,9 @@ async function wtDownloadCanvas(){
   const BTN_W=32,BTN_BX=FL,BTN_BY=fRowY;
   doc.setFillColor(...BTN_BG);doc.setDrawColor(...BTN_BD);doc.setLineWidth(0.3);
   doc.roundedRect(BTN_BX,BTN_BY,BTN_W,BTN_H,3,3,'FD');
-  doc.setFont('helvetica','normal');doc.setFontSize(12);doc.setTextColor(...INK);
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...INK);
   doc.text('paxelart.eu',BTN_BX+BTN_W/2,BTN_BY+BTN_H*0.62,{align:'center'});
-  doc.setFont('helvetica','bold');doc.setFontSize(12);doc.setTextColor(...INK);
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
   doc.text('PAXEL \u00B7 Slow art system',FR,BTN_BY+BTN_H*0.62,{align:'right'});
 
   // PDF as base64
