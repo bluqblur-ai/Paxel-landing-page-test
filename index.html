@@ -43,9 +43,7 @@ section{padding:84px 0;}
 .logo img{height:30px;width:108px;display:block;}
 .tabs{display:flex;align-items:center;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;}
 .tabs::-webkit-scrollbar{display:none;}
-.bmc-btn{flex-shrink:0;padding-left:16px;display:flex;align-items:center;}
-.bmc-btn img{height:34px;width:auto;display:block;border-radius:3px;}
-@media(max-width:480px){.bmc-btn img{height:28px;}}
+
 .tab{font-size:13px;font-weight:700;padding:8px 14px;border-radius:20px;white-space:nowrap;transition:background .2s,color .2s;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--ink);flex-shrink:0;}
 .tab.active-tab{background:var(--ink);color:#fff;}
 .tab.soon{color:var(--ink-soft);display:inline-flex;align-items:center;gap:5px;cursor:default;}
@@ -288,9 +286,18 @@ footer .foot-tabs button:hover{color:var(--ink);}
   grid-template-columns:1fr var(--wt-canvas-col-w,1fr);
 }
 @media(max-width:900px){#wtLayoutGrid.ctrl-hidden{grid-template-columns:1fr;}}
+
+/* Version tag */
+.version-tag{
+  position:fixed;top:10px;right:12px;z-index:9999;
+  font-family:var(--font);font-size:10px;font-weight:700;
+  color:var(--ink-soft);letter-spacing:.04em;
+  pointer-events:none;
+}
 </style>
 </head>
 <body>
+<div class="version-tag">Version 2</div>
 <nav class="nav">
   <div class="wrap nav-inner">
     <div class="logo" onclick="showPage('home')"><img src="paxel-recto.png" alt="PAXEL" width="200"></div>
@@ -300,11 +307,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <button class="tab" id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
       <span class="tab soon">Placeholder <span class="pill">SOON</span></span>
     </div>
-    <div class="bmc-btn">
-      <a href="https://www.buymeacoffee.com/paxel" target="_blank" rel="noopener">
-        <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=paxel&button_colour=d8d1bc&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00" alt="Buy me a coffee">
-      </a>
-    </div>
+
   </div>
 </nav>
 
@@ -971,10 +974,10 @@ function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}wt.
 
 function wtGenerateHash(len){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 
-// ── Shared certificate serial counter (window.storage — global across all users) ──
+// ── Shared certificate serial counter — global via countapi.xyz ──
 // Format: PRE:X-YYYYYYYYY  where X=1..999, Y=000000001..999999999
-// Uses window.storage shared key so every user increments the same counter.
-// Falls back to localStorage if window.storage is unavailable.
+// Primary: countapi.xyz free atomic counter (global across all users/devices).
+// Fallback: localStorage (local only, if API unreachable).
 const CERT_STORAGE_KEY='paxel_cert_global_count';
 const CERT_MAX_Y=999999999;
 
@@ -986,24 +989,23 @@ function wtFormatSerial(n){
 }
 
 async function wtNextCertSerial(){
-  // ── Try window.storage (shared across all users) ──
-  if(window.storage){
-    try{
-      // Read current count
-      let current=0;
-      try{
-        const res=await window.storage.get(CERT_STORAGE_KEY,true); // shared=true
-        if(res&&res.value) current=Math.max(0,parseInt(res.value,10)||0);
-      }catch(e){ current=0; }
-      const next=current+1;
-      // Save incremented value (shared)
-      await window.storage.set(CERT_STORAGE_KEY,String(next),true);
-      return wtFormatSerial(next);
-    }catch(e){
-      console.warn('window.storage failed, falling back to localStorage',e);
+  // ── Primary: countapi.xyz — free global atomic counter, works on any host ──
+  // Each GET to /hit/:namespace/:key atomically increments by 1 and returns the new value.
+  // No auth, no CORS issues, globally shared across all users and devices.
+  try{
+    const res=await fetch('https://api.countapi.xyz/hit/paxelart.eu/cert-serial');
+    if(res.ok){
+      const data=await res.json();
+      if(typeof data.value==='number'&&data.value>0){
+        // Also cache locally so we have something if the API is briefly down
+        try{localStorage.setItem(CERT_STORAGE_KEY,String(data.value));}catch(e){}
+        return wtFormatSerial(data.value);
+      }
     }
+  }catch(e){
+    console.warn('countapi.xyz unreachable, using local fallback',e);
   }
-  // ── Fallback: localStorage (local only) ──
+  // ── Fallback: localStorage (local only — if API unreachable) ──
   try{
     const s=localStorage.getItem(CERT_STORAGE_KEY);
     const current=s?Math.max(0,parseInt(s,10)||0):0;
@@ -1011,7 +1013,6 @@ async function wtNextCertSerial(){
     localStorage.setItem(CERT_STORAGE_KEY,String(next));
     return wtFormatSerial(next);
   }catch(e){
-    // If everything fails, return a timestamp-based serial
     return wtFormatSerial(Date.now()%CERT_MAX_Y||1);
   }
 }
@@ -1214,6 +1215,8 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 
 window.addEventListener('resize',()=>{wtRecalcCanvasHeight();});
+
+
 </script>
 </body>
 </html>
