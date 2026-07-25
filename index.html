@@ -310,7 +310,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
 #ppControlsCol{display:flex;flex-direction:column;gap:20px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease;}
 #ppControlsCol.pp-collapsing{opacity:0;visibility:hidden;}
-#ppCanvasCol{display:flex;flex-direction:column;gap:16px;min-width:0;}
+#ppCanvasCol{display:flex;flex-direction:column;gap:16px;min-width:0;overflow:visible;}
 #ppBelowCanvas{display:flex;flex-direction:column;gap:16px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1);}
 #ppBelowCanvas.pp-sliding{opacity:0;transform:translateX(var(--pp-slide-from,60px));}
 #ppSidePanelSlot{display:none;flex-direction:column;gap:16px;opacity:0;transition:opacity .28s ease;}
@@ -323,6 +323,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
   position:relative;
   padding:60px;
   margin:-60px;
+  z-index:1;
 }
 /* Canvas wrap inside phrase area */
 #ppCanvasWrap{
@@ -342,7 +343,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pp-phrase-popup{
   position:absolute;
   z-index:200;
-  pointer-events:auto;
+  pointer-events:none;
   opacity:0;
   transition:opacity .5s ease, top .5s ease;
 }
@@ -357,6 +358,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
   cursor:pointer;
   transition:background .3s ease;
   line-height:1.2;
+  pointer-events:auto;
 }
 .pp-phrase-card:hover{background:#ededed;}
 .pp-phrase-day{
@@ -380,6 +382,17 @@ footer .foot-tabs button:hover{color:var(--ink);}
 }
 .pp-collectible-new:hover{background:#e6c200;}
 
+/* My Collection row — aligns with toggle button row above grid */
+/* Top row above grid: toggle left, My Collection right — always same flex container */
+.pp-top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+  position:relative;
+  z-index:20;
+}
+
 /* My Collection button — same height/style as btn-toggle-ctrl, fully rounded */
 .pp-my-collection-btn{
   font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
@@ -392,8 +405,11 @@ footer .foot-tabs button:hover{color:var(--ink);}
   border-radius:999px;
   transition:background .2s,color .2s;
   white-space:nowrap;
+  position:relative;
+  z-index:1001;
 }
 .pp-my-collection-btn:hover{background:var(--ink);color:#fff;}
+.pp-my-collection-btn *{pointer-events:none;}
 .pp-inv-count{font-size:11px;color:var(--blue-deep);font-weight:800;}
 .pp-my-collection-btn:hover .pp-inv-count{color:#fff;}
 
@@ -826,12 +842,13 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-controls-section">
     <div class="wrap">
 
-      <!-- Toggle row -->
-      <div class="wt-toggle-btn-row" style="margin-bottom:20px;">
+      <!-- Toggle + My Collection row — same flex container, always aligned -->
+      <div class="pp-top-row">
         <button class="btn-toggle-ctrl" id="ppToggleBtn" onclick="ppToggleControls()">
           <span class="toggle-arrow" id="ppToggleArrow">&#8592;</span>
           <span id="ppToggleBtnLabel">Hide controls</span>
         </button>
+        <button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button>
       </div>
 
       <!-- Layout grid (same pattern as waterer) -->
@@ -924,7 +941,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
         <!-- Canvas column -->
         <div id="ppCanvasCol">
-          <!-- phrase popup area: 30px padding around canvas -->
+          <!-- phrase popup area -->
           <div id="ppPhraseArea">
             <div id="ppCanvasWrap" class="px-border">
               <div id="ppCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN</div>
@@ -971,7 +988,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
               <button class="btn-reveal"    id="ppRevealBtn" disabled onclick="ppRevelarColorActual()">&#9711; Reveal phrase</button>
               <button class="btn-holy"      id="ppHolyBtn"   disabled onclick="ppUsarHolyWater()">&#128167; Holy Water &times;<span id="ppHolyCount">0</span></button>
               <button class="btn-secondary" id="ppExtraBtn"  disabled onclick="ppExtraPhrase()">&#128172; Extra phrase (10 coins)</button>
-              <button class="btn-secondary" id="ppInventoryBtn" onclick="ppOpenInventory()">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button>
+              <button class="btn-secondary" id="ppInventoryBtn" onclick="ppOpenInventory()" style="display:none;">My collection</button>
               <button class="btn-secondary" id="ppDlBtn"     disabled onclick="ppDownloadCanvas()">&#8595; Download HD</button>
             </div>
           </div><!-- /#ppBelowCanvas -->
@@ -1816,8 +1833,11 @@ function ppUpdateUI(){
   document.getElementById('ppHolyBtn').disabled =(pp.monedas<pp.costoHolyWater||pending===0||pp.construyendo);
   document.getElementById('ppExtraBtn').disabled=(pp.monedas<10||pp.diaActual<=0||pp.construyendo);
   // Inventory button collectibles count
-  const ic=document.getElementById('ppInventoryCount');
-  if(ic)ic.textContent=totalCollect>0?'('+totalCollect+')':'';
+  // Update count in both the top-row trigger and the action-btns button
+  ['ppInventoryCount'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.textContent=totalCollect>0?'('+totalCollect+')':'';
+  });
   // Day pips
   const track=document.getElementById('ppDayTrack');
   if(track){track.innerHTML='';for(let i=1;i<=pp.TOTAL_DIAS;i++){const pip=document.createElement('div');pip.className='wt-day-pip';pip.textContent=i;if(i===pp.diaActual&&!pp.diasRevelados.includes(i)&&pp.diaActual>0)pip.classList.add('active');else if(pp.diasRevelados.includes(i))pip.classList.add('revealed');else if(i<pp.diaActual&&!pp.diasRevelados.includes(i))pip.classList.add('unrevealed');track.appendChild(pip);}}
@@ -1957,134 +1977,70 @@ function ppHidePhrase(){
 
 // ── Inventory ──
 function ppOpenInventory(){
-  var existing=document.getElementById('pp-inventory-overlay');
+  const existing=document.getElementById('pp-inventory-overlay');
   if(existing)existing.remove();
-  var total=Object.values(pp.coleccion).reduce(function(a,b){return a+b;},0);
-  function getPrio(p){if(ppCategorias.legendary.indexOf(p)>-1)return 3;if(ppCategorias.rare.indexOf(p)>-1)return 2;return 1;}
-  var found=ppPalabrasClave.filter(function(p){return(pp.coleccion[p]||0)>0;}).sort(function(a,b){return getPrio(b)-getPrio(a);});
-  var missing=ppPalabrasClave.filter(function(p){return(pp.coleccion[p]||0)===0;}).sort(function(a,b){return getPrio(b)-getPrio(a);});
 
-  var overlay=document.createElement('div');
+  const totalCollect=Object.values(pp.coleccion).reduce((a,b)=>a+b,0);
+  const getPrio=p=>{if(ppCategorias.legendary.includes(p))return 3;if(ppCategorias.rare.includes(p))return 2;return 1;};
+  const found  =ppPalabrasClave.filter(p=>(pp.coleccion[p]||0)>0).sort((a,b)=>getPrio(b)-getPrio(a));
+  const missing=ppPalabrasClave.filter(p=>(pp.coleccion[p]||0)===0).sort((a,b)=>getPrio(b)-getPrio(a));
+
+  const s=(el,styles)=>Object.assign(el.style,styles);
+  const F="'Cairo',sans-serif";
+
+  const overlay=document.createElement('div');
   overlay.id='pp-inventory-overlay';
-  overlay.style.position='fixed';
-  overlay.style.inset='0';
-  overlay.style.zIndex='9999';
-  overlay.style.background='rgba(16,19,26,.55)';
-  overlay.style.display='flex';
-  overlay.style.alignItems='center';
-  overlay.style.justifyContent='center';
-  overlay.onclick=function(e){if(e.target===overlay)ppCloseInventory();};
+  s(overlay,{position:'fixed',inset:'0',zIndex:'9999',background:'rgba(16,19,26,.55)',display:'flex',alignItems:'center',justifyContent:'center'});
+  overlay.onclick=e=>{if(e.target===overlay)ppCloseInventory();};
 
-  var box=document.createElement('div');
-  box.style.background='#fff';
-  box.style.border='3px solid #10131A';
-  box.style.borderRadius='4px';
-  box.style.boxShadow='6px 6px 0 #10131A';
-  box.style.width='min(480px,92vw)';
-  box.style.maxHeight='80vh';
-  box.style.display='flex';
-  box.style.flexDirection='column';
-  box.style.overflow='hidden';
-  box.style.fontFamily="'Cairo',sans-serif";
+  const box=document.createElement('div');
+  s(box,{background:'#fff',border:'3px solid #10131A',borderRadius:'4px',boxShadow:'6px 6px 0 #10131A',width:'min(480px,92vw)',maxHeight:'80vh',display:'flex',flexDirection:'column',overflow:'hidden',fontFamily:F});
 
-  var head=document.createElement('div');
-  head.style.padding='20px 24px 14px';
-  head.style.borderBottom='2px solid #E7E2D3';
-  head.style.display='flex';
-  head.style.alignItems='center';
-  head.style.justifyContent='space-between';
-  head.style.flexShrink='0';
+  const head=document.createElement('div');
+  s(head,{padding:'20px 24px 14px',borderBottom:'2px solid #E7E2D3',display:'flex',alignItems:'center',justifyContent:'space-between',flexShrink:'0'});
 
-  var headLeft=document.createElement('div');
-  var h3=document.createElement('h3');
-  h3.style.fontSize='18px';
-  h3.style.fontWeight='800';
-  h3.style.margin='0';
+  const headLeft=document.createElement('div');
+  const h3=document.createElement('h3');
+  s(h3,{fontSize:'18px',fontWeight:'800',fontFamily:F,margin:'0'});
   h3.textContent='My Collection';
-  var sub=document.createElement('div');
-  sub.style.fontSize='12px';
-  sub.style.fontWeight='700';
-  sub.style.color='#4B5563';
-  sub.style.marginTop='2px';
-  sub.textContent=total+' collectible'+(total!==1?'s':'')+' collected';
-  headLeft.appendChild(h3);
-  headLeft.appendChild(sub);
+  const sub=document.createElement('div');
+  s(sub,{fontSize:'12px',fontWeight:'700',color:'#4B5563',marginTop:'2px'});
+  sub.textContent=totalCollect+' collectible'+(totalCollect!==1?'s':'')+' collected';
+  headLeft.appendChild(h3);headLeft.appendChild(sub);
 
-  var closeBtn=document.createElement('button');
+  const closeBtn=document.createElement('button');
+  s(closeBtn,{fontFamily:F,fontSize:'11px',fontWeight:'800',letterSpacing:'.06em',textTransform:'uppercase',background:'none',border:'2px solid #10131A',borderRadius:'3px',padding:'5px 12px',cursor:'pointer',transition:'background .2s'});
   closeBtn.textContent='CLOSE';
-  closeBtn.style.fontFamily="'Cairo',sans-serif";
-  closeBtn.style.fontSize='11px';
-  closeBtn.style.fontWeight='800';
-  closeBtn.style.letterSpacing='.06em';
-  closeBtn.style.textTransform='uppercase';
-  closeBtn.style.background='none';
-  closeBtn.style.border='2px solid #10131A';
-  closeBtn.style.borderRadius='3px';
-  closeBtn.style.padding='5px 12px';
-  closeBtn.style.cursor='pointer';
-  closeBtn.onmouseover=function(){closeBtn.style.background='#10131A';closeBtn.style.color='#fff';};
-  closeBtn.onmouseout=function(){closeBtn.style.background='none';closeBtn.style.color='';};
+  closeBtn.onmouseover=()=>{closeBtn.style.background='#10131A';closeBtn.style.color='#fff';};
+  closeBtn.onmouseout=()=>{closeBtn.style.background='none';closeBtn.style.color='';};
   closeBtn.onclick=ppCloseInventory;
-  head.appendChild(headLeft);
-  head.appendChild(closeBtn);
+  head.appendChild(headLeft);head.appendChild(closeBtn);
 
-  var grid=document.createElement('div');
-  grid.style.display='grid';
-  grid.style.gridTemplateColumns='repeat(4,1fr)';
-  grid.style.gap='10px';
-  grid.style.padding='20px 24px';
-  grid.style.overflowY='auto';
+  const grid=document.createElement('div');
+  s(grid,{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:'10px',padding:'20px 24px',overflowY:'auto'});
 
-  var rarityBorder={common:'3px solid rgb(151,151,151)',rare:'3px solid rgb(255,145,34)',legendary:'3px solid rgb(240,64,64)'};
-
-  found.concat(missing).forEach(function(p){
-    var qty=pp.coleccion[p]||0;
-    var item=document.createElement('div');
-    item.style.aspectRatio='1/1';
-    item.style.borderRadius='6px';
-    item.style.display='flex';
-    item.style.flexDirection='column';
-    item.style.alignItems='center';
-    item.style.justifyContent='center';
-    item.style.textAlign='center';
-    item.style.fontFamily="'Cairo',sans-serif";
-    item.style.padding='4px';
-    item.style.fontWeight='800';
-    item.style.lineHeight='1.2';
-    item.style.transition='transform .2s';
-    item.style.boxSizing='border-box';
-    item.onmouseover=function(){item.style.transform='translateY(-2px)';};
-    item.onmouseout=function(){item.style.transform='';};
+  const rarityBorder={common:'3px solid rgb(151,151,151)',rare:'3px solid rgb(255,145,34)',legendary:'3px solid rgb(240,64,64)'};
+  [...found,...missing].forEach(p=>{
+    const qty=pp.coleccion[p]||0;
+    const item=document.createElement('div');
+    s(item,{aspectRatio:'1/1',borderRadius:'6px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',textAlign:'center',fontFamily:F,padding:'4px',fontWeight:'800',lineHeight:'1.2',transition:'transform .2s',boxSizing:'border-box'});
+    item.onmouseover=()=>{item.style.transform='translateY(-2px)';};
+    item.onmouseout=()=>{item.style.transform='';};
     if(qty>0){
-      var rareza=ppRarezaDe(p);
+      const rareza=ppRarezaDe(p);
       item.style.background='#fff';
       item.style.border=rarityBorder[rareza]||'2px solid #ccc';
-      var fs=p.length<=9?13:Math.max(9,13-(p.length-9)*1.2);
+      const fs=p.length<=9?13:Math.max(9,13-(p.length-9)*1.2);
       item.style.fontSize=fs+'px';
-      if(qty>1){
-        var sp=document.createElement('span');
-        sp.style.fontWeight='500';
-        sp.style.fontSize='11px';
-        sp.style.display='block';
-        sp.style.marginTop='2px';
-        sp.textContent='x'+qty;
-        item.textContent=p;
-        item.appendChild(sp);
-      } else {
-        item.textContent=p;
-      }
-    } else {
-      item.style.background='#F5F5F5';
-      item.style.border='2px dashed #D8D1BC';
-      item.style.color='#D8D1BC';
-      item.style.fontSize='20px';
+      item.innerHTML=qty>1?p+'<span style="font-weight:500;font-size:11px;display:block;margin-top:2px;">x'+qty+'</span>':p;
+    }else{
+      s(item,{background:'#F5F5F5',border:'2px dashed #D8D1BC',color:'#D8D1BC',fontSize:'20px'});
       item.textContent='?';
     }
     grid.appendChild(item);
   });
 
-  box.appendChild(head);
-  box.appendChild(grid);
+  box.appendChild(head);box.appendChild(grid);
   overlay.appendChild(box);
   document.body.appendChild(overlay);
 }
@@ -2208,9 +2164,11 @@ async function ppDownloadCanvas(){
 
 // ── Init ──
 window.addEventListener('DOMContentLoaded',()=>{
-  // Wire up My Collection button via addEventListener (belt AND suspenders with onclick attr)
   var invBtn=document.getElementById('ppInventoryBtn');
   if(invBtn) invBtn.addEventListener('click', function(){ ppOpenInventory(); });
+  var trigger=document.getElementById('ppCollectionTrigger');
+  if(trigger) trigger.addEventListener('click', function(){ ppOpenInventory(); });
+
   ppSetFmt('1:1',600,600,document.getElementById('pp-fmt-1-1'));
   ppUpdateUI();
   const ppZ=document.getElementById('ppUploadZone');
@@ -2222,6 +2180,3 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 
 </script>
-
-</body>
-</html>
