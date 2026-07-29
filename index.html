@@ -342,7 +342,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 /* Phrase popup — fixed inside ppPhraseArea, not following scroll */
 .pp-phrase-popup{
   position:absolute;
-  z-index:1001;
+  z-index:200;
   pointer-events:none;
   opacity:0;
   transition:opacity .5s ease, top .5s ease;
@@ -406,7 +406,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   transition:background .2s,color .2s;
   white-space:nowrap;
   position:relative;
-  z-index:1000;
 }
 .pp-my-collection-btn:hover{background:var(--ink);color:#fff;}
 .pp-my-collection-btn *{pointer-events:none;}
@@ -848,7 +847,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <span class="toggle-arrow" id="ppToggleArrow">&#8592;</span>
           <span id="ppToggleBtnLabel">Hide controls</span>
         </button>
-        <button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button>
+        <button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button" onclick="ppOpenInventory()">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button>
       </div>
 
       <!-- Layout grid (same pattern as waterer) -->
@@ -1858,12 +1857,40 @@ function ppMostrarFraseAleatoria(){
 }
 
 function ppMostrarFraseExtra(){
-  let nuevas=ppFrases.filter(f=>!pp.frasesUsadas.includes(f));
-  let rep=ppFrases.filter(f=>pp.frasesUsadas.includes(f));
-  let grupo=Math.random()<0.6&&nuevas.length?nuevas:(rep.length?rep:ppFrases);
-  const chosen=grupo[Math.floor(Math.random()*grupo.length)];
+  // Stage 1: 60% new (uncollected), 40% old (already collected)
+  // "Collected" = frase has already been shown (frasesUsadas)
+  const nuevas=ppFrases.filter(f=>!pp.frasesUsadas.includes(f));
+  const viejas=ppFrases.filter(f=>pp.frasesUsadas.includes(f));
+
+  // Edge cases: fall back if one pool is empty
+  let pool;
+  if(!nuevas.length && !viejas.length){ pool=ppFrases; }
+  else if(!nuevas.length){ pool=viejas; }
+  else if(!viejas.length){ pool=nuevas; }
+  else{ pool=Math.random()<0.6 ? nuevas : viejas; }
+
+  // Stage 2: apply rarity weighting INSIDE the chosen pool
+  const chosen=ppSeleccionarConRareza(pool);
   pp.frasesUsadas.push(chosen);
   ppMostrarFrase(chosen);
+}
+
+// Pick a phrase from a given pool using the existing rarity system.
+// Rolls a rarity first, then picks a phrase from the pool that contains
+// a keyword of that rarity. Falls back gracefully if none available.
+function ppSeleccionarConRareza(pool){
+  if(!pool.length) return ppFrases[Math.floor(Math.random()*ppFrases.length)];
+
+  const rareza=ppRarezaAleatoria();  // uses existing drop rates: 1% legendary, 19% rare, 80% common
+  // Find phrases in the pool that contain a keyword of the rolled rarity
+  const cands=pool.filter(f=>ppCategorias[rareza].some(p=>new RegExp('\\b'+p+'\\b').test(f)));
+
+  if(cands.length){
+    // Pick randomly among matching phrases in this pool
+    return cands[Math.floor(Math.random()*cands.length)];
+  }
+  // Rarity not available in this pool — fall back to any phrase in the pool
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 function ppMostrarFrase(frase){
@@ -2166,8 +2193,7 @@ async function ppDownloadCanvas(){
 window.addEventListener('DOMContentLoaded',()=>{
   var invBtn=document.getElementById('ppInventoryBtn');
   if(invBtn) invBtn.addEventListener('click', function(){ ppOpenInventory(); });
-  var trigger=document.getElementById('ppCollectionTrigger');
-  if(trigger) trigger.addEventListener('click', function(){ ppOpenInventory(); });
+
 
   ppSetFmt('1:1',600,600,document.getElementById('pp-fmt-1-1'));
   ppUpdateUI();
@@ -2180,3 +2206,5 @@ window.addEventListener('DOMContentLoaded',()=>{
 });
 
 </script>
+</body>
+</html>
