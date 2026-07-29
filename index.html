@@ -323,7 +323,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   position:relative;
   padding:70px;
   margin:-60px;
-  z-index:1;
 }
 /* Canvas wrap inside phrase area */
 #ppCanvasWrap{
@@ -342,7 +341,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 /* Phrase popup — fixed inside ppPhraseArea, not following scroll */
 .pp-phrase-popup{
   position:absolute;
-  z-index:200;
+  z-index:9000;
   pointer-events:none;
   opacity:0;
   transition:opacity .5s ease, top .5s ease;
@@ -406,6 +405,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
   transition:background .2s,color .2s;
   white-space:nowrap;
   position:relative;
+  z-index:500;
 }
 .pp-my-collection-btn:hover{background:var(--ink);color:#fff;}
 .pp-my-collection-btn *{pointer-events:none;}
@@ -583,7 +583,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <span style="font-family:var(--font);font-size:13px;font-weight:800;color:#fff;">Twitter</span>
       </a>
     </div>
-    <div class="closing-tags">PIXEL TOOL &middot; PIXEL WATERER &middot; PIXEL PHRASES</div>
+    <div class="closing-tags">PIXEL TOOL &middot; PIXEL WATERER &middot; PLACEHOLDER</div>
     <p class="closing-disc">*PAXEL&#8482; is an evolving experiment. Mechanics, fees, and timelines are subject to change as part of its natural evolution.</p>
     <div style="margin-top:36px;text-align:left;max-width:560px;margin-left:auto;margin-right:auto;border-top:1px solid #2C3A48;padding-top:28px;display:grid;gap:20px;">
       <div><div style="font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#46B6E2;margin-bottom:6px;">About PAXEL&#8482;</div><p style="font-size:13px;color:#A8B3C2;line-height:1.7;font-weight:500;">PAXEL&#8482; is a digital art project currently under development. Detailed information regarding the legal owner, company registration, and tax details will be published before the official commercial launch.</p></div>
@@ -1014,6 +1014,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
 <script>
 // Upload zone status helpers
+// ── Shared coin wallet (Pixel Waterer + Pixel Phrases) ──
+const paxelWallet={monedas:0};
+
 function setUploadLoading(prefix){
   const icon=document.getElementById(prefix+'UploadIcon');
   const text=document.getElementById(prefix+'UploadText');
@@ -1269,7 +1272,7 @@ function wtAnimarRevelado(bloques,cb){
 
 function wtRevelarColorActual(){
   if(wt.diasRevelados.includes(wt.diaActual)||wt.construyendo)return;
-  wt.monedas++;wtSaveCoins(wt.monedas);wt.diasReveladosNativos.push(wt.diaActual);
+  wt.monedas++;paxelWallet.monedas=wt.monedas;wtSaveCoins(wt.monedas);wt.diasReveladosNativos.push(wt.diaActual);
   document.getElementById('wtRevealBtn').disabled=true;
   let bl=wt.bloquesADibujar.filter(b=>b.activo&&b.parte===wt.diaActual&&b.esEspecial);
   wtAnimarRevelado(bl,()=>{
@@ -1284,7 +1287,7 @@ function wtUsarHolyWater(){
   if(wt.construyendo)return;
   let d=-1;for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i)){d=i;break;}}
   if(d===-1||wt.monedas<wt.costoHolyWater)return;
-  wt.monedas-=wt.costoHolyWater;wtSaveCoins(wt.monedas);
+  wt.monedas-=wt.costoHolyWater;paxelWallet.monedas=wt.monedas;wtSaveCoins(wt.monedas);
   document.getElementById('wtHolyBtn').disabled=true;
   let bl=wt.bloquesADibujar.filter(b=>b.activo&&b.parte===d);
   wtAnimarRevelado(bl,()=>{
@@ -1309,7 +1312,7 @@ function wtUpdateUI(){
   if(wt.diaActual>=8)wt.costoMaximoAlcanzado=2;wt.costoHolyWater=wt.costoMaximoAlcanzado;
   let p=0;for(let i=1;i<=wt.diaActual;i++){if(!wt.diasRevelados.includes(i))p++;}
   document.getElementById('wtHudDay').textContent=wt.diaActual===0?'\u2014':wt.diaActual+' / '+wt.TOTAL_DIAS;
-  document.getElementById('wtHudCoins').textContent=wt.monedas;
+  wt.monedas=paxelWallet.monedas;document.getElementById('wtHudCoins').textContent=wt.monedas;
   document.getElementById('wtHudPending').textContent=p;
   document.getElementById('wtCostBadge').textContent=wt.costoHolyWater;
   const pi=document.getElementById('wtPendingInfo');
@@ -1329,7 +1332,7 @@ function wtUpdateUI(){
 const WT_COINS_KEY='paxel_wt_coins';
 function wtSaveCoins(n){try{localStorage.setItem(WT_COINS_KEY,String(Math.max(0,n)));}catch(e){}}
 function wtLoadCoins(){try{const s=localStorage.getItem(WT_COINS_KEY);const n=s!==null?parseInt(s,10):0;return isNaN(n)||n<0?0:n;}catch(e){return 0;}}
-function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}wt.monedas=0;wtUpdateUI();}
+function wtResetCoins(){try{localStorage.removeItem(WT_COINS_KEY);}catch(e){}paxelWallet.monedas=0;wt.monedas=0;pp.monedas=0;wtUpdateUI();ppUpdateUI();}
 
 function wtGenerateHash(len){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';let r='';for(let i=0;i<len;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
 
@@ -1566,7 +1569,7 @@ function wtRecalcCanvasHeight(){
 window.addEventListener('DOMContentLoaded',()=>{
   ptSetFmt('1:1',600,600,document.getElementById('pt-fmt-1-1'));
   wtSetFmt('1:1',600,600,document.getElementById('wt-fmt-1-1'));
-  wt.monedas=wtLoadCoins();wtUpdateUI();
+  wt.monedas=wtLoadCoins();paxelWallet.monedas=wt.monedas;wtUpdateUI();
   const ptZ=document.getElementById('ptUploadZone');
   if(ptZ){ptZ.addEventListener('dragover',e=>{e.preventDefault();ptZ.classList.add('dragover');});ptZ.addEventListener('dragleave',()=>ptZ.classList.remove('dragover'));ptZ.addEventListener('drop',e=>{e.preventDefault();ptZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('ptFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;ptHandleFileInput(inp);}});}
   const wtZ=document.getElementById('wtUploadZone');
@@ -1767,7 +1770,7 @@ function ppAnimarRevelado(bloques,cb){
 
 function ppRevelarColorActual(){
   if(pp.diasRevelados.includes(pp.diaActual)||pp.construyendo)return;
-  pp.monedas++;
+  pp.monedas++;paxelWallet.monedas=pp.monedas;
   pp.diasReveladosNativos.push(pp.diaActual);
   document.getElementById('ppRevealBtn').disabled=true;
   let bl=pp.bloquesADibujar.filter(b=>b.activo&&b.parte===pp.diaActual&&b.esEspecial);
@@ -1784,7 +1787,7 @@ function ppUsarHolyWater(){
   if(pp.construyendo)return;
   let d=-1;for(let i=1;i<=pp.diaActual;i++){if(!pp.diasRevelados.includes(i)){d=i;break;}}
   if(d===-1||pp.monedas<pp.costoHolyWater)return;
-  pp.monedas-=pp.costoHolyWater;
+  pp.monedas-=pp.costoHolyWater;paxelWallet.monedas=pp.monedas;
   document.getElementById('ppHolyBtn').disabled=true;
   let bl=pp.bloquesADibujar.filter(b=>b.activo&&b.parte===d);
   ppAnimarRevelado(bl,()=>{
@@ -1802,7 +1805,7 @@ function ppUsarHolyWater(){
 
 function ppExtraPhrase(){
   if(pp.diaActual<=0||pp.monedas<10||pp.construyendo)return;
-  pp.monedas-=10;
+  pp.monedas-=10;paxelWallet.monedas=pp.monedas;
   ppMostrarFraseExtra();
   ppUpdateUI();
 }
@@ -1823,7 +1826,7 @@ function ppUpdateUI(){
   let pending=0;for(let i=1;i<=pp.diaActual;i++){if(!pp.diasRevelados.includes(i))pending++;}
   const totalCollect=Object.values(pp.coleccion).reduce((a,b)=>a+b,0);
   document.getElementById('ppHudDay').textContent    =pp.diaActual===0?'\u2014':pp.diaActual+' / '+pp.TOTAL_DIAS;
-  document.getElementById('ppHudCoins').textContent  =pp.monedas;
+  pp.monedas=paxelWallet.monedas;document.getElementById('ppHudCoins').textContent  =pp.monedas;
   document.getElementById('ppHudPending').textContent=pending;
   document.getElementById('ppCostBadge').textContent =pp.costoHolyWater;
   document.getElementById('ppHolyCount').textContent =pending;
