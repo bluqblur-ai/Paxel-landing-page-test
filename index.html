@@ -104,13 +104,14 @@ section{padding:88px 0;position:relative;}
 
 /* ── Hero ── */
 .hero{padding:60px 0 40px;position:relative;overflow:hidden;}
-.hero-grid{display:grid;grid-template-columns:.62fr 1.38fr;gap:40px;align-items:end;}
-@media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:32px;}}
-.hero-rail{display:flex;flex-direction:column;gap:22px;padding-bottom:10px;}
+.hero-grid{display:grid;grid-template-columns:.62fr 1.38fr;grid-template-areas:"rail copy" "rail visual";gap:40px;align-items:end;}
+@media(max-width:920px){.hero-grid{grid-template-columns:1fr;grid-template-areas:"copy" "visual" "rail";gap:32px;}}
+.hero-rail{grid-area:rail;display:flex;flex-direction:column;gap:22px;padding-bottom:10px;}
 .hero-rail .rail-item{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);border-left:2px solid var(--blue);padding-left:12px;}
 .hero-rail .rail-item b{display:block;color:var(--ink);font-size:15px;margin-top:2px;letter-spacing:0;}
-.hero-copy{position:relative;}
+.hero-copy{position:relative;grid-area:copy;}
 .hero h1{font-weight:800;font-size:clamp(38px,6.6vw,92px);line-height:.98;letter-spacing:-.02em;margin:0 0 20px;color:var(--ink);}
+@media(max-width:920px){.hero h1{font-size:clamp(46px,9vw,80px);}}
 .hero h1 .accent{color:var(--blue-deep);}
 .hero h1 .ul{position:relative;display:inline-block;}
 .hero h1 .ul::after{content:'';position:absolute;left:0;right:0;bottom:8px;height:14px;background:var(--blue-pale);z-index:-1;}
@@ -124,7 +125,7 @@ section{padding:88px 0;position:relative;}
 .tool-promo-title{font-family:var(--font);font-size:13px;font-weight:700;color:var(--ink);line-height:1.2;}
 .tool-promo-sub{font-size:12px;color:var(--ink-soft);font-weight:500;margin-top:2px;}
 
-.hero-visual{position:relative;margin-top:34px;}
+.hero-visual{position:relative;grid-area:visual;}
 .hero-blockshape{position:absolute;background:var(--blue-pale);z-index:0;top:16px;left:-14px;right:-14px;bottom:-16px;border-radius:var(--r0);}
 @media(max-width:920px){.hero-blockshape{left:0;right:0;}}
 .hero-card{position:relative;z-index:1;max-width:560px;}
@@ -195,10 +196,7 @@ section{padding:88px 0;position:relative;}
 .roadmap-card.pixel-featured-wt .r-pill{background:var(--blue);color:var(--ink);}
 .pixel-open-btn{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;font-family:var(--font);background:var(--blue);color:var(--ink);border:var(--bw) solid var(--ink);padding:10px 18px;border-radius:var(--r1);cursor:pointer;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
 .pixel-open-btn:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
-.ghost-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;margin-top:2px;}
-.ghost-grid div{aspect-ratio:1/1;background:var(--dormant);}
-.roadmap-card.pixel-featured .ghost-grid div{background:var(--blue);opacity:.5;}
-.ghost-grid div:nth-child(3n){opacity:.6;}
+.roadmap-card .soon-tag{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;font-family:var(--font);background:var(--paper-alt);color:var(--ink-soft);border:var(--bw) dashed var(--dormant-2);padding:9px 16px;border-radius:var(--r1);flex-shrink:0;}
 
 /* ── Closing — the one bold BLUE moment, no black fill ── */
 .closing{background:var(--blue);color:var(--ink);padding:100px 0 64px;text-align:center;position:relative;overflow:hidden;}
@@ -387,7 +385,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 </style>
 </head>
 <body>
-<div class="version-tag">hi!!!</div>
 <nav class="nav">
   <div class="wrap nav-inner">
     <div class="logo" onclick="showPage('home')"><img src="paxel-recto.png" alt="PAXEL" width="200"></div>
@@ -434,24 +431,24 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <h1>Patience,<br><span class="ul">rendered</span> <span class="accent">pixel</span><br>by pixel ;3<span class="caret">&nbsp;</span></h1>
       <p class="lede">Paxel Art is an upcoming project consisting in slowly rendering your pixel art day after day, until it settles into a piece nobody else will ever own. Check out our latest tools below or on the tabs to try out our Paxel prototypes to get the gist!</p>
       <div class="hero-actions">
-        <a href="#gallery" class="btn-ghost">See what Paxel is about &darr;</a>
+        <a href="#roadmap" class="btn-ghost">Check what tools we have &darr;</a>
         <div class="tool-promo-chip" onclick="showPage('phrases')">
           <span class="tool-promo-icon">&#128172;</span>
           <div><div class="tool-promo-title">Try Pixel Phrases!</div><div class="tool-promo-sub">Collect rare words as your art grows &rarr;</div></div>
         </div>
       </div>
-      <div class="hero-visual">
-        <div class="hero-blockshape" aria-hidden="true"></div>
-        <div class="hero-card win">
-          <div class="win-bar">
-            <div class="win-dots"><span></span><span></span><span></span></div>
-            <span class="win-title">UTOPIA.GIF</span>
-            <span class="win-live"><span class="d"></span>REC</span>
-          </div>
-          <div class="win-body">
-            <div class="scan-frame"><img src="Utopia.gif" alt="Utopia canvas" width="100%"></div>
-            <div class="hero-status-bar"><span>Pixel tool demonstration</span><span class="badge"><span class="dot"></span>GENERATING</span></div>
-          </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-blockshape" aria-hidden="true"></div>
+      <div class="hero-card win">
+        <div class="win-bar">
+          <div class="win-dots"><span></span><span></span><span></span></div>
+          <span class="win-title">UTOPIA.GIF</span>
+          <span class="win-live"><span class="d"></span>REC</span>
+        </div>
+        <div class="win-body">
+          <div class="scan-frame"><img src="Utopia.gif" alt="Utopia canvas" width="100%"></div>
+          <div class="hero-status-bar"><span>Pixel tool demonstration</span><span class="badge"><span class="dot"></span>GENERATING</span></div>
         </div>
       </div>
     </div>
@@ -533,7 +530,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <div class="r-body">
           <h4>Pixel tool</h4>
           <p>Pixelate your selected image, choose its resolution, speed of generation and download your pixel art in high quality!</p>
-          <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
           <button class="pixel-open-btn" onclick="showPage('tool')">&#9654; Open Pixel tool</button>
         </div>
       </div>
@@ -542,7 +538,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <div class="r-body">
           <h4>Pixel waterer</h4>
           <p>Upload your image and watch it grow day by day. Reveal today's colors, earn coins and use Holy Water to recover past days!</p>
-          <div class="ghost-grid" style="opacity:.45;"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
           <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('waterer')">&#9654; Open Pixel waterer</button>
         </div>
       </div>
@@ -551,8 +546,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <div class="r-body">
           <h4>Pixel phrases</h4>
           <p>Reveal a unique phrase every day as your pixel art grows. Collect rare words and build your personal inventory!</p>
-          <div class="ghost-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
           <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('phrases')">&#9654; Open Pixel phrases</button>
+        </div>
+      </div>
+      <div class="roadmap-card">
+        <span class="r-pill">CARTRIDGE 04 &middot; COMING SOON</span>
+        <div class="r-body">
+          <h4>Pixel diary</h4>
+          <p>A daily diary for your pixel art: write down whatever you want about your day, then drop the phrases and collectible words you've earned right onto the page.</p>
+          <span class="soon-tag">&#128274; Coming soon</span>
         </div>
       </div>
     </div>
