@@ -1554,26 +1554,20 @@ async function wtDownloadCanvas(){
   doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...INK);
   doc.text('Pre-Certificate of Authenticity',PW/2,HDR_H*0.60,{align:'center'});
 
-  // ── Banner: use jsPDF's lines() to draw a single closed filled polygon ──
-  // lines() takes array of [dx,dy] segments from a start point.
-  // Path: (BAN_X,0) → (+BAN_W,0) → (0,+banBotY) → (-BAN_W/2,-(BAN_NOTCH)) → (-BAN_W/2,+BAN_NOTCH) → close
-  // Actually jsPDF lines() signature: lines(lines, x, y, scale, style, closed)
-  // Each line entry: [x1,y1, x2,y2, x3,y3] for bezier or [x1,y1] for straight
+  // ── Banner emblem: grey ∧ ribbon shape (kept empty — no logo inside) ──
   doc.setFillColor(...DARK_GREY);
   doc.lines(
     [
-      [BAN_W, 0],               // top-right
-      [0, banBotY],             // right edge down to right corner
-      [-(BAN_W/2), -(BAN_NOTCH)], // right corner up to ∧ tip
-      [-(BAN_W/2), BAN_NOTCH],  // ∧ tip down to left corner
-      // close() handles the return to start
+      [BAN_W, 0],
+      [0, banBotY],
+      [-(BAN_W/2), -(BAN_NOTCH)],
+      [-(BAN_W/2), BAN_NOTCH],
     ],
-    BAN_X, 0,   // start point (top-left)
-    [1,1],      // scale
-    'F',        // fill only — no stroke here
-    true        // closed
+    BAN_X, 0,
+    [1,1],
+    'F',
+    true
   );
-  // Same path for stroke only (outline)
   doc.setDrawColor(...BLACK);doc.setLineWidth(0.6);
   doc.lines(
     [
@@ -1584,16 +1578,9 @@ async function wtDownloadCanvas(){
     ],
     BAN_X, 0,
     [1,1],
-    'S',        // stroke only
+    'S',
     true
   );
-
-  // ── Logo: moderate size, well padded, centred in banner ──
-  const LOGO_PAD=7, LOGO_SZ=BAN_W-2*LOGO_PAD;  // 36-14=22mm
-  const LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2;          // horizontally centred
-  const LOGO_Y=(HDR_H-LOGO_SZ)/2+5;                 // vertically centred in header
-  const logoB64='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHoAAAB6CAMAAABHh7fWAAAAP1BMVEVMaXH09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PS2t9jZAAAAFHRSTlMAkBBg4DAgwECATNCgdJdXcMicPAXD2DIAAAAJcEhZcwAAJnIAACZyASErl+4AAAE8SURBVGiB7dttb4IwGIVhEIHW6dyL//+3qsn2HBLOCtPpkuY+n0j7tBd8aUrFpk9f2e3SPEMzz8bUJXWrbWMGB3eZejyVks3o5ArVrbZkBovL0NDQVdMv4zyHWHw+4+po6katYbfQrjJHr+pGUzd5VmhoaOg6aMf424GGhoZ+CO3Sxm6vjbZtccSf0doM6/mhoaGhV9BvxSM70e/uyE6T68X3aOpeo7dbWMMbQz9pRwoNDV0zPcSC1D+bXgg0NDT0le7NtsnlI65aR7v92tLPqe6GXBber+8LNDR0LXSXv3PIpewNPahbE6rNfVnin/X3O9LJq60KTysnhIaGrpvemzVMox9Ku7jTQmhoaOgVtPvUrSvSvQonE0bsAZul7zotvCXQ0NDQ0NDQ0NA/0uVob2r/fKFAQ0ND/wd9BhO45R4QkzFUAAAAAElFTkSuQmCC';
-  doc.addImage(logoB64,'PNG',LOGO_X,LOGO_Y,LOGO_SZ,LOGO_SZ);
 
   // Art image
   doc.setFillColor(70,182,226);doc.rect(ART_X,artTop,ART_W,ART_H,'F');
@@ -2249,7 +2236,7 @@ async function ppDownloadCanvas(){
   const BLACK=[0,0,0];
   const ML=14,MR=14,CW=PW-ML-MR,FL=ML,FR=PW-MR,FV=FL+CW*0.38;
   doc.setFillColor(...WHITE);doc.rect(0,0,PW,PH,'F');
-  const LOGO_PAD=4,HDR_H=24;
+  const HDR_H=24;
   const ART_GAP=10,ratio=pp.canvasH/pp.canvasW;
   const ART_W=90,ART_H=Math.round(ART_W*ratio);
   const ART_X=(PW-ART_W)/2,artTop=HDR_H+ART_GAP;
@@ -2260,6 +2247,7 @@ async function ppDownloadCanvas(){
   doc.setDrawColor(...RULE);doc.setLineWidth(0.35);doc.line(0,HDR_H,PW,HDR_H);
   doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...INK);
   doc.text('Pre-Certificate of Authenticity',PW/2,HDR_H*0.60,{align:'center'});
+  // ── Banner emblem: grey ∧ ribbon shape (kept empty — no logo inside) ──
   doc.setFillColor(...DARK_GREY);
   doc.rect(BAN_X,0,BAN_W,banTipY,'F');
   doc.triangle(BAN_X,banTipY,midBan,banTipY,BAN_X,banBotY,'F');
@@ -2268,15 +2256,6 @@ async function ppDownloadCanvas(){
   doc.line(BAN_X,0,BAN_X+BAN_W,0);doc.line(BAN_X,0,BAN_X,banBotY);
   doc.line(BAN_X+BAN_W,0,BAN_X+BAN_W,banBotY);
   doc.line(BAN_X,banBotY,midBan,banTipY);doc.line(midBan,banTipY,BAN_X+BAN_W,banBotY);
-  const LOGO_SZ=BAN_W-2*LOGO_PAD,LOGO_X=BAN_X+(BAN_W-LOGO_SZ)/2,LOGO_Y=(HDR_H-LOGO_SZ)/2+5;
-  try{
-    const logoB64=await (async()=>{
-      const r=await fetch('paxel-recto.png');if(!r.ok)throw new Error();
-      const buf=await r.arrayBuffer();
-      return btoa(String.fromCharCode(...new Uint8Array(buf)));
-    })();
-    doc.addImage('data:image/png;base64,'+logoB64,'PNG',LOGO_X,LOGO_Y,LOGO_SZ,LOGO_SZ);
-  }catch(e){}
   doc.setFillColor(70,182,226);doc.rect(ART_X,artTop,ART_W,ART_H,'F');
   doc.addImage(pngDataUrl,'PNG',ART_X,artTop,ART_W,ART_H);
   doc.setDrawColor(...INK);doc.setLineWidth(0.3);doc.rect(ART_X,artTop,ART_W,ART_H);
