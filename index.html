@@ -56,9 +56,8 @@ a{color:inherit;text-decoration:none;}
 .alt-bg{background:var(--paper-alt);}
 section{padding:88px 0;position:relative;}
 .section-head{margin-bottom:44px;max-width:680px;position:relative;}
-.lvl-tag{display:inline-flex;align-items:center;gap:10px;margin-bottom:14px;}
-.lvl-tag .lvl-num{font-family:var(--font);font-weight:800;font-size:12px;background:var(--blue);color:var(--ink);padding:5px 10px;border-radius:var(--r1);letter-spacing:.05em;border:var(--bw) solid var(--ink);}
-.lvl-tag .lvl-label{font-family:var(--font);font-weight:800;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--blue-deep);}
+.lvl-tag{display:inline-flex;align-items:center;margin-bottom:14px;}
+.lvl-tag .lvl-label{font-family:var(--font);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);background:#fff;border:var(--bw) solid var(--ink);padding:6px 14px;border-radius:var(--r1);}
 .section-head h2{font-weight:800;font-size:clamp(28px,4.2vw,48px);line-height:1.08;letter-spacing:-.01em;color:var(--ink);}
 .section-head p{margin-top:14px;color:var(--ink-soft);font-size:16px;line-height:1.7;font-weight:500;max-width:580px;}
 .page{display:none;}.page.active{display:block;}
@@ -135,7 +134,7 @@ section{padding:88px 0;position:relative;}
 .scan-frame::after{content:'';position:absolute;left:0;right:0;height:40%;top:-40%;background:linear-gradient(rgba(255,255,255,0) 0%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 100%);animation:scan 6s linear infinite;pointer-events:none;}
 @keyframes scan{0%{top:-40%;}100%{top:100%;}}
 .hero-status-bar{margin-top:10px;display:flex;justify-content:space-between;align-items:center;}
-.hero-status-bar span{font-family:var(--font);font-size:10px;font-weight:600;color:var(--ink-soft);letter-spacing:.04em;}
+.hero-status-bar span{font-family:var(--font);font-size:10px;font-weight:600;color:var(--ink);letter-spacing:.04em;}
 .badge{font-family:var(--font);font-weight:700;font-size:11px;letter-spacing:.03em;text-transform:uppercase;background:var(--blue);color:var(--ink);border:var(--bw) solid var(--ink);padding:6px 12px;border-radius:var(--r1);display:inline-flex;align-items:center;gap:8px;}
 .badge .dot{width:6px;height:6px;background:var(--ink);animation:blip 1.2s steps(2) infinite;border-radius:50%;}
 
@@ -218,7 +217,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
    ============================================================ */
 .tool-page{background:var(--paper);}
 .tool-hero{background:var(--paper-alt);color:var(--ink);padding:0;border-bottom:var(--bw) solid var(--ink);}
-.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding:40px 0 32px;}
+.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-top:40px;padding-bottom:32px;}
+@media(max-width:640px){.tool-hero-inner{align-items:flex-start;padding-top:32px;padding-bottom:26px;}}
 .tool-hero h1{font-weight:800;font-size:clamp(28px,4.2vw,46px);line-height:1.05;margin-bottom:10px;color:var(--ink);}
 .tool-hero h1 .accent{color:var(--blue-deep);}
 .tool-hero p{color:var(--ink-soft);font-size:15px;line-height:1.7;max-width:480px;font-weight:500;}
@@ -459,7 +459,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <section class="alt-bg" id="gallery">
   <div class="wrap">
     <div class="section-head">
-      <div class="lvl-tag"><span class="lvl-num">LVL.01</span><span class="lvl-label">Themes</span></div>
+      <div class="lvl-tag"><span class="lvl-label">Themes</span></div>
       <h2>Periodic themes every 14 days</h2>
       <p>Each PAXEL cycle opens around a new theme &mdash; from sweeping landscapes like <em>Utopia</em> to intimate human moments like <em>Happiness</em> and stark contrasts like <em>Darkness</em>. Every theme shapes the palette, the mood and the kind of scene that slowly emerges from the noise. No two themes repeat, and no two canvases within a theme ever settle the same way.</p>
     </div>
@@ -477,7 +477,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="wrap">
     <div class="cert-layout">
       <div class="ownership-side">
-        <div class="lvl-tag"><span class="lvl-num">LVL.02</span><span class="lvl-label">Ownership</span></div>
+        <div class="lvl-tag"><span class="lvl-label">Ownership</span></div>
         <h3>The wait is the proof</h3>
         <div class="track">
           <div class="feature-item">
@@ -520,7 +520,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <section class="alt-bg" id="roadmap">
   <div class="wrap">
     <div class="section-head">
-      <div class="lvl-tag"><span class="lvl-num">LVL.03</span><span class="lvl-label">Select your tool</span></div>
+      <div class="lvl-tag"><span class="lvl-label">Select your tool</span></div>
       <h2>Built for more, one piece at a time</h2>
       <p>PAXEL is an evolving experiment! This is what we have right now ;)</p>
     </div>
@@ -588,7 +588,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <section id="legal" class="alt-bg">
   <div class="wrap">
     <div class="section-head">
-      <div class="lvl-tag"><span class="lvl-num">LVL.04</span><span class="lvl-label">Legal</span></div>
+      <div class="lvl-tag"><span class="lvl-label">Legal</span></div>
       <h2>Legal Information &amp; Privacy</h2>
       <p>Transparency, privacy, and responsible platform development are important values for PAXEL&#8482;. The information below outlines the current legal framework of the project.</p>
     </div>
@@ -622,7 +622,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <h1>Pixel <span class="accent">tool</span></h1>
         <p>Upload any image, choose your format and resolution, control the generation speed &mdash; then watch it pixelate in real time and download it in high quality.</p>
       </div>
-      <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
     </div>
   </div>
   <div class="tool-controls-section">
@@ -700,7 +699,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <h1>Pixel <span class="accent">waterer</span></h1>
         <p>Upload any image and watch it grow day by day. Reveal today&rsquo;s hidden colors once per day to earn coins &mdash; and spend Holy Water to recover past days you missed. Once fully generated, download the image and receive a Pre-certificate! (which is only for testing!)</p>
       </div>
-      <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
     </div>
   </div>
   <div class="tool-controls-section">
@@ -841,7 +839,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
         <h1>Pixel <span class="accent">phrases</span></h1>
         <p>Upload any image and watch it grow day by day. Each day you reveal a unique phrase and collect rare words &mdash; build your personal inventory as your pixel art settles.</p>
       </div>
-      <div class="eyebrow" style="align-self:center;"><span class="blip"></span>PAXEL&#8482; TOOLS</div>
     </div>
   </div>
 
