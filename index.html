@@ -104,11 +104,11 @@ section{padding:88px 0;position:relative;}
 
 /* ── Hero ── */
 .hero{padding:60px 0 40px;position:relative;overflow:hidden;}
-.hero-grid{display:grid;grid-template-columns:.62fr 1.38fr;grid-template-areas:"rail copy" "rail visual";gap:40px;align-items:end;}
-@media(max-width:920px){.hero-grid{grid-template-columns:1fr;grid-template-areas:"copy" "visual" "rail";gap:32px;}}
-.hero-rail{grid-area:rail;display:flex;flex-direction:column;gap:22px;padding-bottom:10px;}
-.hero-rail .rail-item{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);border-left:2px solid var(--blue);padding-left:12px;}
-.hero-rail .rail-item b{display:block;color:var(--ink);font-size:15px;margin-top:2px;letter-spacing:0;}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;grid-template-areas:"copy visual";gap:40px;align-items:center;}
+@media(max-width:920px){.hero-grid{grid-template-columns:1fr;grid-template-areas:"copy" "visual";gap:32px;}}
+.hero-rail{position:relative;z-index:1;display:flex;flex-direction:row;gap:14px;margin-top:16px;padding:0 2px;}
+.hero-rail .rail-item{flex:1;min-width:0;font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);border-left:2px solid var(--blue);padding-left:10px;}
+.hero-rail .rail-item b{display:block;color:var(--ink);font-size:14px;margin-top:2px;letter-spacing:0;white-space:nowrap;}
 .hero-copy{position:relative;grid-area:copy;}
 .hero h1{font-weight:800;font-size:clamp(38px,6.6vw,92px);line-height:.98;letter-spacing:-.02em;margin:0 0 20px;color:var(--ink);}
 @media(max-width:920px){.hero h1{font-size:clamp(46px,9vw,80px);}}
@@ -421,11 +421,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <div class="page active" id="page-home">
 <header class="hero">
   <div class="wrap hero-grid">
-    <div class="hero-rail">
-      <div class="rail-item">Format<b>Slow&nbsp;art</b></div>
-      <div class="rail-item">Cycle<b>14&nbsp;days</b></div>
-      <div class="rail-item">Output<b>1&nbsp;of&nbsp;1</b></div>
-    </div>
     <div class="hero-copy">
       <div class="eyebrow"><span class="blip"></span>SLOW ART &middot; PROJECT IN DEVELOPMENT!!</div>
       <h1>Patience,<br><span class="ul">rendered</span> <span class="accent">pixel</span><br>by pixel ;3<span class="caret">&nbsp;</span></h1>
@@ -450,6 +445,11 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <div class="scan-frame"><img src="Utopia.gif" alt="Utopia canvas" width="100%"></div>
           <div class="hero-status-bar"><span>Pixel tool demonstration</span><span class="badge"><span class="dot"></span>GENERATING</span></div>
         </div>
+      </div>
+      <div class="hero-rail">
+        <div class="rail-item">Format<b>Slow&nbsp;art</b></div>
+        <div class="rail-item">Cycle<b>14&nbsp;days</b></div>
+        <div class="rail-item">Output<b>1&nbsp;of&nbsp;1</b></div>
       </div>
     </div>
   </div>
