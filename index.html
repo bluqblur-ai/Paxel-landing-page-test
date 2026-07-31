@@ -77,7 +77,8 @@ section{padding:88px 0;position:relative;}
 /* ============================================================
    TICKER — quiet infinite CSS marquee
    ============================================================ */
-.ticker{overflow:hidden;background:var(--paper-alt);border-top:var(--bw) solid var(--ink);border-bottom:var(--bw) solid var(--ink);}
+.ticker{overflow:hidden;background:var(--paper-alt);border-top:var(--bw) solid var(--ink);border-bottom:var(--bw) solid var(--ink);max-height:60px;opacity:1;transform:translateY(0);transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s ease,transform .35s cubic-bezier(.4,0,.2,1),border-width .35s ease;}
+body.scrolled .ticker{max-height:0;opacity:0;transform:translateY(-12px);border-top-width:0;border-bottom-width:0;}
 .ticker-track{display:flex;width:max-content;animation:ticker-scroll 30s linear infinite;}
 .ticker:hover .ticker-track{animation-play-state:paused;}
 @keyframes ticker-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
@@ -88,18 +89,26 @@ section{padding:88px 0;position:relative;}
 
 /* ── Nav ── */
 .nav{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:var(--bw) solid var(--ink);}
-.nav-inner{display:flex;align-items:center;height:74px;gap:14px;}
+.nav-inner{display:flex;align-items:center;height:74px;gap:14px;transition:height .25s cubic-bezier(.4,0,.2,1);}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;cursor:pointer;flex-shrink:0;padding-right:6px;}
-.logo img{height:30px;width:108px;display:block;image-rendering:pixelated;}
+.logo img{height:30px;width:108px;display:block;image-rendering:pixelated;transition:height .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1);}
 .tabs{display:flex;align-items:center;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;justify-content:flex-end;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab{font-family:var(--font);font-size:13px;font-weight:700;padding:9px 16px;border-radius:var(--r1);white-space:nowrap;transition:transform .12s,background .15s;cursor:pointer;border:var(--bw) solid var(--ink);background:#fff;color:var(--ink);flex-shrink:0;}
+.tab{font-family:var(--font);font-size:13px;font-weight:700;padding:9px 16px;border-radius:var(--r1);white-space:nowrap;transition:transform .12s,background .15s,padding .2s ease,font-size .2s ease;cursor:pointer;border:var(--bw) solid var(--ink);background:#fff;color:var(--ink);flex-shrink:0;}
 .tab:hover{background:var(--paper-alt);}
 .tab.active-tab{background:var(--blue);color:var(--ink);}
 .tab.active-tab:hover{background:var(--blue);}
 .tab.soon{color:var(--ink-soft);display:inline-flex;align-items:center;gap:5px;cursor:default;border-style:dashed;}
 .tab.soon:hover{background:none;}
 .tab.soon .pill{font-family:var(--font);font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--dormant);color:var(--ink-soft);padding:2px 6px;border-radius:var(--r1);}
+
+/* Scroll-compact nav: shrinks on scroll, restores on hover; ticker follows */
+body.nav-compact .nav-inner{height:44px;}
+body.nav-compact .logo img{height:18px;width:65px;}
+body.nav-compact .tab{padding:5px 12px;font-size:11.5px;}
+body.nav-compact .nav:hover .nav-inner{height:74px;}
+body.nav-compact .nav:hover .logo img{height:30px;width:108px;}
+body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
 
 /* ── Hero ── */
 .hero{padding:60px 0 40px;position:relative;overflow:hidden;}
@@ -2219,6 +2228,28 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
+</script>
+<script>
+/* Isolated, additive behavior only — does not touch any tool logic above.
+   Toggles body classes on scroll so the nav + ticker react to scroll position. */
+(function(){
+  var COMPACT_THRESHOLD = 60;  // nav shrinks past this point
+  var TOP_THRESHOLD = 4;       // ticker only shows within this many px of the very top
+  var ticking = false;
+  function update(){
+    document.body.classList.toggle('nav-compact', window.scrollY > COMPACT_THRESHOLD);
+    document.body.classList.toggle('scrolled', window.scrollY > TOP_THRESHOLD);
+    ticking = false;
+  }
+  function onScroll(){
+    if(!ticking){
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+  update();
+})();
 </script>
 </body>
 </html>
