@@ -48,6 +48,94 @@ a{color:inherit;text-decoration:none;}
 .eyebrow .blip{width:7px;height:7px;background:var(--blue);animation:blip 1.2s steps(2) infinite;border-radius:1px;}
 @keyframes blip{50%{opacity:.15;}}
 @keyframes blink-caret{50%{opacity:0;}}
+
+/* ── Entrance reveal system ──────────────────────────────────
+   Uses CSS *transitions* (not animations) gated by classes that
+   JS adds exactly once per page ('.entered' on the page container,
+   '.is-visible' on individually scroll-revealed sections). Because
+   transitions only fire on an actual value change — and these classes
+   are never removed — nothing replays when a page is hidden/reshown
+   via the tab navigation. It only plays again after a real reload.
+
+   Home: 1) below-the-fold sections (as you scroll to each)
+         2) title  3) description  4) hero actions  5) utopia.gif
+         6) logo + header + ticker (last)
+   Tool pages (Pixel tool / waterer / phrases), each on first visit:
+         1) title  2) description  3) blue canvas background
+         4) rest of the tool's interfaces                          */
+
+#page-home .hero .eyebrow,
+#page-home .hero h1{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) .7s,transform .9s cubic-bezier(.25,.7,.4,1) .7s;}
+#page-home.entered .hero .eyebrow,
+#page-home.entered .hero h1{opacity:1;transform:translateY(0);}
+
+#page-home .hero p.lede{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) 1.5s,transform .9s cubic-bezier(.25,.7,.4,1) 1.5s;}
+#page-home.entered .hero p.lede{opacity:1;transform:translateY(0);}
+
+#page-home .hero-actions{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) 2.2s,transform .9s cubic-bezier(.25,.7,.4,1) 2.2s;}
+#page-home.entered .hero-actions{opacity:1;transform:translateY(0);}
+
+#page-home .hero-visual{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) 2.9s,transform .9s cubic-bezier(.25,.7,.4,1) 2.9s;}
+#page-home.entered .hero-visual{opacity:1;transform:translateY(0);}
+
+.nav{opacity:0;transform:translateY(-26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1),transform .8s cubic-bezier(.25,.7,.4,1);}
+body.entered-nav .nav{opacity:1;transform:translateY(0);}
+
+/* Home: below-the-fold sections, revealed individually as you scroll to them */
+#page-home #gallery,
+#page-home #certificate,
+#page-home #roadmap,
+#page-home .closing,
+#page-home #legal,
+#page-home > footer{opacity:0;transform:translateY(34px);transition:opacity .85s cubic-bezier(.25,.7,.4,1),transform .85s cubic-bezier(.25,.7,.4,1);}
+#page-home #gallery.is-visible,
+#page-home #certificate.is-visible,
+#page-home #roadmap.is-visible,
+#page-home .closing.is-visible,
+#page-home #legal.is-visible,
+#page-home > footer.is-visible{opacity:1;transform:translateY(0);}
+
+/* Tool pages — reveal order (first visit only):
+   1) title  2) description  3) back-to-menu  4) hide-controls (if present)
+   5) left settings  6) canvas + right-side buttons/interfaces
+   7) my collection (Pixel phrases only)                                    */
+#page-tool .tool-hero h1, #page-waterer .tool-hero h1, #page-phrases .tool-hero h1{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .15s,transform .8s cubic-bezier(.25,.7,.4,1) .15s;}
+#page-tool.entered .tool-hero h1, #page-waterer.entered .tool-hero h1, #page-phrases.entered .tool-hero h1{opacity:1;transform:translateY(0);}
+
+#page-tool .tool-hero p, #page-waterer .tool-hero p, #page-phrases .tool-hero p{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .5s,transform .8s cubic-bezier(.25,.7,.4,1) .5s;}
+#page-tool.entered .tool-hero p, #page-waterer.entered .tool-hero p, #page-phrases.entered .tool-hero p{opacity:1;transform:translateY(0);}
+
+/* Back to menu — fades only (transition already merged into .tool-back's own rule) */
+#page-tool .tool-back, #page-waterer .tool-back, #page-phrases .tool-back{opacity:0;}
+#page-tool.entered .tool-back, #page-waterer.entered .tool-back, #page-phrases.entered .tool-back{opacity:1;}
+
+/* Hide-controls toggle (waterer + phrases only) — fades only, same reason as above */
+#page-waterer .btn-toggle-ctrl, #page-phrases .btn-toggle-ctrl{opacity:0;}
+#page-waterer.entered .btn-toggle-ctrl, #page-phrases.entered .btn-toggle-ctrl{opacity:1;}
+
+/* Left settings column
+   Note: wt/pp's control columns already own opacity+transform for their
+   hide-controls collapse/slide feature, so their reveal uses filter+margin
+   instead — a fully independent property pair that can't conflict with it. */
+#page-tool .tool-left-settings{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.55s,transform .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
+#page-tool.entered .tool-left-settings{opacity:1;transform:translateY(0);}
+#page-waterer #wtControlsCol, #page-phrases #ppControlsCol{filter:opacity(0);margin-top:26px;transition:filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
+#page-waterer.entered #wtControlsCol, #page-phrases.entered #ppControlsCol{filter:opacity(1);margin-top:0;}
+
+/* Canvas + the buttons/interfaces on the right (same note as above applies to *BelowCanvas) */
+#page-tool .canvas-wrap, #page-tool .day-status, #page-tool .action-btns,
+#page-waterer .canvas-wrap,
+#page-phrases #ppCanvasWrap{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.9s,transform .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
+#page-tool.entered .canvas-wrap, #page-tool.entered .day-status, #page-tool.entered .action-btns,
+#page-waterer.entered .canvas-wrap,
+#page-phrases.entered #ppCanvasWrap{opacity:1;transform:translateY(0);}
+#page-waterer #wtBelowCanvas, #page-phrases #ppBelowCanvas{filter:opacity(0);margin-top:26px;transition:filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
+#page-waterer.entered #wtBelowCanvas, #page-phrases.entered #ppBelowCanvas{filter:opacity(1);margin-top:0;}
+
+/* My collection (Pixel phrases only) — fades only (transition already merged into its own rule) */
+#page-phrases .pp-my-collection-btn{opacity:0;}
+#page-phrases.entered .pp-my-collection-btn{opacity:1;}
+
 .caret{display:inline-block;width:.5em;background:currentColor;animation:blink-caret .9s steps(2) infinite;margin-left:2px;}
 
 .px-border{border:var(--bw) solid var(--ink);border-radius:var(--r0);box-shadow:var(--s-sm);}
@@ -78,7 +166,8 @@ section{padding:88px 0;position:relative;}
 /* ============================================================
    TICKER — quiet infinite CSS marquee
    ============================================================ */
-.ticker{overflow:hidden;background:var(--paper-alt);border-top:var(--bw) solid var(--ink);border-bottom:var(--bw) solid var(--ink);max-height:60px;opacity:1;transform:translateY(0);transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .25s ease,transform .35s cubic-bezier(.4,0,.2,1),border-width .35s ease;}
+.ticker{overflow:hidden;background:var(--paper-alt);border-top:var(--bw) solid var(--ink);border-bottom:var(--bw) solid var(--ink);max-height:60px;opacity:0;transform:translateY(-26px);transition:max-height .35s cubic-bezier(.4,0,.2,1),opacity .8s cubic-bezier(.25,.7,.4,1),transform .8s cubic-bezier(.25,.7,.4,1),border-width .35s ease;}
+body.entered-nav .ticker{opacity:1;transform:translateY(0);}
 body.scrolled .ticker{max-height:0;opacity:0;transform:translateY(-12px);border-top-width:0;border-bottom-width:0;}
 .ticker-track{display:flex;width:max-content;animation:ticker-scroll 30s linear infinite;}
 .ticker:hover .ticker-track{animation-play-state:paused;}
@@ -232,7 +321,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .tool-hero h1{font-weight:800;font-size:clamp(28px,4.2vw,46px);line-height:1.05;margin-bottom:10px;color:var(--ink);}
 .tool-hero h1 .accent{color:var(--blue-deep);}
 .tool-hero p{color:var(--ink-soft);font-size:15px;line-height:1.7;max-width:480px;font-weight:500;}
-.tool-back{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);padding:8px 14px;border-radius:var(--r1);cursor:pointer;transition:transform .12s;margin-bottom:18px;box-shadow:var(--s-sm);}
+.tool-back{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);padding:8px 14px;border-radius:var(--r1);cursor:pointer;transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) .85s;margin-bottom:18px;box-shadow:var(--s-sm);}
 .tool-back:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
 
 .tool-controls-section{padding:44px 0;}
@@ -311,7 +400,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
    WATERER — TOGGLE + LAYOUT (structure unchanged)
    ============================================================ */
 .wt-toggle-btn-row{margin-bottom:20px;}
-.btn-toggle-ctrl{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:9px 16px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .12s;white-space:nowrap;box-shadow:var(--s-sm);}
+.btn-toggle-ctrl{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:9px 16px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 1.2s;white-space:nowrap;box-shadow:var(--s-sm);}
 .btn-toggle-ctrl:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 .toggle-arrow{font-size:14px;line-height:1;display:inline-block;transition:transform .35s cubic-bezier(.4,0,.2,1);}
 .btn-toggle-ctrl.ctrl-hidden .toggle-arrow{transform:rotate(180deg);}
@@ -370,7 +459,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pp-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:20;flex-wrap:wrap;gap:12px;}
 
 /* My Collection button */
-.pp-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s;white-space:nowrap;position:relative;z-index:500;box-shadow:var(--s-sm);}
+.pp-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:500;box-shadow:var(--s-sm);}
 .pp-my-collection-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 .pp-my-collection-btn *{pointer-events:none;}
 .pp-inv-count{font-size:11px;color:var(--ink);font-weight:700;background:#fff;padding:1px 6px;border-radius:var(--r1);}
@@ -637,7 +726,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-controls-section">
     <div class="wrap">
       <div class="tool-grid">
-        <div style="display:flex;flex-direction:column;gap:18px;">
+        <div class="tool-left-settings" style="display:flex;flex-direction:column;gap:18px;">
           <div class="ctrl-panel">
             <div class="ctrl-panel-title">Upload.sys</div>
             <div class="ctrl-panel-inner">
@@ -2255,6 +2344,63 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
   window.addEventListener('scroll', onScroll, {passive:true});
   update();
+})();
+</script>
+<script>
+/* Isolated, additive behavior only — does not touch any tool logic above.
+   Entrance-reveal system: marks each page (and each below-the-fold home
+   section) as "entered" exactly once, using classes that are only ever
+   added, never removed — so switching tabs never replays anything. */
+(function(){
+
+  // Home page: it's already the active page at load, so mark it entered right away.
+  var home = document.getElementById('page-home');
+  if(home) home.classList.add('entered');
+
+  // Header (logo + nav + ticker) — timed in JS rather than via CSS transition-delay,
+  // because the ticker also has its own scroll-triggered show/hide on the same
+  // properties; a CSS delay would restart every time that toggles mid-entrance.
+  setTimeout(function(){ document.body.classList.add('entered-nav'); }, 3600);
+
+  // Tool pages: watch for showPage() adding the 'active' class, and mark
+  // each one entered only the very first time that happens.
+  var enteredTool = {};
+  ['page-tool','page-waterer','page-phrases'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    if(el.classList.contains('active')){ el.classList.add('entered'); enteredTool[id]=true; return; }
+    var obs = new MutationObserver(function(){
+      if(!enteredTool[id] && el.classList.contains('active')){
+        enteredTool[id] = true;
+        el.classList.add('entered');
+        obs.disconnect();
+      }
+    });
+    obs.observe(el, {attributes:true, attributeFilter:['class']});
+  });
+
+  // Home below-the-fold sections: reveal each individually as it scrolls into view.
+  var revealSections = document.querySelectorAll(
+    '#page-home #gallery, #page-home #certificate, #page-home #roadmap, ' +
+    '#page-home .closing, #page-home #legal, #page-home > footer'
+  );
+  function revealAll(){ revealSections.forEach(function(sec){ sec.classList.add('is-visible'); }); }
+  if('IntersectionObserver' in window){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.01, rootMargin:'0px 0px 120px 0px'});
+    revealSections.forEach(function(sec){ io.observe(sec); });
+  } else {
+    revealAll();
+  }
+  // Safety net: never leave anything permanently invisible, even if the
+  // observer above misses an edge case for some reason.
+  setTimeout(revealAll, 4500);
 })();
 </script>
 </body>
