@@ -34,7 +34,8 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:clip;font-size:16px;line-height:1.6;}
+body{background:var(--paper);color:var(--ink);font-family:var(--font);-webkit-font-smoothing:antialiased;overflow-x:clip;font-size:16px;line-height:1.6;padding-top:74px;transition:padding-top .25s cubic-bezier(.4,0,.2,1);}
+body.nav-compact{padding-top:44px;}
 a{color:inherit;text-decoration:none;}
 ::selection{background:var(--blue);color:var(--ink);}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important;}}
@@ -88,7 +89,7 @@ body.scrolled .ticker{max-height:0;opacity:0;transform:translateY(-12px);border-
 .ticker-set span::after{content:'';width:5px;height:5px;background:var(--blue);flex-shrink:0;border-radius:50%;}
 
 /* ── Nav ── */
-.nav{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:var(--bw) solid var(--ink);}
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;background:var(--paper);border-bottom:var(--bw) solid var(--ink);}
 .nav-inner{display:flex;align-items:center;height:74px;gap:14px;transition:height .25s cubic-bezier(.4,0,.2,1);}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;cursor:pointer;flex-shrink:0;padding-right:6px;}
 .logo img{height:30px;width:108px;display:block;image-rendering:pixelated;transition:height .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1);}
@@ -2233,12 +2234,17 @@ window.addEventListener('DOMContentLoaded',()=>{
 /* Isolated, additive behavior only — does not touch any tool logic above.
    Toggles body classes on scroll so the nav + ticker react to scroll position. */
 (function(){
-  var COMPACT_THRESHOLD = 60;  // nav shrinks past this point
-  var TOP_THRESHOLD = 4;       // ticker only shows within this many px of the very top
+  var COMPACT_ON = 60;    // nav shrinks once scrolled past this
+  var COMPACT_OFF = 30;   // ...and only expands again once back below this (hysteresis gap avoids flicker)
+  var TOP_THRESHOLD = 4;  // ticker only shows within this many px of the very top
+  var isCompact = false;
   var ticking = false;
   function update(){
-    document.body.classList.toggle('nav-compact', window.scrollY > COMPACT_THRESHOLD);
-    document.body.classList.toggle('scrolled', window.scrollY > TOP_THRESHOLD);
+    var y = window.scrollY;
+    if(!isCompact && y > COMPACT_ON) isCompact = true;
+    else if(isCompact && y < COMPACT_OFF) isCompact = false;
+    document.body.classList.toggle('nav-compact', isCompact);
+    document.body.classList.toggle('scrolled', y > TOP_THRESHOLD);
     ticking = false;
   }
   function onScroll(){
