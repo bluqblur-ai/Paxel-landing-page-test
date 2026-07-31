@@ -119,7 +119,7 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
    instead — a fully independent property pair that can't conflict with it. */
 #page-tool .tool-left-settings{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.55s,transform .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #page-tool.entered .tool-left-settings{opacity:1;transform:translateY(0);}
-#page-waterer #wtControlsCol, #page-phrases #ppControlsCol{filter:opacity(0);margin-top:26px;transition:filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
+#page-waterer #wtControlsCol, #page-phrases #ppControlsCol{filter:opacity(0);margin-top:26px;}
 #page-waterer.entered #wtControlsCol, #page-phrases.entered #ppControlsCol{filter:opacity(1);margin-top:0;}
 
 /* Canvas + the buttons/interfaces on the right (same note as above applies to *BelowCanvas) */
@@ -129,7 +129,7 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-tool.entered .canvas-wrap, #page-tool.entered .day-status, #page-tool.entered .action-btns,
 #page-waterer.entered .canvas-wrap,
 #page-phrases.entered #ppCanvasWrap{opacity:1;transform:translateY(0);}
-#page-waterer #wtBelowCanvas, #page-phrases #ppBelowCanvas{filter:opacity(0);margin-top:26px;transition:filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
+#page-waterer #wtBelowCanvas, #page-phrases #ppBelowCanvas{filter:opacity(0);margin-top:26px;}
 #page-waterer.entered #wtBelowCanvas, #page-phrases.entered #ppBelowCanvas{filter:opacity(1);margin-top:0;}
 
 /* My collection (Pixel phrases only) — fades only (transition already merged into its own rule) */
@@ -407,10 +407,10 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
 #wtLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
 @media(max-width:900px){#wtLayoutGrid{grid-template-columns:1fr;}}
-#wtControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease;}
+#wtControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #wtControlsCol.wt-collapsing{opacity:0;visibility:hidden;}
 #wtCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;}
-#wtBelowCanvas{display:flex;flex-direction:column;gap:14px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1);}
+#wtBelowCanvas{display:flex;flex-direction:column;gap:14px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1),filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
 #wtBelowCanvas.wt-sliding{opacity:0;transform:translateX(var(--wt-slide-from,60px));}
 #wtSidePanelSlot{display:none;flex-direction:column;gap:14px;opacity:0;transition:opacity .28s ease;}
 #wtSidePanelSlot.wt-slot-visible{display:flex;opacity:1;}
@@ -425,10 +425,10 @@ footer .foot-tabs button:hover{color:var(--ink);}
    ============================================================ */
 #ppLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
 @media(max-width:900px){#ppLayoutGrid{grid-template-columns:1fr;}}
-#ppControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease;}
+#ppControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #ppControlsCol.pp-collapsing{opacity:0;visibility:hidden;}
 #ppCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:visible;}
-#ppBelowCanvas{display:flex;flex-direction:column;gap:14px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1);}
+#ppBelowCanvas{display:flex;flex-direction:column;gap:14px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1),filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
 #ppBelowCanvas.pp-sliding{opacity:0;transform:translateX(var(--pp-slide-from,60px));}
 #ppSidePanelSlot{display:none;flex-direction:column;gap:14px;opacity:0;transition:opacity .28s ease;}
 #ppSidePanelSlot.pp-slot-visible{display:flex;opacity:1;}
