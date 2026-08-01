@@ -123,12 +123,10 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-waterer.entered #wtControlsCol, #page-phrases.entered #ppControlsCol{filter:opacity(1);margin-top:0;}
 
 /* Canvas + the buttons/interfaces on the right (same note as above applies to *BelowCanvas) */
-#page-tool .canvas-wrap, #page-tool .day-status, #page-tool .action-btns,
-#page-waterer .canvas-wrap,
-#page-phrases #ppCanvasWrap{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.9s,transform .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
-#page-tool.entered .canvas-wrap, #page-tool.entered .day-status, #page-tool.entered .action-btns,
-#page-waterer.entered .canvas-wrap,
-#page-phrases.entered #ppCanvasWrap{opacity:1;transform:translateY(0);}
+#page-tool .canvas-wrap, #page-waterer .canvas-wrap, #page-phrases #ppCanvasWrap{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.9s,transform .8s cubic-bezier(.25,.7,.4,1) 1.9s,aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
+#page-tool.entered .canvas-wrap, #page-waterer.entered .canvas-wrap, #page-phrases.entered #ppCanvasWrap{opacity:1;transform:translateY(0);}
+#page-tool .day-status, #page-tool .action-btns{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.9s,transform .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
+#page-tool.entered .day-status, #page-tool.entered .action-btns{opacity:1;transform:translateY(0);}
 #page-waterer #wtBelowCanvas, #page-phrases #ppBelowCanvas{filter:opacity(0);margin-top:26px;}
 #page-waterer.entered #wtBelowCanvas, #page-phrases.entered #ppBelowCanvas{filter:opacity(1);margin-top:0;}
 
@@ -446,7 +444,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr var(--pp-canvas-col-w,1fr);}
 @media(max-width:900px){#ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr;}}
 
-#ppPhraseArea{position:relative;padding:70px;margin:-60px;}
+#ppPhraseArea{position:relative;padding:70px;margin:-70px;}
 #ppCanvasWrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 #ppCanvasWrap .p5Container,
 #ppP5Container{width:100%;height:100%;display:flex;align-items:stretch;}
@@ -1129,6 +1127,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <button onclick="showPage('waterer')">Pixel waterer</button>
       <button onclick="showPage('phrases')">Pixel phrases</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
+      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
     </div>
     <span class="mono">&copy; 2026</span>
   </footer>
