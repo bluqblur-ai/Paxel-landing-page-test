@@ -3,7 +3,7 @@
 <head>
 <link rel="icon" type="image/png" href="favicon.png">
 <meta charset="UTF-8">
-<title>PAXEL: plant your pixel art!</title>
+<title>PAXEL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,7 +28,6 @@
   --r0:8px;--r1:6px;
   --s-sm:2px 2px 0 var(--blue);
   --s-md:3px 3px 0 var(--blue);
-  --s-lg:4px 4px 0 var(--blue);
   --bw:1.5px;    /* standard outline — the one distinctive black trait */
   --bw2:2px;     /* slightly heavier, primary buttons / canvas frame */
 }
@@ -96,18 +95,14 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-home > footer.is-visible{opacity:1;transform:translateY(0);}
 
 /* Tool pages — reveal order (first visit only):
-   1) title  2) description  3) back-to-menu  4) hide-controls (if present)
-   5) left settings  6) canvas + right-side buttons/interfaces
-   7) my collection (Pixel phrases only)                                    */
+   1) title  2) description  3) hide-controls (if present)
+   4) left settings  5) canvas + right-side buttons/interfaces
+   6) my collection (Pixel phrases only)                                    */
 #page-tool .tool-hero h1, #page-waterer .tool-hero h1, #page-phrases .tool-hero h1{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .15s,transform .8s cubic-bezier(.25,.7,.4,1) .15s;}
 #page-tool.entered .tool-hero h1, #page-waterer.entered .tool-hero h1, #page-phrases.entered .tool-hero h1{opacity:1;transform:translateY(0);}
 
 #page-tool .tool-hero p, #page-waterer .tool-hero p, #page-phrases .tool-hero p{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .5s,transform .8s cubic-bezier(.25,.7,.4,1) .5s;}
 #page-tool.entered .tool-hero p, #page-waterer.entered .tool-hero p, #page-phrases.entered .tool-hero p{opacity:1;transform:translateY(0);}
-
-/* Back to menu — fades only (transition already merged into .tool-back's own rule) */
-#page-tool .tool-back, #page-waterer .tool-back, #page-phrases .tool-back{opacity:0;}
-#page-tool.entered .tool-back, #page-waterer.entered .tool-back, #page-phrases.entered .tool-back{opacity:1;}
 
 /* Hide-controls toggle (waterer + phrases only) — fades only, same reason as above */
 #page-waterer .btn-toggle-ctrl, #page-phrases .btn-toggle-ctrl{opacity:0;}
@@ -138,7 +133,6 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 
 .px-border{border:var(--bw) solid var(--ink);border-radius:var(--r0);box-shadow:var(--s-sm);}
 
-.divider{height:0;border:none;}
 .stripe{height:3px;background:var(--blue);border:none;opacity:.55;}
 .alt-bg{background:var(--paper-alt);}
 section{padding:88px 0;position:relative;}
@@ -325,13 +319,11 @@ footer .foot-tabs button:hover{color:var(--ink);}
    ============================================================ */
 .tool-page{background:var(--paper);}
 .tool-hero{background:var(--paper-alt);color:var(--ink);padding:0;border-bottom:var(--bw) solid var(--ink);}
-.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-top:40px;padding-bottom:32px;}
+.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-top:48px;padding-bottom:32px;}
 @media(max-width:640px){.tool-hero-inner{align-items:flex-start;padding-top:32px;padding-bottom:26px;}}
 .tool-hero h1{font-weight:800;font-size:clamp(28px,4.2vw,46px);line-height:1.05;margin-bottom:10px;color:var(--ink);}
 .tool-hero h1 .accent{color:var(--blue-deep);}
 .tool-hero p{color:var(--ink-soft);font-size:15px;line-height:1.7;max-width:480px;font-weight:500;}
-.tool-back{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);padding:8px 14px;border-radius:var(--r1);cursor:pointer;transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) .85s;margin-bottom:18px;box-shadow:var(--s-sm);}
-.tool-back:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
 
 .tool-controls-section{padding:44px 0;}
 .tool-grid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
@@ -370,6 +362,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .canvas-empty .caret{color:var(--ink);}
 
 .action-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.wt-primary-actions{display:flex;gap:10px;flex-wrap:wrap;}
 .btn-primary{font-family:var(--font);font-size:14.5px;font-weight:700;padding:14px 24px;border:var(--bw2) solid var(--ink);border-radius:var(--r1);background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:var(--s-sm);transition:transform .1s,box-shadow .1s;}
 .btn-primary:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
 .btn-primary:active{transform:translate(1px,1px);box-shadow:none;}
@@ -386,6 +379,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .wt-hud-card{flex:1;min-width:110px;background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:10px 14px;display:flex;flex-direction:column;gap:2px;}
 .wt-hud-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
 .wt-hud-value{font-size:23px;font-weight:800;color:var(--ink);line-height:1.3;}
+@media(max-width:640px){
+  .wt-hud{gap:6px;}
+  .wt-hud-card{padding:7px 9px;gap:1px;min-width:0;}
+  .wt-hud-label{font-size:8px;letter-spacing:.06em;}
+  .wt-hud-value{font-size:16px;}
+  /* Unrevealed (3rd card) — mobile only, shown right next to Day (1st card) */
+  .wt-hud > .wt-hud-card:nth-child(3){display:flex !important;order:2;}
+  .wt-hud > .wt-hud-card:nth-child(2){order:3;}
+}
 .wt-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;}
 .wt-legend-item{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--ink-soft);}
 .wt-legend-swatch{width:14px;height:14px;border:var(--bw) solid var(--ink);border-radius:2px;flex-shrink:0;}
@@ -415,7 +417,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .btn-toggle-ctrl.ctrl-hidden .toggle-arrow{transform:rotate(180deg);}
 
 #wtLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
-@media(max-width:900px){#wtLayoutGrid{grid-template-columns:1fr;}}
+@media(max-width:900px){#wtLayoutGrid{grid-template-columns:1fr;}#wtCanvasCol{order:1;}#wtSidePanelSlot{order:2;}}
 #wtControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #wtControlsCol.wt-collapsing{opacity:0;visibility:hidden;}
 #wtCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;}
@@ -426,14 +428,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #wtLayoutGrid.ctrl-hidden{grid-template-columns:1fr var(--wt-canvas-col-w,1fr);}
 @media(max-width:900px){#wtLayoutGrid.ctrl-hidden{grid-template-columns:1fr;}}
 
-/* Version tag */
-.version-tag{position:fixed;top:8px;right:10px;z-index:9999;font-family:var(--font);font-size:10px;font-weight:700;color:var(--ink);background:#fff;border:1px solid var(--ink);padding:3px 8px;border-radius:var(--r1);letter-spacing:.02em;pointer-events:none;}
-
 /* ============================================================
    PIXEL PHRASES PAGE
    ============================================================ */
 #ppLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
-@media(max-width:900px){#ppLayoutGrid{grid-template-columns:1fr;}}
+#ppCollectionSlot{display:none;}
+@media(max-width:900px){#ppLayoutGrid{grid-template-columns:1fr;}#ppCanvasCol{order:1;}#ppSidePanelSlot{order:2;}}
 #ppControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #ppControlsCol.pp-collapsing{opacity:0;visibility:hidden;}
 #ppCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:visible;}
@@ -444,7 +444,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr var(--pp-canvas-col-w,1fr);}
 @media(max-width:900px){#ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr;}}
 
-#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:1;}
+#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:10;}
 #ppCanvasWrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 #ppCanvasWrap .p5Container,
 #ppP5Container{width:100%;height:100%;display:flex;align-items:stretch;}
@@ -463,32 +463,70 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pp-collectible-tag:hover{background:#ededed;}
 .pp-collectible-new{font-family:var(--font);font-size:14px;font-weight:800;border-radius:20px;padding:4px 10px;border:1px solid var(--ink);background:#FFD700;cursor:pointer;transition:background .3s ease;}
 .pp-collectible-new:hover{background:#e6c200;}
+@media(max-width:640px){
+  .pp-phrase-card{width:220px;padding:11px;}
+  .pp-phrase-day{font-size:11px;margin-bottom:4px;}
+  .pp-phrase-text{font-size:14px;}
+  .pp-phrase-collectibles{gap:4px;margin-top:8px;}
+  .pp-collectible-tag,.pp-collectible-new{font-size:11.5px;padding:3px 8px;}
+}
 
 /* Top row above grid: toggle left, My Collection right */
 .pp-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:20;flex-wrap:wrap;gap:12px;}
 
 /* My Collection button */
-.pp-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:500;box-shadow:var(--s-sm);}
+.pp-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:1;box-shadow:var(--s-sm);}
 .pp-my-collection-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 .pp-my-collection-btn *{pointer-events:none;}
 .pp-inv-count{font-size:11px;color:var(--ink);font-weight:700;background:#fff;padding:1px 6px;border-radius:var(--r1);}
 
-/* Inventory overlay (rule kept for consistency; JS applies inline styles directly) */
-#pp-inventory-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;}
-#pp-inventory-overlay.active{display:flex;}
-#pp-inventory-box{background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r0);box-shadow:var(--s-lg);width:min(480px,92vw);max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
-#pp-inventory-box .inv-head{padding:14px 20px;border-bottom:var(--bw) solid var(--ink);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--paper-alt);}
-#pp-inventory-box .inv-head h3{font-size:16px;font-weight:700;color:var(--ink);}
-.inv-collectibles-count{font-size:11px;font-weight:600;color:var(--ink-soft);margin-top:2px;}
-#pp-inventory-box .inv-close{font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--blue);border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:5px 12px;cursor:pointer;color:var(--ink);}
-#pp-inventory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:20px;overflow-y:auto;}
-.inv-item{aspect-ratio:1/1;border-radius:var(--r1);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px;font-weight:700;font-size:13px;line-height:1.2;transition:transform .15s;}
-.inv-item:hover{transform:translateY(-2px);}
-.inv-item .inv-qty{font-weight:500;font-size:11px;display:block;margin-top:2px;}
-.inv-item.locked{background:var(--paper-alt);border:2px dashed var(--dormant-2);color:var(--dormant-2);font-size:20px;}
-.inv-item.common{background:#fff;border:2px solid rgb(151,151,151);}
-.inv-item.rare{background:#fff;border:2px solid rgb(255,145,34);}
-.inv-item.legendary{background:#fff;border:2px solid rgb(240,64,64);}
+@media(max-width:640px){
+  /* Day-pip squares (day 1–14) — hidden on mobile */
+  .wt-day-track{display:none;}
+  /* Toggle controls / My collection buttons — smaller on mobile */
+  .btn-toggle-ctrl{padding:6px 11px;font-size:10.5px;gap:6px;}
+  .pp-my-collection-btn{padding:6px 11px;font-size:10.5px;gap:6px;}
+}
+
+/* ── Desktop-only: cap canvas height so portrait ratios (e.g. 3:4) don't
+   grow too tall for the screen, AND keep everything below the canvas
+   (day-status, HUD, action buttons) matched to the exact same width so the
+   whole column stays visually aligned regardless of aspect ratio. ── */
+@media(min-width:901px){
+  /* Controls column gets more room now that the canvas is a fixed, smaller width */
+  #wtLayoutGrid,#ppLayoutGrid{grid-template-columns:1.15fr .85fr;}
+  /* Canvas + everything below it: right-aligned instead of centered, so their
+     right edge lines up with the My Collection button's position */
+  #wtCanvasWrap,#ppCanvasWrap{width:auto;max-width:480px;max-height:640px;margin-left:auto;margin-right:0;}
+  #ptCanvasWrap{width:auto;max-width:480px;max-height:640px;margin:0 auto;}
+  .canvas-panel .day-status,.canvas-panel .action-btns{max-width:480px;margin-left:auto;margin-right:auto;}
+  #wtBelowCanvas,#ppBelowCanvas{max-width:480px;margin-left:auto;margin-right:0;}
+  /* Pixel waterer only: Day/Coins stretch to the full canvas width, everything else stays left-aligned */
+  #wtBelowCanvas{width:480px !important;margin-left:auto !important;margin-right:0 !important;}
+  #wtBelowCanvas .wt-hud{width:100% !important;}
+  #wtBelowCanvas .wt-hud-card{flex:1 1 0 !important;}
+  #wtBelowCanvas .action-btns,#wtBelowCanvas .wt-primary-actions{justify-content:flex-start !important;}
+}
+
+/* ── Mobile-only: reorder below-canvas blocks (Generate/Reveal → HUD → rest),
+   and shrink Holy Water / Extra phrase / Download. Placed last on purpose so
+   it always wins the cascade over the base rules defined earlier. ── */
+@media(max-width:640px){
+  .wt-primary-actions{order:1;margin-bottom:14px;}
+  .wt-hud{order:2;}
+  .action-btns{order:3;}
+  #wtHolyBtn,#ppHolyBtn,#ppExtraBtn,#wtDlBtn,#ppDlBtn{font-size:12px;padding:10px 14px;gap:5px;}
+  #wtGenBtn,#ppGenBtn{padding:9px 20px;}
+  #wtRevealBtn,#ppRevealBtn{padding:9px 18px;}
+  #ppLayoutGrid{gap:16px;}
+  #ppCollectionSlot{display:flex;}
+  #ppCollectionSlot:empty{display:none;}
+  /* Fixes unwanted horizontal scroll: the 70px padding/margin trick (used so
+     phrase popups have room to roam) made #ppPhraseArea overflow past the
+     viewport edges on narrow screens. Shrinking both equally on mobile keeps
+     the net-zero canvas alignment while removing the overflow. */
+  #ppPhraseArea{padding:20px;margin:-20px;}
+}
 
 </style>
 </head>
@@ -729,7 +767,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
-        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO MENU</button>
         <h1>Pixel <span class="accent">tool</span></h1>
         <p>Upload any image, choose your format and resolution, control the generation speed &mdash; then watch it pixelate in real time and download it in high quality.</p>
       </div>
@@ -806,7 +843,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
-        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO MENU</button>
         <h1>Pixel <span class="accent">waterer</span></h1>
         <p>Upload any image and watch it grow day by day. Reveal today&rsquo;s hidden colors once per day to earn coins &mdash; and spend Holy Water to recover past days you missed. Once fully generated, download the image and receive a Pre-certificate! (which is only for testing!)</p>
       </div>
@@ -903,22 +939,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
                 </div>
                 <div class="wt-hud-value" style="color:var(--blue-deep);" id="wtHudCoins">0</div>
               </div>
-              <div class="wt-hud-card"><div class="wt-hud-label">Unrevealed</div><div class="wt-hud-value" id="wtHudPending">0</div></div>
+              <div class="wt-hud-card" style="display:none;"><div class="wt-hud-label">Unrevealed</div><div class="wt-hud-value" id="wtHudPending">0</div></div>
             </div>
-            <div style="background:var(--paper-alt);border:2.5px solid var(--ink);border-radius:3px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:16px;">&#128167;</span>
-                <div>
-                  <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
-                  <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="wtCostBadge">1</span> coin per unrevealed day</div>
-                </div>
-              </div>
-              <div id="wtPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
-            </div>
-            <div class="action-btns">
+            <div id="wtPendingInfo" style="display:none;"></div>
+            <div class="wt-primary-actions">
               <button class="btn-primary" id="wtGenBtn" disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
               <button class="btn-reveal" id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
-              <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
+            </div>
+            <div class="action-btns">
+              <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; [<span id="wtCostBadge">1</span> coins] Holy Water &times;<span id="wtHolyCount">0</span></button>
               <button class="btn-secondary" id="wtDlBtn" disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
             </div>
           </div><!-- /#wtBelowCanvas -->
@@ -946,7 +975,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
-        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO MENU</button>
         <h1>Pixel <span class="accent">phrases</span></h1>
         <p>Upload any image and watch it grow day by day. Each day you reveal a unique phrase and collect rare words &mdash; build your personal inventory as your pixel art settles.</p>
       </div>
@@ -962,7 +990,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <span class="toggle-arrow" id="ppToggleArrow">&#8592;</span>
           <span id="ppToggleBtnLabel">Hide controls</span>
         </button>
-        <button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button" onclick="ppOpenInventory()">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button>
+        <span id="ppCollectionAnchor"></span>
       </div>
 
       <!-- Layout grid (same pattern as waterer) -->
@@ -1061,6 +1089,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
         </div><!-- /#ppControlsCol -->
 
+        <div id="ppCollectionSlot" style="justify-content:flex-end;"><button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button" onclick="ppOpenInventory()">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button></div>
+
         <!-- Canvas column -->
         <div id="ppCanvasCol">
           <!-- phrase popup area -->
@@ -1086,30 +1116,23 @@ footer .foot-tabs button:hover{color:var(--ink);}
                 <div class="wt-hud-label">Coins</div>
                 <div class="wt-hud-value" style="color:var(--blue-deep);" id="ppHudCoins">0</div>
               </div>
-              <div class="wt-hud-card">
+              <div class="wt-hud-card" style="display:none;">
                 <div class="wt-hud-label">Unrevealed</div>
                 <div class="wt-hud-value" id="ppHudPending">0</div>
               </div>
             </div>
+            <div id="ppPendingInfo" style="display:none;"></div>
 
-            <!-- Holy Water bar -->
-            <div style="background:var(--paper-alt);border:2.5px solid var(--ink);border-radius:3px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:16px;">&#128167;</span>
-                <div>
-                  <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
-                  <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="ppCostBadge">1</span> coin per unrevealed day</div>
-                </div>
-              </div>
-              <div id="ppPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
+            <!-- Primary actions -->
+            <div class="wt-primary-actions">
+              <button class="btn-primary"   id="ppGenBtn"    disabled onclick="ppIniciarConstruccionDia()">Upload an image first</button>
+              <button class="btn-reveal"    id="ppRevealBtn" disabled onclick="ppRevelarColorActual()">&#9711; Reveal phrase</button>
             </div>
 
             <!-- Action buttons -->
             <div class="action-btns">
-              <button class="btn-primary"   id="ppGenBtn"    disabled onclick="ppIniciarConstruccionDia()">Upload an image first</button>
-              <button class="btn-reveal"    id="ppRevealBtn" disabled onclick="ppRevelarColorActual()">&#9711; Reveal phrase</button>
-              <button class="btn-holy"      id="ppHolyBtn"   disabled onclick="ppUsarHolyWater()">&#128167; Holy Water &times;<span id="ppHolyCount">0</span></button>
-              <button class="btn-secondary" id="ppExtraBtn"  disabled onclick="ppExtraPhrase()">&#128172; Extra phrase (10 coins)</button>
+              <button class="btn-holy"      id="ppHolyBtn"   disabled onclick="ppUsarHolyWater()">&#128167; [<span id="ppCostBadge">1</span> coins] Holy Water &times;<span id="ppHolyCount">0</span></button>
+              <button class="btn-secondary" id="ppExtraBtn"  disabled onclick="ppExtraPhrase()">&#128172; [10 coins] Extra phrase</button>
               <button class="btn-secondary" id="ppInventoryBtn" onclick="ppOpenInventory()" style="display:none;">My collection</button>
               <button class="btn-secondary" id="ppDlBtn"     disabled onclick="ppDownloadCanvas()">&#8595; Download HD</button>
             </div>
@@ -1187,8 +1210,8 @@ let ptIntervalSpeed=30,ptBloquesPorCiclo=1,ptCurrentInterval=null;
 function ptInitP5(){
   const sk=function(p){
     ptPxSketch=p;
-    p.setup=function(){let c=p.createCanvas(pt.canvasW,pt.canvasH);c.parent('ptP5Container');p.pixelDensity(5);p.background(0);};
-    p.draw=function(){if(!pt.img)return;let w=p.width/pt.COLS,h=p.height/pt.ROWS;for(let b of pt.bloquesADibujar){if(b.activo){p.fill(b.color[0],b.color[1],b.color[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}}};
+    p.setup=function(){let c=p.createCanvas(pt.canvasW,pt.canvasH);c.parent('ptP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
+    p.draw=function(){if(!pt.img)return;let w=p.width/pt.COLS,h=p.height/pt.ROWS;p.noStroke();for(let b of pt.bloquesADibujar){if(b.activo){p.fill(b.color[0],b.color[1],b.color[2]);p.rect(b.columna*w,b.fila*h,w,h);}}};
   };
   ptP5Instance=new p5(sk);
   document.getElementById('ptCanvasEmpty').style.display='none';
@@ -1227,7 +1250,8 @@ function ptIniciarConstruccionDia(){
   pt.construyendo=true;pt.diaActual++;document.getElementById('ptGenBtn').disabled=true;
   let pR=pt.bloquesADibujar.length-pt.indiceActual,dR=pt.TOTAL_DIAS-pt.diaActual+1,pH=Math.ceil(pR/dR),pc=0;
   ptUpdateDayStatus();
-  ptCurrentInterval=setInterval(()=>{for(let i=0;i<ptBloquesPorCiclo;i++){if(pc<pH&&pt.indiceActual<pt.bloquesADibujar.length){pt.bloquesADibujar[pt.indiceActual].activo=true;pt.indiceActual++;pc++;}}if(pc>=pH||pt.indiceActual>=pt.bloquesADibujar.length){clearInterval(ptCurrentInterval);ptCurrentInterval=null;pt.construyendo=false;ptActualizarBoton();}},ptIntervalSpeed);
+  if(ptPxSketch)ptPxSketch.loop();
+  ptCurrentInterval=setInterval(()=>{for(let i=0;i<ptBloquesPorCiclo;i++){if(pc<pH&&pt.indiceActual<pt.bloquesADibujar.length){pt.bloquesADibujar[pt.indiceActual].activo=true;pt.indiceActual++;pc++;}}if(pc>=pH||pt.indiceActual>=pt.bloquesADibujar.length){clearInterval(ptCurrentInterval);ptCurrentInterval=null;pt.construyendo=false;ptActualizarBoton();if(ptPxSketch){ptPxSketch.redraw();ptPxSketch.noLoop();}}},ptIntervalSpeed);
 }
 
 function ptActualizarBoton(){
@@ -1253,7 +1277,7 @@ function ptDownloadCanvas(){
 function ptSetFmt(tipo,w,h,btn){
   document.querySelectorAll('#page-tool .fmt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
   pt.canvasW=w;pt.canvasH=h;
-  const wrap=document.getElementById('ptCanvasWrap');wrap.style.aspectRatio=w+'/'+h;
+  const wrap=document.getElementById('ptCanvasWrap');wrap.style.aspectRatio=w+'/'+h;wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(ptP5Instance&&ptPxSketch){ptPxSketch.resizeCanvas(w,h);if(pt.img){ptPxSketch.background(255);pt.bloquesADibujar=[];pt.indiceActual=0;pt.diaActual=0;ptUpdateDayStatus();}document.getElementById('ptDlBtn').disabled=true;}
   const sel=document.getElementById('ptResSelect');sel.innerHTML='';
   let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
@@ -1339,8 +1363,8 @@ let wtCurrentInterval=null;
 function wtInitP5(){
   const sk=function(p){
     wtPxSketch=p;
-    p.setup=function(){let c=p.createCanvas(wt.canvasW,wt.canvasH);c.parent('wtP5Container');p.pixelDensity(5);p.background(0);};
-    p.draw=function(){if(!wt.img)return;let w=p.width/wt.COLS,h=p.height/wt.ROWS;for(let b of wt.bloquesADibujar){if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}}};
+    p.setup=function(){let c=p.createCanvas(wt.canvasW,wt.canvasH);c.parent('wtP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
+    p.draw=function(){if(!wt.img)return;let w=p.width/wt.COLS,h=p.height/wt.ROWS;p.noStroke();for(let b of wt.bloquesADibujar){if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.rect(b.columna*w,b.fila*h,w,h);}}};
   };
   wtP5Instance=new p5(sk);
   document.getElementById('wtCanvasEmpty').style.display='none';
@@ -1385,12 +1409,14 @@ function wtIniciarConstruccionDia(){
   wt.construyendo=true;wt.diaActual++;document.getElementById('wtGenBtn').disabled=true;
   let pR=wt.bloquesADibujar.length-wt.indiceActual,dR=wt.TOTAL_DIAS-wt.diaActual+1,pH=Math.ceil(pR/dR),pc=0;
   wtUpdateUI();
-  wtCurrentInterval=setInterval(()=>{for(let i=0;i<wt.bloquesPorCiclo;i++){if(pc<pH&&wt.indiceActual<wt.bloquesADibujar.length){wt.bloquesADibujar[wt.indiceActual].activo=true;wt.bloquesADibujar[wt.indiceActual].parte=wt.diaActual;wt.indiceActual++;pc++;}}if(pc>=pH||wt.indiceActual>=wt.bloquesADibujar.length){clearInterval(wtCurrentInterval);wtCurrentInterval=null;wt.construyendo=false;wtActualizarBotones();}},wt.intervalSpeed);
+  if(wtPxSketch)wtPxSketch.loop();
+  wtCurrentInterval=setInterval(()=>{for(let i=0;i<wt.bloquesPorCiclo;i++){if(pc<pH&&wt.indiceActual<wt.bloquesADibujar.length){wt.bloquesADibujar[wt.indiceActual].activo=true;wt.bloquesADibujar[wt.indiceActual].parte=wt.diaActual;wt.indiceActual++;pc++;}}if(pc>=pH||wt.indiceActual>=wt.bloquesADibujar.length){clearInterval(wtCurrentInterval);wtCurrentInterval=null;wt.construyendo=false;wtActualizarBotones();if(wtPxSketch){wtPxSketch.redraw();wtPxSketch.noLoop();}}},wt.intervalSpeed);
 }
 
 function wtAnimarRevelado(bloques,cb){
   if(!bloques.length){if(cb)cb();return;}wt.construyendo=true;let ind=0;
-  let timer=setInterval(()=>{for(let i=0;i<wt.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}}if(ind>=bloques.length){clearInterval(timer);wt.construyendo=false;if(cb)cb();wtUpdateUI();}},wt.intervalSpeed);
+  if(wtPxSketch)wtPxSketch.loop();
+  let timer=setInterval(()=>{for(let i=0;i<wt.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}}if(ind>=bloques.length){clearInterval(timer);wt.construyendo=false;if(cb)cb();wtUpdateUI();if(wtPxSketch){wtPxSketch.redraw();wtPxSketch.noLoop();}}},wt.intervalSpeed);
 }
 
 function wtRevelarColorActual(){
@@ -1661,7 +1687,7 @@ async function wtDownloadCanvas(){
 function wtSetFmt(tipo,w,h,btn){
   document.querySelectorAll('#page-waterer .fmt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
   wt.canvasW=w;wt.canvasH=h;
-  const wrap=document.getElementById('wtCanvasWrap');wrap.style.aspectRatio=w+'/'+h;
+  const wrap=document.getElementById('wtCanvasWrap');wrap.style.aspectRatio=w+'/'+h;wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(wtP5Instance&&wtPxSketch){wtPxSketch.resizeCanvas(w,h);if(wt.img){wtPxSketch.background(255);wt.bloquesADibujar=[];wt.indiceActual=0;wt.diaActual=0;wtUpdateUI();}document.getElementById('wtDlBtn').disabled=true;}
   const sel=document.getElementById('wtResSelect');sel.innerHTML='';
   let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
@@ -1803,12 +1829,13 @@ function ppToggleControls(){
 function ppInitP5(){
   const sk=function(p){
     ppPxSketch=p;
-    p.setup=function(){let c=p.createCanvas(pp.canvasW,pp.canvasH);c.parent('ppP5Container');p.pixelDensity(5);p.background(0);};
+    p.setup=function(){let c=p.createCanvas(pp.canvasW,pp.canvasH);c.parent('ppP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
     p.draw=function(){
       if(!pp.img)return;
       let w=p.width/pp.COLS,h=p.height/pp.ROWS;
+      p.noStroke();
       for(let b of pp.bloquesADibujar){
-        if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.noStroke();p.rect(b.columna*w,b.fila*h,w,h);}
+        if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.rect(b.columna*w,b.fila*h,w,h);}
       }
     };
   };
@@ -1863,18 +1890,20 @@ function ppIniciarConstruccionDia(){
   ppHidePhrase();
   let pR=pp.bloquesADibujar.length-pp.indiceActual,dR=pp.TOTAL_DIAS-pp.diaActual+1,pH=Math.ceil(pR/dR),pc=0;
   ppUpdateUI();
+  if(ppPxSketch)ppPxSketch.loop();
   let timer=setInterval(()=>{
     for(let i=0;i<pp.bloquesPorCiclo;i++){if(pc<pH&&pp.indiceActual<pp.bloquesADibujar.length){pp.bloquesADibujar[pp.indiceActual].activo=true;pp.bloquesADibujar[pp.indiceActual].parte=pp.diaActual;pp.indiceActual++;pc++;}}
-    if(pc>=pH||pp.indiceActual>=pp.bloquesADibujar.length){clearInterval(timer);pp.construyendo=false;ppActualizarBotones();}
+    if(pc>=pH||pp.indiceActual>=pp.bloquesADibujar.length){clearInterval(timer);pp.construyendo=false;ppActualizarBotones();if(ppPxSketch){ppPxSketch.redraw();ppPxSketch.noLoop();}}
   },pp.intervalSpeed);
 }
 
 function ppAnimarRevelado(bloques,cb){
   if(!bloques.length){if(cb)cb();ppUpdateUI();return;}
   pp.construyendo=true;let ind=0;
+  if(ppPxSketch)ppPxSketch.loop();
   let timer=setInterval(()=>{
     for(let i=0;i<pp.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}}
-    if(ind>=bloques.length){clearInterval(timer);pp.construyendo=false;if(cb)cb();ppUpdateUI();}
+    if(ind>=bloques.length){clearInterval(timer);pp.construyendo=false;if(cb)cb();ppUpdateUI();if(ppPxSketch){ppPxSketch.redraw();ppPxSketch.noLoop();}}
   },pp.intervalSpeed);
 }
 
@@ -2041,8 +2070,17 @@ function ppMostrarFrase(frase){
   const effectiveH=areaH>50?areaH:fallbackH;
   const maxX=Math.max(0,effectiveW-CARD_W);
   const maxY=Math.max(0,effectiveH-CARD_EST_H);
-  const posX=Math.random()*maxX;
-  const posY=Math.random()*maxY;
+  let posX,posY;
+  if(window.innerWidth<=640){
+    // Mobile: fixed "toast" spot instead of random — centered, low enough
+    // over the canvas to reach into the action buttons below it.
+    const MOBILE_CARD_W=220,MOBILE_CARD_H=150;
+    posX=Math.max(0,(effectiveW-MOBILE_CARD_W)/2);
+    posY=Math.max(0,effectiveH-MOBILE_CARD_H+30);
+  }else{
+    posX=Math.random()*maxX;
+    posY=Math.random()*maxY;
+  }
 
   const popup=document.createElement('div');
   popup.className='pp-phrase-popup';
@@ -2196,6 +2234,7 @@ function ppSetFmt(tipo,w,h,btn){
   pp.canvasW=w;pp.canvasH=h;
   const wrap=document.getElementById('ppCanvasWrap');
   wrap.style.aspectRatio=w+'/'+h;
+  wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(ppP5Instance&&ppPxSketch){ppPxSketch.resizeCanvas(w,h);if(pp.img){ppPxSketch.background(255);pp.bloquesADibujar=[];pp.indiceActual=0;pp.diaActual=0;ppUpdateUI();}document.getElementById('ppDlBtn').disabled=true;}
   const sel=document.getElementById('ppResSelect');sel.innerHTML='';
   const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
@@ -2393,6 +2432,42 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Safety net: never leave anything permanently invisible, even if the
   // observer above misses an edge case for some reason.
   setTimeout(revealAll, 4500);
+})();
+</script>
+<script>
+/* Isolated, additive behavior only — does not touch ppToggleControls() or
+   any other tool logic. Mobile only: moves the "My collection" button
+   between the controls panel and the canvas while controls are visible,
+   and back to its original spot (next to "Hide/Show controls") once
+   they're hidden — by observing the same pp-ctrl-hidden class the
+   existing toggle function already manages. */
+(function(){
+  var btn = document.getElementById('ppCollectionTrigger');
+  var slot = document.getElementById('ppCollectionSlot');
+  var anchor = document.getElementById('ppCollectionAnchor');
+  var grid = document.getElementById('ppLayoutGrid');
+  if(!btn || !slot || !anchor || !grid) return;
+
+  function update(){
+    var mobile = window.innerWidth <= 640;
+    var hidden = grid.classList.contains('pp-ctrl-hidden');
+    if(mobile && !hidden){
+      if(btn.parentNode !== slot) slot.appendChild(btn);
+    }else{
+      if(btn.parentNode !== anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor.nextSibling);
+    }
+  }
+
+  update();
+
+  var obs = new MutationObserver(update);
+  obs.observe(grid, {attributes:true, attributeFilter:['class']});
+
+  var resizeT;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeT);
+    resizeT = setTimeout(update, 150);
+  }, {passive:true});
 })();
 </script>
 </body>
