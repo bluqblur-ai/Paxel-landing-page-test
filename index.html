@@ -288,33 +288,18 @@ body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
 .news-entry-text h2 .accent{color:var(--blue-deep);}
 .news-entry-text p{font-size:16px;line-height:1.75;color:var(--ink-soft);font-weight:500;max-width:420px;}
 
-.news-entry-visual{position:relative;aspect-ratio:5/6;width:100%;}
-@media(max-width:920px){.news-entry-visual{margin:0;}}
-.news-blockshape{position:absolute;inset:30px -2px 24px 16px;background:var(--blue-pale);border-radius:var(--r0);z-index:0;}
-@media(max-width:920px){.news-blockshape{inset:30px 6px 24px 6px;}}
+.news-entry-visual{position:relative;padding:20px;}
+.news-blockshape{position:absolute;inset:0;background:var(--blue-pale);border-radius:var(--r0);z-index:0;}
 
-.news-critter{position:absolute;width:40%;aspect-ratio:1/1;border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;box-shadow:var(--s-md);z-index:1;display:flex;align-items:center;justify-content:center;}
-.news-critter img{width:100%;height:100%;object-fit:cover;display:block;}
-
-/* Left column — Dougie above Deerek, both sharing the same left edge */
-.news-critter-dougie{top:18%;left:2%;background:#47BEEE;transform:rotate(-6deg);}
-.news-critter-deerek{top:58%;left:2%;background:#D96B63;transform:rotate(-4deg);}
-/* Right column — Kirara above Meemaw, both sharing the same right edge,
-   the whole column shifted higher than the left column */
-.news-critter-kirara{top:0;right:4%;background:#ED4F9D;transform:rotate(5deg);z-index:2;}
-.news-critter-meemaw{top:40%;right:4%;background:#8B5FBF;transform:rotate(4deg);}
-
-.news-tag{position:absolute;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:8px 18px;font-family:var(--font);font-weight:800;font-size:14px;color:var(--ink);box-shadow:var(--s-sm);z-index:3;white-space:nowrap;}
-.news-tag-dougie{top:38%;left:-2%;}
-.news-tag-deerek{top:78%;left:-2%;}
-.news-tag-kirara{top:14%;right:-2%;}
-.news-tag-meemaw{top:56%;right:-2%;}
+.news-critters-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.news-critter{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.news-critter-img{width:100%;aspect-ratio:1/1;border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;box-shadow:var(--s-md);display:flex;align-items:center;justify-content:center;}
+.news-critter-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.news-critter-name{font-family:var(--font);font-weight:800;font-size:14px;color:var(--ink);background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 16px;box-shadow:var(--s-sm);white-space:nowrap;}
 @media(max-width:600px){
-  .news-tag{font-size:12px;padding:6px 14px;}
-  .news-tag-dougie{left:0;}
-  .news-tag-deerek{left:0;}
-  .news-tag-kirara{right:-2%;}
-  .news-tag-meemaw{right:-2%;}
+  .news-entry-visual{padding:14px;}
+  .news-critters-grid{gap:12px;}
+  .news-critter-name{font-size:12px;padding:5px 13px;}
 }
 
 @media(max-width:760px){.roadmap-grid{grid-template-columns:1fr;}}
@@ -771,14 +756,24 @@ footer .foot-tabs button:hover{color:var(--ink);}
         </div>
         <div class="news-entry-visual">
           <div class="news-blockshape" aria-hidden="true"></div>
-          <div class="news-critter news-critter-dougie"><img src="dougie.png" alt="Dougie the fox"></div>
-          <span class="news-tag news-tag-dougie">Dougie</span>
-          <div class="news-critter news-critter-kirara"><img src="kirara.png" alt="Kirara the ghost bunny"></div>
-          <span class="news-tag news-tag-kirara">Kirara</span>
-          <div class="news-critter news-critter-deerek"><img src="deerek.png" alt="Deerek the deer"></div>
-          <span class="news-tag news-tag-deerek">Deerek</span>
-          <div class="news-critter news-critter-meemaw"><img src="meemaw.png" alt="Meemaw the cat"></div>
-          <span class="news-tag news-tag-meemaw">Meemaw</span>
+          <div class="news-critters-grid">
+            <div class="news-critter">
+              <div class="news-critter-img" style="background:#47BEEE;"><img src="dougie.png" alt="Dougie the fox"></div>
+              <span class="news-critter-name">Dougie</span>
+            </div>
+            <div class="news-critter">
+              <div class="news-critter-img" style="background:#ED4F9D;"><img src="kirara.png" alt="Kirara the ghost bunny"></div>
+              <span class="news-critter-name">Kirara</span>
+            </div>
+            <div class="news-critter">
+              <div class="news-critter-img" style="background:#D96B63;"><img src="deerek.png" alt="Deerek the deer"></div>
+              <span class="news-critter-name">Deerek</span>
+            </div>
+            <div class="news-critter">
+              <div class="news-critter-img" style="background:#8B5FBF;"><img src="meemaw.png" alt="Meemaw the cat"></div>
+              <span class="news-critter-name">Meemaw</span>
+            </div>
+          </div>
         </div>
       </article>
       <!-- Future news entries go here — same "article.news-entry" pattern -->
