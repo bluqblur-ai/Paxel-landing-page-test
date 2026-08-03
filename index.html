@@ -444,7 +444,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr var(--pp-canvas-col-w,1fr);}
 @media(max-width:900px){#ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr;}}
 
-#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:10;}
+#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:1;}
 #ppCanvasWrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 #ppCanvasWrap .p5Container,
 #ppP5Container{width:100%;height:100%;display:flex;align-items:stretch;}
@@ -506,6 +506,13 @@ footer .foot-tabs button:hover{color:var(--ink);}
   #wtBelowCanvas .wt-hud{width:100% !important;}
   #wtBelowCanvas .wt-hud-card{flex:1 1 0 !important;}
   #wtBelowCanvas .action-btns,#wtBelowCanvas .wt-primary-actions{justify-content:flex-start !important;}
+  /* When controls are hidden, #wtBelowCanvas moves into the side-panel slot
+     (a narrower column on the left, where the controls used to be) — reset
+     it to fill THAT column instead of the fixed 480px meant for its normal
+     spot next to the canvas, so it lines up with the hide/show controls
+     button above it instead of overflowing/misaligning. */
+  #wtSidePanelSlot #wtBelowCanvas{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;}
+  #ppSidePanelSlot #ppBelowCanvas{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;}
 }
 
 /* ── Mobile-only: reorder below-canvas blocks (Generate/Reveal → HUD → rest),
@@ -2057,6 +2064,7 @@ function ppMostrarFrase(frase){
   // Create popup DOM element (absolute inside ppPhraseArea)
   const area=document.getElementById('ppPhraseArea');
   if(!area)return;
+  area.style.zIndex='30';
   const areaRect=area.getBoundingClientRect();
   const areaW=area.offsetWidth||400;
   const areaH=area.offsetHeight||400;
@@ -2149,7 +2157,7 @@ function ppHidePhrase(){
   if(!ppActivePopup)return;
   ppActivePopup.style.opacity='0';
   const p=ppActivePopup;
-  setTimeout(()=>{if(p&&p.parentNode)p.parentNode.removeChild(p);},500);
+  setTimeout(()=>{if(p&&p.parentNode)p.parentNode.removeChild(p);const area=document.getElementById('ppPhraseArea');if(area)area.style.zIndex='1';},500);
   ppActivePopup=null;
 }
 
@@ -2468,6 +2476,50 @@ window.addEventListener('DOMContentLoaded',()=>{
     clearTimeout(resizeT);
     resizeT = setTimeout(update, 150);
   }, {passive:true});
+})();
+</script>
+<script>
+/* Isolated, additive easter egg — does not touch any existing function.
+   Typing "money" anywhere on the page grants 1000 coins to the shared
+   PAXEL wallet (used by both Pixel waterer and Pixel phrases), then saves
+   and refreshes whichever tool UI is currently visible. */
+(function(){
+  var CHEAT='money', buffer='';
+  function showToast(){
+    var t=document.createElement('div');
+    t.textContent='\u2728 +1000 coins added!';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);'+
+      'background:#fff;color:#000;font-family:"Cairo",sans-serif;font-weight:800;font-size:14px;'+
+      'padding:12px 22px;border:1.5px solid #000;border-radius:8px;box-shadow:3px 3px 0 #47BEEE;'+
+      'z-index:99999;opacity:0;transition:opacity .35s ease,transform .35s ease;pointer-events:none;';
+    document.body.appendChild(t);
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
+    });});
+    setTimeout(function(){
+      t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';
+      setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},400);
+    },2200);
+  }
+  function activateCheat(){
+    if(typeof paxelWallet==='undefined')return;
+    paxelWallet.monedas=(paxelWallet.monedas||0)+1000;
+    if(typeof wt!=='undefined')wt.monedas=paxelWallet.monedas;
+    if(typeof pp!=='undefined')pp.monedas=paxelWallet.monedas;
+    if(typeof wtSaveCoins==='function')wtSaveCoins(paxelWallet.monedas);
+    if(typeof wtUpdateUI==='function')try{wtUpdateUI();}catch(e){}
+    if(typeof ppUpdateUI==='function')try{ppUpdateUI();}catch(e){}
+    showToast();
+  }
+  window.addEventListener('keydown',function(e){
+    if(e.ctrlKey||e.metaKey||e.altKey)return;
+    var tag=(document.activeElement&&document.activeElement.tagName)||'';
+    if(tag==='INPUT'||tag==='TEXTAREA')return;
+    var k=e.key;
+    if(!k||k.length!==1)return;
+    buffer=(buffer+k).toLowerCase().slice(-CHEAT.length);
+    if(buffer===CHEAT){buffer='';activateCheat();}
+  });
 })();
 </script>
 </body>
