@@ -444,7 +444,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr var(--pp-canvas-col-w,1fr);}
 @media(max-width:900px){#ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr;}}
 
-#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:30;}
+#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:1;}
 #ppCanvasWrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 #ppCanvasWrap .p5Container,
 #ppP5Container{width:100%;height:100%;display:flex;align-items:stretch;}
@@ -2064,6 +2064,7 @@ function ppMostrarFrase(frase){
   // Create popup DOM element (absolute inside ppPhraseArea)
   const area=document.getElementById('ppPhraseArea');
   if(!area)return;
+  area.style.zIndex='30';
   const areaRect=area.getBoundingClientRect();
   const areaW=area.offsetWidth||400;
   const areaH=area.offsetHeight||400;
@@ -2156,7 +2157,7 @@ function ppHidePhrase(){
   if(!ppActivePopup)return;
   ppActivePopup.style.opacity='0';
   const p=ppActivePopup;
-  setTimeout(()=>{if(p&&p.parentNode)p.parentNode.removeChild(p);},500);
+  setTimeout(()=>{if(p&&p.parentNode)p.parentNode.removeChild(p);const area=document.getElementById('ppPhraseArea');if(area)area.style.zIndex='1';},500);
   ppActivePopup=null;
 }
 
