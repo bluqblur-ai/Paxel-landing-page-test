@@ -3,7 +3,7 @@
 <head>
 <link rel="icon" type="image/png" href="favicon.png">
 <meta charset="UTF-8">
-<title>PAXEL: plant your pixel art!</title>
+<title>PAXEL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -96,18 +96,14 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-home > footer.is-visible{opacity:1;transform:translateY(0);}
 
 /* Tool pages — reveal order (first visit only):
-   1) title  2) description  3) back-to-menu  4) hide-controls (if present)
-   5) left settings  6) canvas + right-side buttons/interfaces
-   7) my collection (Pixel phrases only)                                    */
+   1) title  2) description  3) hide-controls (if present)
+   4) left settings  5) canvas + right-side buttons/interfaces
+   6) my collection (Pixel phrases only)                                    */
 #page-tool .tool-hero h1, #page-waterer .tool-hero h1, #page-phrases .tool-hero h1{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .15s,transform .8s cubic-bezier(.25,.7,.4,1) .15s;}
 #page-tool.entered .tool-hero h1, #page-waterer.entered .tool-hero h1, #page-phrases.entered .tool-hero h1{opacity:1;transform:translateY(0);}
 
 #page-tool .tool-hero p, #page-waterer .tool-hero p, #page-phrases .tool-hero p{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .5s,transform .8s cubic-bezier(.25,.7,.4,1) .5s;}
 #page-tool.entered .tool-hero p, #page-waterer.entered .tool-hero p, #page-phrases.entered .tool-hero p{opacity:1;transform:translateY(0);}
-
-/* Back to menu — fades only (transition already merged into .tool-back's own rule) */
-#page-tool .tool-back, #page-waterer .tool-back, #page-phrases .tool-back{opacity:0;}
-#page-tool.entered .tool-back, #page-waterer.entered .tool-back, #page-phrases.entered .tool-back{opacity:1;}
 
 /* Hide-controls toggle (waterer + phrases only) — fades only, same reason as above */
 #page-waterer .btn-toggle-ctrl, #page-phrases .btn-toggle-ctrl{opacity:0;}
@@ -325,13 +321,11 @@ footer .foot-tabs button:hover{color:var(--ink);}
    ============================================================ */
 .tool-page{background:var(--paper);}
 .tool-hero{background:var(--paper-alt);color:var(--ink);padding:0;border-bottom:var(--bw) solid var(--ink);}
-.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-top:40px;padding-bottom:32px;}
+.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-top:48px;padding-bottom:32px;}
 @media(max-width:640px){.tool-hero-inner{align-items:flex-start;padding-top:32px;padding-bottom:26px;}}
 .tool-hero h1{font-weight:800;font-size:clamp(28px,4.2vw,46px);line-height:1.05;margin-bottom:10px;color:var(--ink);}
 .tool-hero h1 .accent{color:var(--blue-deep);}
 .tool-hero p{color:var(--ink-soft);font-size:15px;line-height:1.7;max-width:480px;font-weight:500;}
-.tool-back{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);padding:8px 14px;border-radius:var(--r1);cursor:pointer;transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) .85s;margin-bottom:18px;box-shadow:var(--s-sm);}
-.tool-back:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
 
 .tool-controls-section{padding:44px 0;}
 .tool-grid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
@@ -370,6 +364,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .canvas-empty .caret{color:var(--ink);}
 
 .action-btns{display:flex;gap:10px;flex-wrap:wrap;}
+.wt-primary-actions{display:flex;gap:10px;flex-wrap:wrap;}
 .btn-primary{font-family:var(--font);font-size:14.5px;font-weight:700;padding:14px 24px;border:var(--bw2) solid var(--ink);border-radius:var(--r1);background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:var(--s-sm);transition:transform .1s,box-shadow .1s;}
 .btn-primary:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
 .btn-primary:active{transform:translate(1px,1px);box-shadow:none;}
@@ -386,6 +381,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .wt-hud-card{flex:1;min-width:110px;background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:10px 14px;display:flex;flex-direction:column;gap:2px;}
 .wt-hud-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
 .wt-hud-value{font-size:23px;font-weight:800;color:var(--ink);line-height:1.3;}
+@media(max-width:640px){
+  .wt-hud{gap:6px;}
+  .wt-hud-card{padding:7px 9px;gap:1px;min-width:0;}
+  .wt-hud-label{font-size:8px;letter-spacing:.06em;}
+  .wt-hud-value{font-size:16px;}
+  /* Unrevealed (3rd card) — mobile only, shown right next to Day (1st card) */
+  .wt-hud > .wt-hud-card:nth-child(3){display:flex !important;order:2;}
+  .wt-hud > .wt-hud-card:nth-child(2){order:3;}
+}
 .wt-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;}
 .wt-legend-item{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--ink-soft);}
 .wt-legend-swatch{width:14px;height:14px;border:var(--bw) solid var(--ink);border-radius:2px;flex-shrink:0;}
@@ -415,7 +419,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .btn-toggle-ctrl.ctrl-hidden .toggle-arrow{transform:rotate(180deg);}
 
 #wtLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
-@media(max-width:900px){#wtLayoutGrid{grid-template-columns:1fr;}}
+@media(max-width:900px){#wtLayoutGrid{grid-template-columns:1fr;}#wtCanvasCol{order:1;}#wtSidePanelSlot{order:2;}}
 #wtControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #wtControlsCol.wt-collapsing{opacity:0;visibility:hidden;}
 #wtCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;}
@@ -433,7 +437,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
    PIXEL PHRASES PAGE
    ============================================================ */
 #ppLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
-@media(max-width:900px){#ppLayoutGrid{grid-template-columns:1fr;}}
+#ppCollectionSlot{display:none;}
+@media(max-width:900px){#ppLayoutGrid{grid-template-columns:1fr;}#ppCanvasCol{order:1;}#ppSidePanelSlot{order:2;}}
 #ppControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
 #ppControlsCol.pp-collapsing{opacity:0;visibility:hidden;}
 #ppCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:visible;}
@@ -463,6 +468,13 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pp-collectible-tag:hover{background:#ededed;}
 .pp-collectible-new{font-family:var(--font);font-size:14px;font-weight:800;border-radius:20px;padding:4px 10px;border:1px solid var(--ink);background:#FFD700;cursor:pointer;transition:background .3s ease;}
 .pp-collectible-new:hover{background:#e6c200;}
+@media(max-width:640px){
+  .pp-phrase-card{width:220px;padding:11px;}
+  .pp-phrase-day{font-size:11px;margin-bottom:4px;}
+  .pp-phrase-text{font-size:14px;}
+  .pp-phrase-collectibles{gap:4px;margin-top:8px;}
+  .pp-collectible-tag,.pp-collectible-new{font-size:11.5px;padding:3px 8px;}
+}
 
 /* Top row above grid: toggle left, My Collection right */
 .pp-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:20;flex-wrap:wrap;gap:12px;}
@@ -472,6 +484,14 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pp-my-collection-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 .pp-my-collection-btn *{pointer-events:none;}
 .pp-inv-count{font-size:11px;color:var(--ink);font-weight:700;background:#fff;padding:1px 6px;border-radius:var(--r1);}
+
+@media(max-width:640px){
+  /* Day-pip squares (day 1–14) — hidden on mobile */
+  .wt-day-track{display:none;}
+  /* Toggle controls / My collection buttons — smaller on mobile */
+  .btn-toggle-ctrl{padding:6px 11px;font-size:10.5px;gap:6px;}
+  .pp-my-collection-btn{padding:6px 11px;font-size:10.5px;gap:6px;}
+}
 
 /* Inventory overlay (rule kept for consistency; JS applies inline styles directly) */
 #pp-inventory-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);align-items:center;justify-content:center;}
@@ -489,6 +509,26 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .inv-item.common{background:#fff;border:2px solid rgb(151,151,151);}
 .inv-item.rare{background:#fff;border:2px solid rgb(255,145,34);}
 .inv-item.legendary{background:#fff;border:2px solid rgb(240,64,64);}
+
+/* ── Mobile-only: reorder below-canvas blocks (Generate/Reveal → HUD → rest),
+   and shrink Holy Water / Extra phrase / Download. Placed last on purpose so
+   it always wins the cascade over the base rules defined earlier. ── */
+@media(max-width:640px){
+  .wt-primary-actions{order:1;margin-bottom:14px;}
+  .wt-hud{order:2;}
+  .action-btns{order:3;}
+  #wtHolyBtn,#ppHolyBtn,#ppExtraBtn,#wtDlBtn,#ppDlBtn{font-size:12px;padding:10px 14px;gap:5px;}
+  #wtGenBtn,#ppGenBtn{padding:9px 20px;}
+  #wtRevealBtn,#ppRevealBtn{padding:9px 18px;}
+  #ppLayoutGrid{gap:16px;}
+  #ppCollectionSlot{display:flex;}
+  #ppCollectionSlot:empty{display:none;}
+  /* Fixes unwanted horizontal scroll: the 70px padding/margin trick (used so
+     phrase popups have room to roam) made #ppPhraseArea overflow past the
+     viewport edges on narrow screens. Shrinking both equally on mobile keeps
+     the net-zero canvas alignment while removing the overflow. */
+  #ppPhraseArea{padding:20px;margin:-20px;}
+}
 
 </style>
 </head>
@@ -729,7 +769,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
-        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO MENU</button>
         <h1>Pixel <span class="accent">tool</span></h1>
         <p>Upload any image, choose your format and resolution, control the generation speed &mdash; then watch it pixelate in real time and download it in high quality.</p>
       </div>
@@ -806,7 +845,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
-        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO MENU</button>
         <h1>Pixel <span class="accent">waterer</span></h1>
         <p>Upload any image and watch it grow day by day. Reveal today&rsquo;s hidden colors once per day to earn coins &mdash; and spend Holy Water to recover past days you missed. Once fully generated, download the image and receive a Pre-certificate! (which is only for testing!)</p>
       </div>
@@ -903,22 +941,15 @@ footer .foot-tabs button:hover{color:var(--ink);}
                 </div>
                 <div class="wt-hud-value" style="color:var(--blue-deep);" id="wtHudCoins">0</div>
               </div>
-              <div class="wt-hud-card"><div class="wt-hud-label">Unrevealed</div><div class="wt-hud-value" id="wtHudPending">0</div></div>
+              <div class="wt-hud-card" style="display:none;"><div class="wt-hud-label">Unrevealed</div><div class="wt-hud-value" id="wtHudPending">0</div></div>
             </div>
-            <div style="background:var(--paper-alt);border:2.5px solid var(--ink);border-radius:3px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:16px;">&#128167;</span>
-                <div>
-                  <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
-                  <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="wtCostBadge">1</span> coin per unrevealed day</div>
-                </div>
-              </div>
-              <div id="wtPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
-            </div>
-            <div class="action-btns">
+            <div id="wtPendingInfo" style="display:none;"></div>
+            <div class="wt-primary-actions">
               <button class="btn-primary" id="wtGenBtn" disabled onclick="wtIniciarConstruccionDia()">Upload an image first</button>
               <button class="btn-reveal" id="wtRevealBtn" disabled onclick="wtRevelarColorActual()">Reveal color</button>
-              <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; Holy Water &times;<span id="wtHolyCount">0</span></button>
+            </div>
+            <div class="action-btns">
+              <button class="btn-holy" id="wtHolyBtn" disabled onclick="wtUsarHolyWater()">&#128167; [<span id="wtCostBadge">1</span> coins] Holy Water &times;<span id="wtHolyCount">0</span></button>
               <button class="btn-secondary" id="wtDlBtn" disabled onclick="wtDownloadCanvas()">&#8595; Download HD</button>
             </div>
           </div><!-- /#wtBelowCanvas -->
@@ -946,7 +977,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
   <div class="tool-hero">
     <div class="wrap tool-hero-inner">
       <div>
-        <button class="tool-back" onclick="showPage('home')">&larr; BACK TO MENU</button>
         <h1>Pixel <span class="accent">phrases</span></h1>
         <p>Upload any image and watch it grow day by day. Each day you reveal a unique phrase and collect rare words &mdash; build your personal inventory as your pixel art settles.</p>
       </div>
@@ -962,7 +992,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <span class="toggle-arrow" id="ppToggleArrow">&#8592;</span>
           <span id="ppToggleBtnLabel">Hide controls</span>
         </button>
-        <button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button" onclick="ppOpenInventory()">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button>
+        <span id="ppCollectionAnchor"></span>
       </div>
 
       <!-- Layout grid (same pattern as waterer) -->
@@ -1061,6 +1091,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
         </div><!-- /#ppControlsCol -->
 
+        <div id="ppCollectionSlot" style="justify-content:flex-end;"><button class="pp-my-collection-btn" id="ppCollectionTrigger" type="button" onclick="ppOpenInventory()">&#127890; My collection <span id="ppInventoryCount" class="pp-inv-count"></span></button></div>
+
         <!-- Canvas column -->
         <div id="ppCanvasCol">
           <!-- phrase popup area -->
@@ -1086,30 +1118,23 @@ footer .foot-tabs button:hover{color:var(--ink);}
                 <div class="wt-hud-label">Coins</div>
                 <div class="wt-hud-value" style="color:var(--blue-deep);" id="ppHudCoins">0</div>
               </div>
-              <div class="wt-hud-card">
+              <div class="wt-hud-card" style="display:none;">
                 <div class="wt-hud-label">Unrevealed</div>
                 <div class="wt-hud-value" id="ppHudPending">0</div>
               </div>
             </div>
+            <div id="ppPendingInfo" style="display:none;"></div>
 
-            <!-- Holy Water bar -->
-            <div style="background:var(--paper-alt);border:2.5px solid var(--ink);border-radius:3px;padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:16px;">&#128167;</span>
-                <div>
-                  <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);">Holy Water cost</div>
-                  <div style="font-size:14px;font-weight:800;color:var(--ink);"><span id="ppCostBadge">1</span> coin per unrevealed day</div>
-                </div>
-              </div>
-              <div id="ppPendingInfo" style="font-size:14px;font-weight:800;color:var(--blue-deep);"></div>
+            <!-- Primary actions -->
+            <div class="wt-primary-actions">
+              <button class="btn-primary"   id="ppGenBtn"    disabled onclick="ppIniciarConstruccionDia()">Upload an image first</button>
+              <button class="btn-reveal"    id="ppRevealBtn" disabled onclick="ppRevelarColorActual()">&#9711; Reveal phrase</button>
             </div>
 
             <!-- Action buttons -->
             <div class="action-btns">
-              <button class="btn-primary"   id="ppGenBtn"    disabled onclick="ppIniciarConstruccionDia()">Upload an image first</button>
-              <button class="btn-reveal"    id="ppRevealBtn" disabled onclick="ppRevelarColorActual()">&#9711; Reveal phrase</button>
-              <button class="btn-holy"      id="ppHolyBtn"   disabled onclick="ppUsarHolyWater()">&#128167; Holy Water &times;<span id="ppHolyCount">0</span></button>
-              <button class="btn-secondary" id="ppExtraBtn"  disabled onclick="ppExtraPhrase()">&#128172; Extra phrase (10 coins)</button>
+              <button class="btn-holy"      id="ppHolyBtn"   disabled onclick="ppUsarHolyWater()">&#128167; [<span id="ppCostBadge">1</span> coins] Holy Water &times;<span id="ppHolyCount">0</span></button>
+              <button class="btn-secondary" id="ppExtraBtn"  disabled onclick="ppExtraPhrase()">&#128172; [10 coins] Extra phrase</button>
               <button class="btn-secondary" id="ppInventoryBtn" onclick="ppOpenInventory()" style="display:none;">My collection</button>
               <button class="btn-secondary" id="ppDlBtn"     disabled onclick="ppDownloadCanvas()">&#8595; Download HD</button>
             </div>
@@ -2041,8 +2066,17 @@ function ppMostrarFrase(frase){
   const effectiveH=areaH>50?areaH:fallbackH;
   const maxX=Math.max(0,effectiveW-CARD_W);
   const maxY=Math.max(0,effectiveH-CARD_EST_H);
-  const posX=Math.random()*maxX;
-  const posY=Math.random()*maxY;
+  let posX,posY;
+  if(window.innerWidth<=640){
+    // Mobile: fixed "toast" spot instead of random — centered, low enough
+    // over the canvas to reach into the action buttons below it.
+    const MOBILE_CARD_W=220,MOBILE_CARD_H=150;
+    posX=Math.max(0,(effectiveW-MOBILE_CARD_W)/2);
+    posY=Math.max(0,effectiveH-MOBILE_CARD_H+30);
+  }else{
+    posX=Math.random()*maxX;
+    posY=Math.random()*maxY;
+  }
 
   const popup=document.createElement('div');
   popup.className='pp-phrase-popup';
@@ -2393,6 +2427,42 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Safety net: never leave anything permanently invisible, even if the
   // observer above misses an edge case for some reason.
   setTimeout(revealAll, 4500);
+})();
+</script>
+<script>
+/* Isolated, additive behavior only — does not touch ppToggleControls() or
+   any other tool logic. Mobile only: moves the "My collection" button
+   between the controls panel and the canvas while controls are visible,
+   and back to its original spot (next to "Hide/Show controls") once
+   they're hidden — by observing the same pp-ctrl-hidden class the
+   existing toggle function already manages. */
+(function(){
+  var btn = document.getElementById('ppCollectionTrigger');
+  var slot = document.getElementById('ppCollectionSlot');
+  var anchor = document.getElementById('ppCollectionAnchor');
+  var grid = document.getElementById('ppLayoutGrid');
+  if(!btn || !slot || !anchor || !grid) return;
+
+  function update(){
+    var mobile = window.innerWidth <= 640;
+    var hidden = grid.classList.contains('pp-ctrl-hidden');
+    if(mobile && !hidden){
+      if(btn.parentNode !== slot) slot.appendChild(btn);
+    }else{
+      if(btn.parentNode !== anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor.nextSibling);
+    }
+  }
+
+  update();
+
+  var obs = new MutationObserver(update);
+  obs.observe(grid, {attributes:true, attributeFilter:['class']});
+
+  var resizeT;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeT);
+    resizeT = setTimeout(update, 150);
+  }, {passive:true});
 })();
 </script>
 </body>
