@@ -84,17 +84,21 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-home #gallery,
 #page-home #certificate,
 #page-home #roadmap,
-#page-home #news,
 #page-home .closing,
 #page-home #legal,
 #page-home > footer{opacity:0;transform:translateY(34px);transition:opacity .85s cubic-bezier(.25,.7,.4,1),transform .85s cubic-bezier(.25,.7,.4,1);}
 #page-home #gallery.is-visible,
 #page-home #certificate.is-visible,
 #page-home #roadmap.is-visible,
-#page-home #news.is-visible,
 #page-home .closing.is-visible,
 #page-home #legal.is-visible,
 #page-home > footer.is-visible{opacity:1;transform:translateY(0);}
+
+/* #news gets a simpler opacity-only fade (no translateY) — its rotated,
+   absolutely-positioned illustrations can look unstable when the whole
+   section also slides vertically at the same time. */
+#page-home #news{opacity:0;transition:opacity .85s cubic-bezier(.25,.7,.4,1);}
+#page-home #news.is-visible{opacity:1;}
 
 /* Tool pages — reveal order (first visit only):
    1) title  2) description  3) hide-controls (if present)
@@ -298,15 +302,15 @@ body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
 
 /* Left column — Dougie above Deerek, both sharing the same left edge */
 .news-critter-dougie{top:18%;left:2%;background:#47BEEE;transform:rotate(-6deg);}
-.news-critter-deerek{top:59%;left:2%;background:#D96B63;transform:rotate(-4deg);}
+.news-critter-deerek{top:58%;left:2%;background:#D96B63;transform:rotate(-4deg);}
 /* Right column — Kirara above Meemaw, both sharing the same right edge,
    the whole column shifted higher than the left column */
 .news-critter-kirara{top:0;right:4%;background:#ED4F9D;transform:rotate(5deg);z-index:2;}
-.news-critter-meemaw{top:41%;right:4%;background:#8B5FBF;transform:rotate(4deg);}
+.news-critter-meemaw{top:40%;right:4%;background:#8B5FBF;transform:rotate(4deg);}
 
 .news-tag{position:absolute;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:8px 18px;font-family:var(--font);font-weight:800;font-size:14px;color:var(--ink);box-shadow:var(--s-sm);z-index:3;white-space:nowrap;}
 .news-tag-dougie{top:38%;left:-8%;}
-.news-tag-deerek{top:79%;left:-8%;}
+.news-tag-deerek{top:78%;left:-8%;}
 .news-tag-kirara{top:14%;right:-10%;}
 .news-tag-meemaw{top:56%;right:-10%;}
 @media(max-width:600px){
