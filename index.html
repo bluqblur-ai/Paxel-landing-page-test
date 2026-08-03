@@ -488,6 +488,21 @@ footer .foot-tabs button:hover{color:var(--ink);}
   .pp-my-collection-btn{padding:6px 11px;font-size:10.5px;gap:6px;}
 }
 
+/* ── Desktop-only: cap canvas height so portrait ratios (e.g. 3:4) don't
+   grow too tall for the screen, AND keep everything below the canvas
+   (day-status, HUD, action buttons) matched to the exact same width so the
+   whole column stays visually aligned regardless of aspect ratio. ── */
+@media(min-width:901px){
+  .canvas-wrap,#ppCanvasWrap{width:auto;max-width:480px;max-height:640px;margin:0 auto;}
+  .canvas-panel .day-status,.canvas-panel .action-btns,
+  #wtBelowCanvas,#ppBelowCanvas{max-width:480px;margin-left:auto;margin-right:auto;}
+  /* Pixel waterer only: Day/Coins stretch to the full canvas width, everything else stays left-aligned */
+  #wtBelowCanvas{width:480px !important;}
+  #wtBelowCanvas .wt-hud{width:100% !important;}
+  #wtBelowCanvas .wt-hud-card{flex:1 1 0 !important;}
+  #wtBelowCanvas .action-btns,#wtBelowCanvas .wt-primary-actions{justify-content:flex-start !important;}
+}
+
 /* ── Mobile-only: reorder below-canvas blocks (Generate/Reveal → HUD → rest),
    and shrink Holy Water / Extra phrase / Download. Placed last on purpose so
    it always wins the cascade over the base rules defined earlier. ── */
@@ -1257,7 +1272,7 @@ function ptDownloadCanvas(){
 function ptSetFmt(tipo,w,h,btn){
   document.querySelectorAll('#page-tool .fmt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
   pt.canvasW=w;pt.canvasH=h;
-  const wrap=document.getElementById('ptCanvasWrap');wrap.style.aspectRatio=w+'/'+h;
+  const wrap=document.getElementById('ptCanvasWrap');wrap.style.aspectRatio=w+'/'+h;wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(ptP5Instance&&ptPxSketch){ptPxSketch.resizeCanvas(w,h);if(pt.img){ptPxSketch.background(255);pt.bloquesADibujar=[];pt.indiceActual=0;pt.diaActual=0;ptUpdateDayStatus();}document.getElementById('ptDlBtn').disabled=true;}
   const sel=document.getElementById('ptResSelect');sel.innerHTML='';
   let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
@@ -1667,7 +1682,7 @@ async function wtDownloadCanvas(){
 function wtSetFmt(tipo,w,h,btn){
   document.querySelectorAll('#page-waterer .fmt-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');
   wt.canvasW=w;wt.canvasH=h;
-  const wrap=document.getElementById('wtCanvasWrap');wrap.style.aspectRatio=w+'/'+h;
+  const wrap=document.getElementById('wtCanvasWrap');wrap.style.aspectRatio=w+'/'+h;wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(wtP5Instance&&wtPxSketch){wtPxSketch.resizeCanvas(w,h);if(wt.img){wtPxSketch.background(255);wt.bloquesADibujar=[];wt.indiceActual=0;wt.diaActual=0;wtUpdateUI();}document.getElementById('wtDlBtn').disabled=true;}
   const sel=document.getElementById('wtResSelect');sel.innerHTML='';
   let opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:(tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96']);
@@ -2214,6 +2229,7 @@ function ppSetFmt(tipo,w,h,btn){
   pp.canvasW=w;pp.canvasH=h;
   const wrap=document.getElementById('ppCanvasWrap');
   wrap.style.aspectRatio=w+'/'+h;
+  wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(ppP5Instance&&ppPxSketch){ppPxSketch.resizeCanvas(w,h);if(pp.img){ppPxSketch.background(255);pp.bloquesADibujar=[];pp.indiceActual=0;pp.diaActual=0;ppUpdateUI();}document.getElementById('ppDlBtn').disabled=true;}
   const sel=document.getElementById('ppResSelect');sel.innerHTML='';
   const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
