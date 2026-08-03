@@ -444,7 +444,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr var(--pp-canvas-col-w,1fr);}
 @media(max-width:900px){#ppLayoutGrid.pp-ctrl-hidden{grid-template-columns:1fr;}}
 
-#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:1;}
+#ppPhraseArea{position:relative;padding:70px;margin:-70px;z-index:10;}
 #ppCanvasWrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
 #ppCanvasWrap .p5Container,
 #ppP5Container{width:100%;height:100%;display:flex;align-items:stretch;}
@@ -475,7 +475,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pp-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:20;flex-wrap:wrap;gap:12px;}
 
 /* My Collection button */
-.pp-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:500;box-shadow:var(--s-sm);}
+.pp-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:1;box-shadow:var(--s-sm);}
 .pp-my-collection-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 .pp-my-collection-btn *{pointer-events:none;}
 .pp-inv-count{font-size:11px;color:var(--ink);font-weight:700;background:#fff;padding:1px 6px;border-radius:var(--r1);}
@@ -493,14 +493,26 @@ footer .foot-tabs button:hover{color:var(--ink);}
    (day-status, HUD, action buttons) matched to the exact same width so the
    whole column stays visually aligned regardless of aspect ratio. ── */
 @media(min-width:901px){
-  .canvas-wrap,#ppCanvasWrap{width:auto;max-width:480px;max-height:640px;margin:0 auto;}
-  .canvas-panel .day-status,.canvas-panel .action-btns,
-  #wtBelowCanvas,#ppBelowCanvas{max-width:480px;margin-left:auto;margin-right:auto;}
+  /* Controls column gets more room now that the canvas is a fixed, smaller width */
+  #wtLayoutGrid,#ppLayoutGrid{grid-template-columns:1.15fr .85fr;}
+  /* Canvas + everything below it: right-aligned instead of centered, so their
+     right edge lines up with the My Collection button's position */
+  #wtCanvasWrap,#ppCanvasWrap{width:auto;max-width:480px;max-height:640px;margin-left:auto;margin-right:0;}
+  #ptCanvasWrap{width:auto;max-width:480px;max-height:640px;margin:0 auto;}
+  .canvas-panel .day-status,.canvas-panel .action-btns{max-width:480px;margin-left:auto;margin-right:auto;}
+  #wtBelowCanvas,#ppBelowCanvas{max-width:480px;margin-left:auto;margin-right:0;}
   /* Pixel waterer only: Day/Coins stretch to the full canvas width, everything else stays left-aligned */
-  #wtBelowCanvas{width:480px !important;}
+  #wtBelowCanvas{width:480px !important;margin-left:auto !important;margin-right:0 !important;}
   #wtBelowCanvas .wt-hud{width:100% !important;}
   #wtBelowCanvas .wt-hud-card{flex:1 1 0 !important;}
   #wtBelowCanvas .action-btns,#wtBelowCanvas .wt-primary-actions{justify-content:flex-start !important;}
+  /* When controls are hidden, #wtBelowCanvas moves into the side-panel slot
+     (a narrower column on the left, where the controls used to be) — reset
+     it to fill THAT column instead of the fixed 480px meant for its normal
+     spot next to the canvas, so it lines up with the hide/show controls
+     button above it instead of overflowing/misaligning. */
+  #wtSidePanelSlot #wtBelowCanvas{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;}
+  #ppSidePanelSlot #ppBelowCanvas{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;}
 }
 
 /* ── Mobile-only: reorder below-canvas blocks (Generate/Reveal → HUD → rest),
