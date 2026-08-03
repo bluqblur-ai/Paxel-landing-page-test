@@ -84,21 +84,17 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-home #gallery,
 #page-home #certificate,
 #page-home #roadmap,
+#page-home #news,
 #page-home .closing,
 #page-home #legal,
 #page-home > footer{opacity:0;transform:translateY(34px);transition:opacity .85s cubic-bezier(.25,.7,.4,1),transform .85s cubic-bezier(.25,.7,.4,1);}
 #page-home #gallery.is-visible,
 #page-home #certificate.is-visible,
 #page-home #roadmap.is-visible,
+#page-home #news.is-visible,
 #page-home .closing.is-visible,
 #page-home #legal.is-visible,
 #page-home > footer.is-visible{opacity:1;transform:translateY(0);}
-
-/* #news gets a simpler opacity-only fade (no translateY) — its rotated,
-   absolutely-positioned illustrations can look unstable when the whole
-   section also slides vertically at the same time. */
-#page-home #news{opacity:0;transition:opacity .85s cubic-bezier(.25,.7,.4,1);}
-#page-home #news.is-visible{opacity:1;}
 
 /* Tool pages — reveal order (first visit only):
    1) title  2) description  3) hide-controls (if present)
