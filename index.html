@@ -2478,11 +2478,27 @@ window.addEventListener('DOMContentLoaded',()=>{
     '#page-home .closing, #page-home #legal, #page-home > footer'
   );
   function revealAll(){ revealSections.forEach(function(sec){ sec.classList.add('is-visible'); }); }
+  function revealWhenReady(target){
+    var imgs = target.querySelectorAll('img');
+    if(!imgs.length){ target.classList.add('is-visible'); return; }
+    var pending = Array.prototype.map.call(imgs, function(img){
+      if(img.complete) return Promise.resolve();
+      return new Promise(function(res){
+        img.addEventListener('load', res, {once:true});
+        img.addEventListener('error', res, {once:true});
+      });
+    });
+    // Race against a timeout so a slow/broken image can never block the reveal.
+    Promise.race([
+      Promise.all(pending),
+      new Promise(function(res){ setTimeout(res, 800); })
+    ]).then(function(){ target.classList.add('is-visible'); });
+  }
   if('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(entries){
       entries.forEach(function(entry){
         if(entry.isIntersecting){
-          entry.target.classList.add('is-visible');
+          revealWhenReady(entry.target);
           io.unobserve(entry.target);
         }
       });
