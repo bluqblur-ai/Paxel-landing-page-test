@@ -280,7 +280,7 @@ body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
    Positions/rotations below are extracted directly from the source SVG's
    coordinates, converted to percentages of the illustration cluster's own
    bounding box, so the composition matches the original design exactly. */
-#news{padding:88px 0;}
+#news{padding:88px 0;will-change:opacity,transform;}
 .news-entry{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
 @media(max-width:920px){.news-entry{grid-template-columns:1fr;gap:64px;}}
 .news-entry-text h2{font-weight:800;font-size:clamp(32px,4.6vw,50px);line-height:1.1;margin:20px 0 18px;color:var(--ink);}
@@ -755,13 +755,13 @@ footer .foot-tabs button:hover{color:var(--ink);}
       </div>
       <div class="news-entry-visual">
         <div class="news-blockshape" aria-hidden="true"></div>
-        <div class="news-critter news-critter-dougie"><img src="dougie.png" alt="Dougie"></div>
+        <div class="news-critter news-critter-dougie"><img src="dougie.png" alt="Dougie" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-dougie">Dougie</span>
-        <div class="news-critter news-critter-kirara"><img src="kirara.png" alt="Kirara"></div>
+        <div class="news-critter news-critter-kirara"><img src="kirara.png" alt="Kirara" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-kirara">Kirara</span>
-        <div class="news-critter news-critter-deerek"><img src="deerek.png" alt="Deerek"></div>
+        <div class="news-critter news-critter-deerek"><img src="deerek.png" alt="Deerek" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-deerek">Deerek</span>
-        <div class="news-critter news-critter-meemaw"><img src="meemaw.png" alt="Meemaw"></div>
+        <div class="news-critter news-critter-meemaw"><img src="meemaw.png" alt="Meemaw" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-meemaw">Meemaw</span>
       </div>
     </div>
