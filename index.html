@@ -276,32 +276,33 @@ body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
 /* ── Roadmap → "Select your tool" cartridge screen ── */
 .roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 
-/* ── PAXEL News section (between "Select your tool" and "Upcoming") ──
-   .news-feed holds one or more .news-entry posts; new posts get added here
-   over time, each following the same text-left / illustrations-right
-   layout as this first entry. ── */
+/* ── "New Paxel animals" section (between Select your tool and Upcoming) ──
+   Positions/rotations below are extracted directly from the source SVG's
+   coordinates, converted to percentages of the illustration cluster's own
+   bounding box, so the composition matches the original design exactly. */
 #news{padding:88px 0;}
-.news-feed{display:flex;flex-direction:column;gap:64px;margin-top:8px;}
 .news-entry{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
-@media(max-width:920px){.news-entry{grid-template-columns:1fr;gap:80px;}}
+@media(max-width:920px){.news-entry{grid-template-columns:1fr;gap:64px;}}
 .news-entry-text h2{font-weight:800;font-size:clamp(32px,4.6vw,50px);line-height:1.1;margin:20px 0 18px;color:var(--ink);}
 .news-entry-text h2 .accent{color:var(--blue-deep);}
 .news-entry-text p{font-size:16px;line-height:1.75;color:var(--ink-soft);font-weight:500;max-width:420px;}
 
-.news-entry-visual{position:relative;padding:20px;}
+.news-entry-visual{position:relative;aspect-ratio:548.75/630.55;width:100%;}
 .news-blockshape{position:absolute;inset:0;background:var(--blue-pale);border-radius:var(--r0);z-index:0;}
 
-.news-critters-grid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-.news-critter{display:flex;flex-direction:column;align-items:center;gap:10px;}
-.news-critter-img{width:100%;aspect-ratio:1/1;border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;box-shadow:var(--s-md);display:flex;align-items:center;justify-content:center;}
-.news-critter-img img{width:100%;height:100%;object-fit:cover;display:block;}
-.news-critter-name{font-family:var(--font);font-weight:800;font-size:14px;color:var(--ink);background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 16px;box-shadow:var(--s-sm);white-space:nowrap;}
-@media(max-width:600px){
-  .news-entry-visual{padding:14px;}
-  .news-critters-grid{gap:12px;}
-  .news-critter-name{font-size:12px;padding:5px 13px;}
-}
+.news-critter{position:absolute;width:47.2%;aspect-ratio:1/1;border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;box-shadow:var(--s-md);z-index:1;}
+.news-critter img{width:100%;height:100%;object-fit:cover;display:block;}
+.news-critter-dougie{left:0;top:12.94%;background:#47BEEE;transform:rotate(-5.05deg);}
+.news-critter-kirara{right:0;top:0;background:#ED4F9D;transform:rotate(6.54deg);z-index:2;}
+.news-critter-deerek{left:0;top:58.93%;background:#D96B63;transform:rotate(8.03deg);}
+.news-critter-meemaw{right:0;top:47.36%;background:#8B5FBF;transform:rotate(-8.01deg);}
 
+.news-tag{position:absolute;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:8px 18px;font-family:var(--font);font-weight:800;font-size:14px;color:var(--ink);box-shadow:var(--s-sm);z-index:3;white-space:nowrap;}
+.news-tag-dougie{top:40%;left:-2%;}
+.news-tag-deerek{top:86%;left:-2%;}
+.news-tag-kirara{top:27%;right:-2%;}
+.news-tag-meemaw{top:73%;right:-2%;}
+@media(max-width:600px){.news-tag{font-size:12px;padding:6px 14px;}.news-tag-dougie,.news-tag-deerek{left:0;}.news-tag-kirara,.news-tag-meemaw{right:0;}}
 @media(max-width:760px){.roadmap-grid{grid-template-columns:1fr;}}
 .roadmap-card{background:var(--paper);border:var(--bw) solid var(--ink);border-radius:var(--r0);overflow:hidden;box-shadow:var(--s-sm);transition:transform .15s ease,box-shadow .15s ease;}
 .roadmap-card .r-pill{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:var(--paper-alt);color:var(--ink-soft);padding:8px 16px;display:block;border-bottom:var(--bw) solid var(--ink);}
@@ -746,37 +747,23 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <div class="stripe"></div>
 <section id="news">
   <div class="wrap">
-    <div class="news-feed">
-      <!-- News entry: New Paxel animals -->
-      <article class="news-entry">
-        <div class="news-entry-text">
-          <div class="eyebrow">NEW UPDATE</div>
-          <h2>New <span class="accent">Paxel animals</span>!<br>Say hi!!!</h2>
-          <p>We&rsquo;ve got brand new signature animals for Paxel.<br>As for the current use it will be subject to change!<br>Why don&rsquo;t you welcome them?</p>
-        </div>
-        <div class="news-entry-visual">
-          <div class="news-blockshape" aria-hidden="true"></div>
-          <div class="news-critters-grid">
-            <div class="news-critter">
-              <div class="news-critter-img" style="background:#47BEEE;"><img src="dougie.png" alt="Dougie the fox"></div>
-              <span class="news-critter-name">Dougie</span>
-            </div>
-            <div class="news-critter">
-              <div class="news-critter-img" style="background:#ED4F9D;"><img src="kirara.png" alt="Kirara the ghost bunny"></div>
-              <span class="news-critter-name">Kirara</span>
-            </div>
-            <div class="news-critter">
-              <div class="news-critter-img" style="background:#D96B63;"><img src="deerek.png" alt="Deerek the deer"></div>
-              <span class="news-critter-name">Deerek</span>
-            </div>
-            <div class="news-critter">
-              <div class="news-critter-img" style="background:#8B5FBF;"><img src="meemaw.png" alt="Meemaw the cat"></div>
-              <span class="news-critter-name">Meemaw</span>
-            </div>
-          </div>
-        </div>
-      </article>
-      <!-- Future news entries go here — same "article.news-entry" pattern -->
+    <div class="news-entry">
+      <div class="news-entry-text">
+        <div class="eyebrow">NEW UPDATE</div>
+        <h2>New <span class="accent">Paxel animals</span>!<br>Say hi!!!</h2>
+        <p>We&rsquo;ve got brand new signature animals for Paxel.<br>As for the current use it will be subject to change!<br>Why don&rsquo;t you welcome them?</p>
+      </div>
+      <div class="news-entry-visual">
+        <div class="news-blockshape" aria-hidden="true"></div>
+        <div class="news-critter news-critter-dougie"><img src="dougie.png" alt="Dougie"></div>
+        <span class="news-tag news-tag-dougie">Dougie</span>
+        <div class="news-critter news-critter-kirara"><img src="kirara.png" alt="Kirara"></div>
+        <span class="news-tag news-tag-kirara">Kirara</span>
+        <div class="news-critter news-critter-deerek"><img src="deerek.png" alt="Deerek"></div>
+        <span class="news-tag news-tag-deerek">Deerek</span>
+        <div class="news-critter news-critter-meemaw"><img src="meemaw.png" alt="Meemaw"></div>
+        <span class="news-tag news-tag-meemaw">Meemaw</span>
+      </div>
     </div>
   </div>
 </section>
@@ -2515,12 +2502,16 @@ window.addEventListener('DOMContentLoaded',()=>{
    between the controls panel and the canvas while controls are visible,
    and back to its original spot (next to "Hide/Show controls") once
    they're hidden — by observing the same pp-ctrl-hidden class the
-   existing toggle function already manages. */
+   existing toggle function already manages. Also makes sure #ppPhraseArea
+   never stays stuck at its elevated z-index (used while a phrase popup is
+   showing) across a controls toggle, so it can never linger above later
+   page content like the footer. */
 (function(){
   var btn = document.getElementById('ppCollectionTrigger');
   var slot = document.getElementById('ppCollectionSlot');
   var anchor = document.getElementById('ppCollectionAnchor');
   var grid = document.getElementById('ppLayoutGrid');
+  var phraseArea = document.getElementById('ppPhraseArea');
   if(!btn || !slot || !anchor || !grid) return;
 
   function update(){
@@ -2531,6 +2522,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     }else{
       if(btn.parentNode !== anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor.nextSibling);
     }
+    if(phraseArea) phraseArea.style.zIndex='1';
   }
 
   update();
@@ -2543,50 +2535,6 @@ window.addEventListener('DOMContentLoaded',()=>{
     clearTimeout(resizeT);
     resizeT = setTimeout(update, 150);
   }, {passive:true});
-})();
-</script>
-<script>
-/* Isolated, additive easter egg — does not touch any existing function.
-   Typing "money" anywhere on the page grants 1000 coins to the shared
-   PAXEL wallet (used by both Pixel waterer and Pixel phrases), then saves
-   and refreshes whichever tool UI is currently visible. */
-(function(){
-  var CHEAT='money', buffer='';
-  function showToast(){
-    var t=document.createElement('div');
-    t.textContent='\u2728 +1000 coins added!';
-    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);'+
-      'background:#fff;color:#000;font-family:"Cairo",sans-serif;font-weight:800;font-size:14px;'+
-      'padding:12px 22px;border:1.5px solid #000;border-radius:8px;box-shadow:3px 3px 0 #47BEEE;'+
-      'z-index:99999;opacity:0;transition:opacity .35s ease,transform .35s ease;pointer-events:none;';
-    document.body.appendChild(t);
-    requestAnimationFrame(function(){requestAnimationFrame(function(){
-      t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
-    });});
-    setTimeout(function(){
-      t.style.opacity='0';t.style.transform='translateX(-50%) translateY(20px)';
-      setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},400);
-    },2200);
-  }
-  function activateCheat(){
-    if(typeof paxelWallet==='undefined')return;
-    paxelWallet.monedas=(paxelWallet.monedas||0)+1000;
-    if(typeof wt!=='undefined')wt.monedas=paxelWallet.monedas;
-    if(typeof pp!=='undefined')pp.monedas=paxelWallet.monedas;
-    if(typeof wtSaveCoins==='function')wtSaveCoins(paxelWallet.monedas);
-    if(typeof wtUpdateUI==='function')try{wtUpdateUI();}catch(e){}
-    if(typeof ppUpdateUI==='function')try{ppUpdateUI();}catch(e){}
-    showToast();
-  }
-  window.addEventListener('keydown',function(e){
-    if(e.ctrlKey||e.metaKey||e.altKey)return;
-    var tag=(document.activeElement&&document.activeElement.tagName)||'';
-    if(tag==='INPUT'||tag==='TEXTAREA')return;
-    var k=e.key;
-    if(!k||k.length!==1)return;
-    buffer=(buffer+k).toLowerCase().slice(-CHEAT.length);
-    if(buffer===CHEAT){buffer='';activateCheat();}
-  });
 })();
 </script>
 </body>
