@@ -49,38 +49,24 @@ a{color:inherit;text-decoration:none;}
 @keyframes blink-caret{50%{opacity:0;}}
 
 /* ── Entrance reveal system ──────────────────────────────────
-   Uses CSS *transitions* (not animations) gated by classes that
-   JS adds exactly once per page ('.entered' on the page container,
-   '.is-visible' on individually scroll-revealed sections). Because
-   transitions only fire on an actual value change — and these classes
-   are never removed — nothing replays when a page is hidden/reshown
-   via the tab navigation. It only plays again after a real reload.
+   Uses CSS *transitions* (not animations) gated by a class that JS
+   adds exactly once per page ('.entered' on the page container).
+   Because transitions only fire on an actual value change — and this
+   class is never removed — nothing replays when a page is hidden/
+   reshown via the tab navigation. It only plays again after a real reload.
 
-   Home: 1) below-the-fold sections (as you scroll to each)
-         2) title  3) description  4) hero actions  5) utopia.gif
-         6) logo + header + ticker (last)
+   Home: unified, no stagger, fires once on first load —
+         1) title through footer: fade in + slide up, together
+         2) header (logo + nav + ticker): fade in + slide down, together
    Tool pages (Pixel tool / waterer / phrases), each on first visit:
          1) title  2) description  3) blue canvas background
          4) rest of the tool's interfaces                          */
 
-#page-home .hero .eyebrow,
-#page-home .hero h1{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) .7s,transform .9s cubic-bezier(.25,.7,.4,1) .7s;}
-#page-home.entered .hero .eyebrow,
-#page-home.entered .hero h1{opacity:1;transform:translateY(0);}
-
-#page-home .hero p.lede{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) 1.5s,transform .9s cubic-bezier(.25,.7,.4,1) 1.5s;}
-#page-home.entered .hero p.lede{opacity:1;transform:translateY(0);}
-
-#page-home .hero-actions{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) 2.2s,transform .9s cubic-bezier(.25,.7,.4,1) 2.2s;}
-#page-home.entered .hero-actions{opacity:1;transform:translateY(0);}
-
-#page-home .hero-visual{opacity:0;transform:translateY(30px);transition:opacity .9s cubic-bezier(.25,.7,.4,1) 2.9s,transform .9s cubic-bezier(.25,.7,.4,1) 2.9s;}
-#page-home.entered .hero-visual{opacity:1;transform:translateY(0);}
-
-.nav{opacity:0;transform:translateY(-26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1),transform .8s cubic-bezier(.25,.7,.4,1);}
-body.entered-nav .nav{opacity:1;transform:translateY(0);}
-
-/* Home: below-the-fold sections, revealed individually as you scroll to them */
+/* ── Home entrance animation: unified, two groups, no stagger, no
+   scroll-trigger — everything fires once, together, on first visit.
+   Group 1 (title through footer): fade in + slide up.
+   Group 2 (header: nav + ticker): fade in + slide down. ── */
+#page-home .hero,
 #page-home #gallery,
 #page-home #certificate,
 #page-home #roadmap,
@@ -88,13 +74,17 @@ body.entered-nav .nav{opacity:1;transform:translateY(0);}
 #page-home .closing,
 #page-home #legal,
 #page-home > footer{opacity:0;transform:translateY(34px);transition:opacity .85s cubic-bezier(.25,.7,.4,1),transform .85s cubic-bezier(.25,.7,.4,1);}
-#page-home #gallery.is-visible,
-#page-home #certificate.is-visible,
-#page-home #roadmap.is-visible,
-#page-home #news.is-visible,
-#page-home .closing.is-visible,
-#page-home #legal.is-visible,
-#page-home > footer.is-visible{opacity:1;transform:translateY(0);}
+#page-home.entered .hero,
+#page-home.entered #gallery,
+#page-home.entered #certificate,
+#page-home.entered #roadmap,
+#page-home.entered #news,
+#page-home.entered .closing,
+#page-home.entered #legal,
+#page-home.entered > footer{opacity:1;transform:translateY(0);}
+
+.nav{opacity:0;transform:translateY(-26px);transition:opacity .85s cubic-bezier(.25,.7,.4,1),transform .85s cubic-bezier(.25,.7,.4,1);}
+body.entered-nav .nav{opacity:1;transform:translateY(0);}
 
 /* Tool pages — reveal order (first visit only):
    1) title  2) description  3) hide-controls (if present)
@@ -2453,7 +2443,8 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Header (logo + nav + ticker) — timed in JS rather than via CSS transition-delay,
   // because the ticker also has its own scroll-triggered show/hide on the same
   // properties; a CSS delay would restart every time that toggles mid-entrance.
-  setTimeout(function(){ document.body.classList.add('entered-nav'); }, 3600);
+  // Fires at the same time as the main entrance group above (unified reveal).
+  setTimeout(function(){ document.body.classList.add('entered-nav'); }, 0);
 
   // Tool pages: watch for showPage() adding the 'active' class, and mark
   // each one entered only the very first time that happens.
@@ -2471,45 +2462,6 @@ window.addEventListener('DOMContentLoaded',()=>{
     });
     obs.observe(el, {attributes:true, attributeFilter:['class']});
   });
-
-  // Home below-the-fold sections: reveal each individually as it scrolls into view.
-  var revealSections = document.querySelectorAll(
-    '#page-home #gallery, #page-home #certificate, #page-home #roadmap, #page-home #news, ' +
-    '#page-home .closing, #page-home #legal, #page-home > footer'
-  );
-  function revealAll(){ revealSections.forEach(function(sec){ sec.classList.add('is-visible'); }); }
-  function revealWhenReady(target){
-    var imgs = target.querySelectorAll('img');
-    if(!imgs.length){ target.classList.add('is-visible'); return; }
-    var pending = Array.prototype.map.call(imgs, function(img){
-      if(img.complete) return Promise.resolve();
-      return new Promise(function(res){
-        img.addEventListener('load', res, {once:true});
-        img.addEventListener('error', res, {once:true});
-      });
-    });
-    // Race against a timeout so a slow/broken image can never block the reveal.
-    Promise.race([
-      Promise.all(pending),
-      new Promise(function(res){ setTimeout(res, 800); })
-    ]).then(function(){ target.classList.add('is-visible'); });
-  }
-  if('IntersectionObserver' in window){
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(entry){
-        if(entry.isIntersecting){
-          revealWhenReady(entry.target);
-          io.unobserve(entry.target);
-        }
-      });
-    }, {threshold:0.01, rootMargin:'0px 0px 120px 0px'});
-    revealSections.forEach(function(sec){ io.observe(sec); });
-  } else {
-    revealAll();
-  }
-  // Safety net: never leave anything permanently invisible, even if the
-  // observer above misses an edge case for some reason.
-  setTimeout(revealAll, 4500);
 })();
 </script>
 <script>
