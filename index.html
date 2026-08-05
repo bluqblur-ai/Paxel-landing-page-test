@@ -2436,15 +2436,35 @@ window.addEventListener('DOMContentLoaded',()=>{
    added, never removed — so switching tabs never replays anything. */
 (function(){
 
-  // Home page: it's already the active page at load, so mark it entered right away.
+  // Home page: wait for every image on it (hero art, gallery stills,
+  // certificate art, the 4 new mascot images, etc.) to finish loading —
+  // or fail — before starting the entrance animation, so nothing pops in
+  // mid-transition. A timeout keeps this from ever blocking indefinitely.
   var home = document.getElementById('page-home');
-  if(home) home.classList.add('entered');
-
-  // Header (logo + nav + ticker) — timed in JS rather than via CSS transition-delay,
-  // because the ticker also has its own scroll-triggered show/hide on the same
-  // properties; a CSS delay would restart every time that toggles mid-entrance.
-  // Fires at the same time as the main entrance group above (unified reveal).
-  setTimeout(function(){ document.body.classList.add('entered-nav'); }, 0);
+  function startHomeEntrance(){
+    if(home) home.classList.add('entered');
+    document.body.classList.add('entered-nav');
+  }
+  if(home){
+    var homeImgs = home.querySelectorAll('img');
+    if(!homeImgs.length){
+      startHomeEntrance();
+    }else{
+      var pendingImgs = Array.prototype.map.call(homeImgs, function(img){
+        if(img.complete) return Promise.resolve();
+        return new Promise(function(res){
+          img.addEventListener('load', res, {once:true});
+          img.addEventListener('error', res, {once:true});
+        });
+      });
+      Promise.race([
+        Promise.all(pendingImgs),
+        new Promise(function(res){ setTimeout(res, 1500); })
+      ]).then(startHomeEntrance);
+    }
+  }else{
+    startHomeEntrance();
+  }
 
   // Tool pages: watch for showPage() adding the 'active' class, and mark
   // each one entered only the very first time that happens.
