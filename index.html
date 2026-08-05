@@ -8,6 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="dougie.png">
+<link rel="preload" as="image" href="kirara.png">
+<link rel="preload" as="image" href="deerek.png">
+<link rel="preload" as="image" href="meemaw.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -280,7 +284,7 @@ body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
 .news-entry-visual{position:relative;aspect-ratio:548.75/630.55;width:100%;}
 .news-blockshape{position:absolute;inset:0;background:var(--blue-pale);border-radius:var(--r0);z-index:0;}
 
-.news-critter{position:absolute;width:47.2%;aspect-ratio:1/1;border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;box-shadow:var(--s-md);z-index:1;}
+.news-critter{position:absolute;width:47.2%;aspect-ratio:1/1;border:var(--bw2) solid var(--ink);border-radius:16.79%;overflow:hidden;box-shadow:var(--s-md);z-index:1;}
 .news-critter img{width:100%;height:100%;object-fit:cover;display:block;}
 .news-critter-dougie{left:0;top:12.94%;background:#47BEEE;transform:rotate(-5.05deg);}
 .news-critter-kirara{right:0;top:0;background:#ED4F9D;transform:rotate(6.54deg);z-index:2;}
@@ -745,13 +749,13 @@ footer .foot-tabs button:hover{color:var(--ink);}
       </div>
       <div class="news-entry-visual">
         <div class="news-blockshape" aria-hidden="true"></div>
-        <div class="news-critter news-critter-dougie"><img src="dougie.webp" alt="Dougie" onerror="this.style.display='none'"></div>
+        <div class="news-critter news-critter-dougie"><img src="dougie.png" alt="Dougie" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-dougie">Dougie</span>
-        <div class="news-critter news-critter-kirara"><img src="kirara.webp" alt="Kirara" onerror="this.style.display='none'"></div>
+        <div class="news-critter news-critter-kirara"><img src="kirara.png" alt="Kirara" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-kirara">Kirara</span>
-        <div class="news-critter news-critter-deerek"><img src="deerek.webp" alt="Deerek" onerror="this.style.display='none'"></div>
+        <div class="news-critter news-critter-deerek"><img src="deerek.png" alt="Deerek" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-deerek">Deerek</span>
-        <div class="news-critter news-critter-meemaw"><img src="meemaw.webp" alt="Meemaw" onerror="this.style.display='none'"></div>
+        <div class="news-critter news-critter-meemaw"><img src="meemaw.png" alt="Meemaw" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-meemaw">Meemaw</span>
       </div>
     </div>
@@ -2459,7 +2463,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       });
       Promise.race([
         Promise.all(pendingImgs),
-        new Promise(function(res){ setTimeout(res, 1500); })
+        new Promise(function(res){ setTimeout(res, 3000); })
       ]).then(startHomeEntrance);
     }
   }else{
