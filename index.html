@@ -15,6 +15,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- ZineJS core (flipbook engine) — not on a public CDN, so it's self-hosted:
+     upload zinejs-core.js next to this index.html. Licensed PolyForm
+     Noncommercial 1.0.0 — free for non-commercial use only; a commercial
+     PAXEL launch needs a license from the author (github.com/awecode/zinejs). -->
+<script src="zinejs-core.js"></script>
 <style>
 /* ============================================================
    PAXEL — "SWISS ARCADE" SYSTEM (v3 — simplified)
@@ -559,6 +564,248 @@ footer .foot-tabs button:hover{color:var(--ink);}
   #ppPhraseArea{padding:20px;margin:-20px;}
 }
 
+
+/* ── Pixel diary CSS (mirrors Pixel phrases exactly) ── */
+
+
+
+#page-tool .tool-hero h1, #page-waterer .tool-hero h1, #page-diary .tool-hero h1{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .15s,transform .8s cubic-bezier(.25,.7,.4,1) .15s;}
+
+#page-tool.entered .tool-hero h1, #page-waterer.entered .tool-hero h1, #page-diary.entered .tool-hero h1{opacity:1;transform:translateY(0);}
+
+
+#page-tool .tool-hero p, #page-waterer .tool-hero p, #page-diary .tool-hero p{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .5s,transform .8s cubic-bezier(.25,.7,.4,1) .5s;}
+
+#page-tool.entered .tool-hero p, #page-waterer.entered .tool-hero p, #page-diary.entered .tool-hero p{opacity:1;transform:translateY(0);}
+
+
+
+#page-waterer .btn-toggle-ctrl, #page-diary .btn-toggle-ctrl{opacity:0;}
+
+#page-waterer.entered .btn-toggle-ctrl, #page-diary.entered .btn-toggle-ctrl{opacity:1;}
+
+#page-waterer #wtControlsCol, #page-diary #pdControlsCol{filter:opacity(0);margin-top:26px;}
+
+#page-waterer.entered #wtControlsCol, #page-diary.entered #pdControlsCol{filter:opacity(1);margin-top:0;}
+
+
+
+#page-tool .canvas-wrap, #page-waterer .canvas-wrap, #page-diary #pdCanvasWrap{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) 1.9s,transform .8s cubic-bezier(.25,.7,.4,1) 1.9s,aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
+
+#page-tool.entered .canvas-wrap, #page-waterer.entered .canvas-wrap, #page-diary.entered #pdCanvasWrap{opacity:1;transform:translateY(0);}
+
+#page-waterer #wtBelowCanvas, #page-diary #pdBelowCanvas{filter:opacity(0);margin-top:26px;}
+
+#page-waterer.entered #wtBelowCanvas, #page-diary.entered #pdBelowCanvas{filter:opacity(1);margin-top:0;}
+
+
+
+#page-diary .pd-my-collection-btn{opacity:0;}
+
+#page-diary.entered .pd-my-collection-btn{opacity:1;}
+
+.upload-zone.wt-uploading .upload-zone-icon,.upload-zone.pt-uploading .upload-zone-icon,.upload-zone.pd-uploading .upload-zone-icon{animation:spin-icon .7s linear infinite;}
+
+
+
+#pdLayoutGrid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
+
+#pdCollectionSlot{display:none;}
+
+@media(max-width:900px){#pdLayoutGrid{grid-template-columns:1fr;}#pdCanvasCol{order:1;}#pdSidePanelSlot{order:2;}}
+
+#pdControlsCol{display:flex;flex-direction:column;gap:18px;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease,filter .8s cubic-bezier(.25,.7,.4,1) 1.55s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.55s;}
+
+#pdControlsCol.pd-collapsing{opacity:0;visibility:hidden;}
+
+#pdCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:visible;}
+
+#pdBelowCanvas{display:flex;flex-direction:column;gap:14px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1),filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
+
+#pdBelowCanvas.pd-sliding{opacity:0;transform:translateX(var(--pd-slide-from,60px));}
+
+#pdSidePanelSlot{display:none;flex-direction:column;gap:14px;opacity:0;transition:opacity .28s ease;}
+
+#pdSidePanelSlot.pd-slot-visible{display:flex;opacity:1;}
+
+#pdLayoutGrid.pd-ctrl-hidden{grid-template-columns:1fr var(--pd-canvas-col-w,1fr);}
+
+@media(max-width:900px){#pdLayoutGrid.pd-ctrl-hidden{grid-template-columns:1fr;}}
+
+
+#pdPhraseArea{position:relative;padding:70px;margin:-70px;z-index:1;}
+
+#pdCanvasWrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
+
+#pdCanvasWrap .p5Container,
+#pdP5Container{width:100%;height:100%;display:flex;align-items:stretch;}
+
+#pdP5Container canvas{width:100%!important;height:100%!important;display:block;image-rendering:pixelated;}
+
+#pdCanvasEmpty{color:var(--ink);font-family:var(--font);font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:40px;width:100%;align-self:center;}
+
+
+
+.pd-phrase-popup{position:absolute;z-index:10;pointer-events:none;opacity:0;transition:opacity .5s ease, top .5s ease;}
+
+.pd-phrase-card{background:#ffffff;border:1px solid var(--ink);border-radius:4px;box-shadow:3px 3px 0 var(--ink);width:300px;padding:15px;font-family:var(--font);cursor:pointer;transition:background .3s ease;line-height:1.2;pointer-events:auto;}
+
+.pd-phrase-card:hover{background:#ededed;}
+
+.pd-phrase-day{font-weight:800;color:var(--blue);margin-bottom:6px;font-size:13px;letter-spacing:.04em;}
+
+.pd-phrase-text{font-size:18px;color:var(--ink);}
+
+.pd-phrase-collectibles{display:flex;gap:5px;flex-direction:row;flex-wrap:wrap;margin-top:10px;}
+
+.pd-collectible-tag{font-family:var(--font);font-size:14px;border-radius:20px;padding:4px 10px;border:1px solid;background:#fff;cursor:pointer;transition:background .3s ease;}
+
+.pd-collectible-tag:hover{background:#ededed;}
+
+.pd-collectible-new{font-family:var(--font);font-size:14px;font-weight:800;border-radius:20px;padding:4px 10px;border:1px solid var(--ink);background:#FFD700;cursor:pointer;transition:background .3s ease;}
+
+.pd-collectible-new:hover{background:#e6c200;}
+
+@media(max-width:640px){
+  .pd-phrase-card{width:220px;padding:11px;}
+  .pd-phrase-day{font-size:11px;margin-bottom:4px;}
+  .pd-phrase-text{font-size:14px;}
+  .pd-phrase-collectibles{gap:4px;margin-top:8px;}
+  .pd-collectible-tag,.pd-collectible-new{font-size:11.5px;padding:3px 8px;}}
+
+
+
+.pd-top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;position:relative;z-index:20;flex-wrap:wrap;gap:12px;}
+
+
+
+.pd-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:1;box-shadow:var(--s-sm);}
+
+.pd-my-collection-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+
+.pd-my-collection-btn *{pointer-events:none;}
+
+.pd-inv-count{font-size:11px;color:var(--ink);font-weight:700;background:#fff;padding:1px 6px;border-radius:var(--r1);}
+
+
+@media(max-width:640px){
+  .pd-my-collection-btn{padding:6px 11px;font-size:10.5px;gap:6px;}}
+
+
+
+@media(min-width:901px){
+  
+  #wtLayoutGrid,#pdLayoutGrid{grid-template-columns:1.15fr .85fr;}
+  
+  #wtCanvasWrap,#pdCanvasWrap{width:auto;max-width:480px;max-height:640px;margin-left:auto;margin-right:0;}
+  #wtBelowCanvas,#pdBelowCanvas{max-width:480px;margin-left:auto;margin-right:0;}
+  #pdSidePanelSlot #pdBelowCanvas{width:100% !important;max-width:100% !important;margin-left:0 !important;margin-right:0 !important;}}
+
+
+
+@media(max-width:640px){
+  #wtHolyBtn,#pdHolyBtn,#pdExtraBtn,#wtDlBtn,#pdDlBtn{font-size:12px;padding:10px 14px;gap:5px;}
+  #wtGenBtn,#pdGenBtn{padding:9px 20px;}
+  #wtRevealBtn,#pdRevealBtn{padding:9px 18px;}
+  #pdLayoutGrid{gap:16px;}
+  #pdCollectionSlot{display:flex;}
+  #pdCollectionSlot:empty{display:none;}
+  
+  #pdPhraseArea{padding:20px;margin:-20px;}
+}
+
+/* ── "My diary" — a floating panel, not a modal. No dark backdrop: the
+   diary itself can be dragged anywhere and resized bigger/smaller (the
+   resize handle applies one CSS transform:scale to the whole panel, so
+   the book, its controls, and the sticker picker all stay perfectly
+   proportional to each other at any size). ── */
+.pd-diary-float{position:fixed;top:8vh;left:50%;margin-left:-160px;z-index:9999;display:none;}
+.pd-diary-float.pd-diary-open{display:block;}
+
+.pd-diary-scale-wrap{position:relative;width:320px;transform-origin:top left;font-family:var(--font);}
+
+.pd-diary-drag-handle{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--blue);border:var(--bw2) solid var(--ink);border-bottom:none;border-radius:var(--r1) var(--r1) 0 0;cursor:grab;touch-action:none;user-select:none;}
+.pd-diary-drag-handle:active{cursor:grabbing;}
+.pd-diary-sub{flex:1;font-size:11px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pd-diary-close{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;}
+.pd-diary-close:hover{background:var(--ink);color:#fff;}
+
+.pd-book-wrap{position:relative;display:flex;flex-direction:column;align-items:flex-start;border:var(--bw2) solid var(--ink);border-top:none;border-bottom:none;padding:14px 14px 0;}
+.pd-page-tab{background:var(--blue);color:var(--ink);border:var(--bw) solid var(--ink);border-bottom:none;border-radius:6px 6px 0 0;padding:4px 10px;font-weight:800;font-size:10px;position:relative;z-index:1;margin-left:1em;}
+
+/* Read mode: ZineJS mounts here and owns the whole realistic page-curl
+   experience. --zine-* CSS vars retheme its (rare) own injected chrome. */
+.pd-zine-shell{position:relative;width:100%;height:280px;border:var(--bw2) solid var(--ink);border-radius:0 var(--r0) var(--r0) var(--r0);box-shadow:var(--s-sm);overflow:hidden;background:#fff;}
+.pd-zine-container{position:absolute;inset:0;}
+.pd-zine-hint{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:9.5px;font-weight:700;color:var(--ink-soft);background:rgba(255,255,255,.85);border:1px solid var(--dormant);border-radius:999px;padding:2px 9px;pointer-events:none;z-index:2;}
+
+/* Edit mode: our own interactive single-page canvas, shown on top of the
+   ZineJS shell while editing one page. Baked back into an image on exit. */
+.pd-edit-overlay{position:absolute;inset:0;z-index:5;}
+.pd-edit-page{position:relative;width:100%;height:100%;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1px,transparent 1px);background-size:16px 16px;border:var(--bw2) solid var(--ink);border-radius:0 var(--r0) var(--r0) var(--r0);box-shadow:var(--s-sm);overflow:hidden;}
+
+/* Sticker picker trigger: a small icon button sitting in the top-left
+   corner of the page being edited. */
+.pd-sticker-picker-btn{position:absolute;top:6px;left:6px;width:28px;height:28px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);box-shadow:var(--s-sm);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:2;transition:transform .12s,box-shadow .12s;}
+.pd-sticker-picker-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+.pd-edit-done-btn{position:absolute;top:6px;right:6px;font-family:var(--font);font-weight:800;font-size:11px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer;box-shadow:var(--s-sm);z-index:2;transition:transform .12s,box-shadow .12s;}
+.pd-edit-done-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+
+@media(max-width:640px){
+  .pd-sticker-picker-btn{width:24px;height:24px;font-size:12px;}
+}
+
+.pd-book-controls{position:relative;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;width:100%;padding:12px 14px;border:var(--bw2) solid var(--ink);border-top:none;border-radius:0 0 var(--r1) var(--r1);}
+.pd-book-nav-btn{font-family:var(--font);font-weight:700;font-size:10.5px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:0.3em;white-space:nowrap;background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:6px 9px;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
+.pd-book-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
+.pd-book-nav-btn:not(:disabled):hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+.pd-key-hint{font-size:0.8em;font-weight:800;color:var(--ink-soft);background:var(--paper-alt);border:1px solid var(--dormant);border-radius:4px;padding:0.05em 0.3em;}
+.pd-add-page-btn{font-family:var(--font);font-weight:700;font-size:10.5px;color:var(--ink);cursor:pointer;white-space:nowrap;background:var(--blue);border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:6px 10px;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;order:1;}
+.pd-add-page-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+.pd-book-nav-next{order:2;}
+.pd-book-nav-prev{order:-1;}
+
+/* Resize handle for the WHOLE diary (bottom-right corner of the panel). */
+.pd-diary-resize-handle{position:absolute;bottom:-10px;right:-10px;width:26px;height:26px;background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:50%;box-shadow:var(--s-sm);cursor:nwse-resize;display:flex;align-items:center;justify-content:center;font-size:12px;touch-action:none;z-index:2;}
+
+/* Sticker picker: pops up over the page being edited. */
+.pd-sticker-picker-popup{position:absolute;top:0;left:0;right:0;bottom:0;background:#fff;border:var(--bw2) solid var(--ink);border-radius:0 var(--r0) var(--r0) var(--r0);box-shadow:var(--s-md);padding:12px;display:flex;flex-direction:column;z-index:6;}
+.pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
+.pd-picker-tab{flex:1;font-family:var(--font);font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:6px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
+.pd-picker-tab.active{background:var(--blue);color:var(--ink);}
+.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:6px;padding-right:2px;min-height:100px;align-content:flex-start;}
+.pd-picker-list.pd-view-words{flex-direction:row;flex-wrap:wrap;}
+.pd-picker-list.pd-view-phrases{flex-direction:column;}
+.pd-picker-empty{font-size:12px;color:var(--ink-soft);font-weight:600;text-align:center;padding:20px 8px;margin:auto;}
+
+.pd-sticker-chip{cursor:pointer;user-select:none;touch-action:none;}
+.pd-sticker-chip.pd-word{display:inline-flex;font-family:var(--font);font-weight:700;font-size:11.5px;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:4px 10px;box-shadow:var(--s-sm);}
+.pd-sticker-chip.pd-phrase{background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:7px 9px;box-shadow:var(--s-sm);font-size:11px;line-height:1.4;color:var(--ink);font-weight:600;}
+.pd-picker-list .pd-sticker-chip.pd-phrase{width:100%;}
+.pd-placed-sticker .pd-sticker-chip.pd-phrase{max-width:150px;}
+.pd-sticker-chip:hover{transform:translate(-1px,-1px);}
+.pd-chip-count{font-size:0.85em;font-weight:800;color:var(--ink-soft);margin-left:0.4em;}
+
+/* Stickers placed on the page being edited — draggable with one finger,
+   pinch with two to resize + rotate together (handled in JS); dedicated
+   handles remain for precise mouse control. */
+.pd-placed-sticker{position:absolute;cursor:grab;touch-action:none;}
+.pd-placed-sticker.pd-dragging{cursor:grabbing;z-index:60;}
+.pd-placed-sticker.pd-selected{z-index:55;}
+.pd-placed-sticker .pd-sticker-remove{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.pd-placed-sticker:hover .pd-sticker-remove,
+.pd-placed-sticker.pd-selected .pd-sticker-remove{display:flex;}
+.pd-sticker-handle{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--blue);border:var(--bw) solid var(--ink);font-size:11px;line-height:1;display:none;align-items:center;justify-content:center;box-shadow:var(--s-sm);touch-action:none;}
+.pd-placed-sticker:hover .pd-sticker-handle,
+.pd-placed-sticker.pd-selected .pd-sticker-handle{display:flex;}
+.pd-sticker-rotate{top:-30px;left:50%;transform:translateX(-50%);cursor:grab;}
+.pd-sticker-resize{bottom:-9px;right:-9px;cursor:nwse-resize;}
+
+@media(max-width:640px){
+  .pd-diary-float{left:50%;margin-left:-150px;top:6vh;}
+  .pd-diary-scale-wrap{width:300px;}
+}
+
 </style>
 </head>
 <body>
@@ -567,9 +814,10 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <div class="logo" onclick="showPage('home')"><img src="paxel-recto.png" alt="PAXEL" width="200"></div>
     <div class="tabs">
       <button class="tab active-tab" id="tab-home" onclick="showPage('home')">Home</button>
-      <button class="tab" id="tab-tool" onclick="showPage('tool')">Pixel tool</button>
+      <span id="tempToolTabSlot"></span>
       <button class="tab" id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
       <button class="tab" id="tab-phrases" onclick="showPage('phrases')">Pixel phrases</button>
+      <button class="tab" id="tab-diary" onclick="showPage('diary')">Pixel diary</button>
     </div>
   </div>
 </nav>
@@ -726,12 +974,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
           <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('phrases')">&#9654; Open Pixel phrases</button>
         </div>
       </div>
-      <div class="roadmap-card">
-        <span class="r-pill">CARTRIDGE 04 &middot; COMING SOON</span>
+      <div class="roadmap-card pixel-featured" onclick="showPage('diary')">
+        <span class="r-pill">CARTRIDGE 04 &middot; READY</span>
         <div class="r-body">
           <h4>Pixel diary</h4>
           <p>A daily diary for your pixel art: write down whatever you want about your day, then drop the phrases and collectible words you've earned right onto the page.</p>
-          <span class="soon-tag">&#128274; Coming soon</span>
+          <button class="pixel-open-btn" onclick="event.stopPropagation();showPage('diary')">&#9654; Open Pixel diary</button>
         </div>
       </div>
     </div>
@@ -809,6 +1057,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <button onclick="showPage('tool')">Pixel tool</button>
     <button onclick="showPage('waterer')">Pixel waterer</button>
     <button onclick="showPage('phrases')">Pixel phrases</button>
+      <button onclick="showPage('diary')">Pixel diary</button>
     <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
     <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
   </div>
@@ -884,6 +1133,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <div class="foot-tabs">
       <button onclick="showPage('tool')">Pixel tool</button><button onclick="showPage('waterer')">Pixel waterer</button>
       <button onclick="showPage('phrases')">Pixel phrases</button>
+      <button onclick="showPage('diary')">Pixel diary</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
       <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
     </div>
@@ -1016,6 +1266,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <div class="foot-tabs">
       <button onclick="showPage('tool')">Pixel tool</button><button onclick="showPage('waterer')">Pixel waterer</button>
       <button onclick="showPage('phrases')">Pixel phrases</button>
+      <button onclick="showPage('diary')">Pixel diary</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
       <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
     </div>
@@ -1204,6 +1455,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <button onclick="showPage('tool')">Pixel tool</button>
       <button onclick="showPage('waterer')">Pixel waterer</button>
       <button onclick="showPage('phrases')">Pixel phrases</button>
+      <button onclick="showPage('diary')">Pixel diary</button>
       <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
       <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
     </div>
@@ -1211,6 +1463,197 @@ footer .foot-tabs button:hover{color:var(--ink);}
   </footer>
 </div>
 </div><!-- /page-phrases -->
+
+<!-- PIXEL DIARY PAGE (clone of Pixel phrases) -->
+<div class="page" id="page-diary">
+<div class="tool-page">
+  <div class="tool-hero">
+    <div class="wrap tool-hero-inner">
+      <div>
+        <h1>Pixel <span class="accent">diary</span></h1>
+        <p>Open your diary and turn it into a scrapbook of everything you've collected. Drag your collected words and phrases onto the page like stickers, arrange them however you like, and flip through as many pages as you want.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="tool-controls-section">
+    <div class="wrap">
+
+      <!-- Toggle + My Collection row — same flex container, always aligned -->
+      <div class="pd-top-row">
+        <button class="btn-toggle-ctrl" id="pdToggleBtn" onclick="pdToggleControls()">
+          <span class="toggle-arrow" id="pdToggleArrow">&#8592;</span>
+          <span id="pdToggleBtnLabel">Hide controls</span>
+        </button>
+        <span id="pdCollectionAnchor"></span>
+      </div>
+
+      <!-- Layout grid (same pattern as waterer) -->
+      <div id="pdLayoutGrid">
+        <div id="pdSidePanelSlot"></div>
+        <div id="pdControlsCol">
+
+          <!-- Upload -->
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Upload.sys</div>
+            <div class="ctrl-panel-inner">
+              <div class="upload-zone" id="pdUploadZone">
+                <input type="file" accept="image/*" id="pdFileInput" onchange="pdHandleFile(this)">
+                <div class="upload-zone-icon" id="pdUploadIcon">&#128172;</div>
+                <p id="pdUploadText">Drop your image here</p>
+                <span id="pdUploadSub">PNG, JPG, GIF &mdash; any size</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Color key -->
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Color key &amp; rarity</div>
+            <div class="ctrl-panel-inner">
+              <div class="wt-legend">
+                <div class="wt-legend-item">
+                  <div class="wt-legend-swatch" style="background:var(--wt-hidden);"></div>
+                  Special pixel (hidden)
+                </div>
+                <div class="wt-legend-item">
+                  <div class="wt-legend-swatch" style="background:var(--wt-special);"></div>
+                  Special pixel (revealed)
+                </div>
+                <div class="wt-legend-item">
+                  <div class="wt-legend-swatch" style="background:var(--ink);"></div>
+                  Normal pixel
+                </div>
+              </div>
+              <div style="height:10px;"></div>
+              <div class="wt-legend">
+                <div class="wt-legend-item">
+                  <div class="wt-legend-swatch" style="border:3px solid rgb(151,151,151);background:#fff;"></div>
+                  Common
+                </div>
+                <div class="wt-legend-item">
+                  <div class="wt-legend-swatch" style="border:3px solid rgb(255,145,34);background:#fff;"></div>
+                  Rare
+                </div>
+                <div class="wt-legend-item">
+                  <div class="wt-legend-swatch" style="border:3px solid rgb(240,64,64);background:#fff;"></div>
+                  Legendary
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Format -->
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Format.cfg</div>
+            <div class="ctrl-panel-inner">
+              <div class="ctrl-row">
+                <span class="ctrl-sublabel">Canvas aspect ratio</span>
+                <div class="format-btns">
+                  <button class="fmt-btn selected" id="pd-fmt-1-1" onclick="pdSetFmt('1:1',600,600,this)">1:1</button>
+                  <button class="fmt-btn" id="pd-fmt-3-4" onclick="pdSetFmt('3:4',450,600,this)">3:4</button>
+                  <button class="fmt-btn" id="pd-fmt-4-3" onclick="pdSetFmt('4:3',600,450,this)">4:3</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Generation settings (no Duration) -->
+          <div class="ctrl-panel">
+            <div class="ctrl-panel-title">Engine.cfg</div>
+            <div class="ctrl-panel-inner">
+              <div class="ctrl-row">
+                <label class="ctrl-label">Resolution</label>
+                <span class="ctrl-sublabel">Higher = more detail, slower</span>
+                <select class="ctrl-select" id="pdResSelect" onchange="pdOnResChange()"></select>
+              </div>
+              <div class="ctrl-row">
+                <label class="ctrl-label">Speed (ms between ticks)</label>
+                <span class="ctrl-sublabel">Lower = faster generation</span>
+                <input type="range" class="ctrl-range" id="pdSpeedRange" min="1" max="200" value="30"
+                  oninput="pd.intervalSpeed=parseInt(this.value);document.getElementById('pdSpeedVal').textContent=this.value+'ms'">
+                <div class="ctrl-range-value" id="pdSpeedVal">30ms</div>
+              </div>
+              <div class="ctrl-row">
+                <label class="ctrl-label">Pixels per tick</label>
+                <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
+                <input type="number" class="ctrl-number" id="pdPpcInput" min="1" max="500" value="1"
+                  oninput="pd.bloquesPorCiclo=parseInt(this.value)||1">
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /#pdControlsCol -->
+
+        <div id="pdCollectionSlot" style="justify-content:flex-end;"><button class="pd-my-collection-btn" id="pdCollectionTrigger" type="button" onclick="pdOpenInventory()">&#128214; My diary <span id="pdInventoryCount" class="pd-inv-count"></span></button></div>
+
+        <!-- Canvas column -->
+        <div id="pdCanvasCol">
+          <!-- phrase popup area -->
+          <div id="pdPhraseArea">
+            <div id="pdCanvasWrap" class="px-border">
+              <div id="pdCanvasEmpty">UPLOAD AN IMAGE<br>TO BEGIN<span class="caret">&nbsp;</span></div>
+              <div id="pdP5Container" style="display:none;width:100%;height:100%;"></div>
+            </div>
+          </div>
+
+          <!-- Below-canvas panels (same pattern as waterer) -->
+          <div id="pdBelowCanvas">
+            <!-- Day pips -->
+            <div id="pdDayTrack" class="wt-day-track"></div>
+
+            <!-- HUD -->
+            <div class="wt-hud">
+              <div class="wt-hud-card">
+                <div class="wt-hud-label">Day</div>
+                <div class="wt-hud-value" id="pdHudDay">&mdash;</div>
+              </div>
+              <div class="wt-hud-card">
+                <div class="wt-hud-label">Coins</div>
+                <div class="wt-hud-value" style="color:var(--blue-deep);" id="pdHudCoins">0</div>
+              </div>
+              <div class="wt-hud-card" style="display:none;">
+                <div class="wt-hud-label">Unrevealed</div>
+                <div class="wt-hud-value" id="pdHudPending">0</div>
+              </div>
+            </div>
+            <div id="pdPendingInfo" style="display:none;"></div>
+
+            <!-- Primary actions -->
+            <div class="wt-primary-actions">
+              <button class="btn-primary"   id="pdGenBtn"    disabled onclick="pdIniciarConstruccionDia()">Upload an image first</button>
+              <button class="btn-reveal"    id="pdRevealBtn" disabled onclick="pdRevelarColorActual()">&#9711; Reveal phrase</button>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="action-btns">
+              <button class="btn-holy"      id="pdHolyBtn"   disabled onclick="pdUsarHolyWater()">&#128167; [<span id="pdCostBadge">1</span> coins] Holy Water &times;<span id="pdHolyCount">0</span></button>
+              <button class="btn-secondary" id="pdExtraBtn"  disabled onclick="pdExtraPhrase()">&#128172; [10 coins] Extra phrase</button>
+              <button class="btn-secondary" id="pdInventoryBtn" onclick="pdOpenInventory()" style="display:none;">My collection</button>
+              <button class="btn-secondary" id="pdDlBtn"     disabled onclick="pdDownloadCanvas()">&#8595; Download HD</button>
+            </div>
+          </div><!-- /#pdBelowCanvas -->
+
+        </div><!-- /#pdCanvasCol -->
+      </div><!-- /#pdLayoutGrid -->
+
+    </div>
+  </div>
+
+  <footer class="wrap">
+    <span class="mono">PAXEL&#8482; &mdash; SLOW ART SYSTEM</span>
+    <div class="foot-tabs">
+      <button onclick="showPage('tool')">Pixel tool</button>
+      <button onclick="showPage('waterer')">Pixel waterer</button>
+      <button onclick="showPage('phrases')">Pixel phrases</button>
+      <button onclick="showPage('diary')">Pixel diary</button>
+      <button onclick="showPage('home');setTimeout(()=>document.getElementById('legal').scrollIntoView({behavior:'smooth'}),50)">Legal</button>
+      <a href="https://x.com/paxelArt_pixels" target="_blank" rel="noopener" style="font-size:13px;font-weight:700;color:var(--ink-soft);text-decoration:none;display:inline-flex;align-items:center;gap:6px;" onmouseover="this.style.color='var(--ink)'" onmouseout="this.style.color='var(--ink-soft)'"><img src="x-logo.png" alt="X" style="width:14px;height:14px;display:block;"> Twitter</a>
+    </div>
+    <span class="mono">&copy; 2026</span>
+  </footer>
+</div>
+</div><!-- /page-diary -->
+
 
 
 <script>
@@ -2405,6 +2848,1194 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
+
+
+// ============================================================
+
+let pdP5Instance=null,pdPxSketch=null;
+let pdCtrlHidden=false;
+
+const PD_HIDDEN  =[207,117,0];   // orange hidden special
+
+let pd={
+  img:null,bloquesADibujar:[],indiceActual:0,diaActual:0,
+  construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,
+  canvasW:600,canvasH:600,intervalSpeed:30,bloquesPorCiclo:1,
+  monedas:0,diasRevelados:[],diasReveladosNativos:[],
+  costoHolyWater:1,costoMaximoAlcanzado:1,
+  coleccion:{},frasesUsadas:[],
+};
+
+const pdFrases=[
+  "The stars don't care if you're lost, but they are beautiful to watch while you find your Way.",
+  "We are all just stories in the end; make yours a good Read.",
+  "In the grand scheme of the universe, your mistakes are smaller than a grain of Sand.",
+  "Existence is a brief Flicker of light between two infinite nights.",
+  "You are the universe experiencing itself through a human Perspective.",
+  "Don't search for meaning; Create it.",
+  "The present moment is the only place where life actually Happens.",
+  "I'm not lazy, I'm just on Energy-saving mode.",
+  "Life is short. Smile while you still have Teeth.",
+  "I followed my heart and it led me to the Fridge.",
+  "Reality is a crutch for people who can't handle Mondays.",
+  "My bed is a magical place where I suddenly Remember everything I forgot to do.",
+  "I'm an expert at Procrastinating; I'll tell you how later.",
+  "If you think you are too small to make a difference, try sleeping in a room with a Mosquito.",
+  "To reach the finish line, simply keep walking with Consistency.",
+  "If plan A doesn't work, remember the alphabet has 26 more letters to Reconfigure.",
+  "Your life is a blank canvas; have the courage to turn it into an Epopoeia.",
+  "If you fall, get up with style, dust yourself off, and continue with Joy.",
+  "Sometimes, the greatest act of bravery is simply Disconnecting from mental noise.",
+  "You are a force of nature capable of leaving an Indelible mark on the world.",
+  "Don't worry about success; worry about always having a good Coffee on hand.",
+  "Perfection is a myth; it is much more fun to Improvise the journey.",
+  "Not everything that flies has Wings, but everything that waits finds its shape.",
+  "Patience is not absence of action, but rather the art of seeing change happen.",
+  "If you wish to be an Onlooker forever, then you won't have to know...",
+  "Live with such intensity that the universe is forced to acknowledge your Radiance.",
+];
+
+const pdCategorias={
+  common:   ["Way","Read","Sand","Create","Happens","Teeth","Fridge","Mondays","Remember","Consistency","Joy","Coffee","Wings","Patience"],
+  rare:     ["Perspective","Energy-saving","Procrastinating","Mosquito","Reconfigure","Disconnecting","Improvise"],
+  legendary:["Flicker","Epopoeia","Indelible","Radiance","Onlooker"],
+};
+const pdPalabrasClave=[...pdCategorias.common,...pdCategorias.rare,...pdCategorias.legendary];
+
+function pdRarezaAleatoria(){const r=Math.random();if(r<0.01)return'legendary';if(r<0.20)return'rare';return'common';}
+function pdColorRareza(p){if(pdCategorias.legendary.includes(p))return'rgb(240,64,64)';if(pdCategorias.rare.includes(p))return'rgb(255,145,34)';return'rgb(151,151,151)';}
+function pdRarezaDe(p){if(pdCategorias.legendary.includes(p))return'legendary';if(pdCategorias.rare.includes(p))return'rare';return'common';}
+
+// ── Toggle controls (mirrors wtToggleControls) ──
+function pdToggleControls(){
+  pdCtrlHidden=!pdCtrlHidden;
+  const grid     =document.getElementById('pdLayoutGrid');
+  const slot     =document.getElementById('pdSidePanelSlot');
+  const ctrlCol  =document.getElementById('pdControlsCol');
+  const canvasCol=document.getElementById('pdCanvasCol');
+  const below    =document.getElementById('pdBelowCanvas');
+  const btn      =document.getElementById('pdToggleBtn');
+  const arrow    =document.getElementById('pdToggleArrow');
+  const label    =document.getElementById('pdToggleBtnLabel');
+  const FADE=280,SLIDE=350;
+
+  if(pdCtrlHidden){
+    const cw=canvasCol.getBoundingClientRect().width;
+    grid.style.setProperty('--pd-canvas-col-w',cw+'px');
+    below.style.setProperty('--pd-slide-from','60px');
+    below.classList.add('pd-sliding');
+    ctrlCol.classList.add('pd-collapsing');
+    setTimeout(()=>{
+      ctrlCol.style.display='none';
+      slot.classList.add('pd-slot-visible');
+      slot.appendChild(below);
+      grid.classList.add('pd-ctrl-hidden');
+      btn.classList.add('ctrl-hidden');
+      arrow.style.transform='rotate(180deg)';
+      label.textContent='Show controls';
+      void below.getBoundingClientRect();
+      below.style.setProperty('--pd-slide-from','-60px');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>below.classList.remove('pd-sliding')));
+    },FADE);
+  } else {
+    below.style.setProperty('--pd-slide-from','-60px');
+    below.classList.add('pd-sliding');
+    setTimeout(()=>{
+      grid.style.removeProperty('--pd-canvas-col-w');
+      slot.classList.remove('pd-slot-visible');
+      canvasCol.appendChild(below);
+      ctrlCol.style.display='';
+      ctrlCol.classList.remove('pd-collapsing');
+      grid.classList.remove('pd-ctrl-hidden');
+      btn.classList.remove('ctrl-hidden');
+      arrow.style.transform='rotate(0deg)';
+      label.textContent='Hide controls';
+      void below.getBoundingClientRect();
+      below.style.setProperty('--pd-slide-from','60px');
+      requestAnimationFrame(()=>requestAnimationFrame(()=>below.classList.remove('pd-sliding')));
+    },FADE);
+  }
+}
+
+// ── p5 instance ──
+function pdInitP5(){
+  const sk=function(p){
+    pdPxSketch=p;
+    p.setup=function(){let c=p.createCanvas(pd.canvasW,pd.canvasH);c.parent('pdP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
+    p.draw=function(){
+      if(!pd.img)return;
+      let w=p.width/pd.COLS,h=p.height/pd.ROWS;
+      p.noStroke();
+      for(let b of pd.bloquesADibujar){
+        if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.rect(b.columna*w,b.fila*h,w,h);}
+      }
+    };
+  };
+  pdP5Instance=new p5(sk);
+  document.getElementById('pdCanvasEmpty').style.display='none';
+  document.getElementById('pdP5Container').style.display='block';
+}
+
+function pdHandleFile(input){
+  if(!input.files||!input.files[0])return;
+  setUploadLoading('pd');
+  const reader=new FileReader();
+  reader.onload=function(e){
+    if(!pdP5Instance)pdInitP5();
+    const img=new Image();
+    img.onload=function(){pdPxSketch.loadImage(e.target.result,function(p5img){pd.img=p5img;pdProcesarImagen();setTimeout(()=>setUploadLoaded('pd','\u{1F4AC}'),400);});};
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function pdProcesarImagen(){
+  if(!pd.img||!pdPxSketch)return;
+  pdPxSketch.background(255);
+  // Keep accumulated state: monedas, coleccion, frasesUsadas — only reset canvas state
+  pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;
+  pd.diasRevelados=[];pd.diasReveladosNativos=[];
+  pd.costoMaximoAlcanzado=1;pd.costoHolyWater=1;
+  pd.construyendo=false;
+  document.getElementById('pdDlBtn').disabled=true;
+  document.getElementById('pdCanvasEmpty').style.display='none';
+  document.getElementById('pdP5Container').style.display='block';
+  pdHidePhrase();
+  pd.img.loadPixels();
+  let cW=pd.img.width/pd.COLS,cH=pd.img.height/pd.ROWS;
+  for(let y=0;y<pd.ROWS;y++)for(let x=0;x<pd.COLS;x++){
+    let cx=Math.floor(x*cW+cW/2),cy=Math.floor(y*cH+cH/2),idx=(cx+cy*pd.img.width)*4;
+    let r=pd.img.pixels[idx],g=pd.img.pixels[idx+1],b=pd.img.pixels[idx+2];
+    let es=Math.random()<0.3,ca=es?PD_HIDDEN.slice():[r,g,b];
+    pd.bloquesADibujar.push({columna:x,fila:y,colorOriginal:[r,g,b],colorActual:ca,esEspecial:es,activo:false,parte:0});
+  }
+  for(let i=pd.bloquesADibujar.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[pd.bloquesADibujar[i],pd.bloquesADibujar[j]]=[pd.bloquesADibujar[j],pd.bloquesADibujar[i]];}
+  document.getElementById('pdGenBtn').disabled=false;
+  document.getElementById('pdGenBtn').textContent='Generate Day 1';
+  pdUpdateUI();
+}
+
+function pdIniciarConstruccionDia(){
+  if(pd.construyendo||pd.diaActual>=pd.TOTAL_DIAS)return;
+  pd.construyendo=true;pd.diaActual++;
+  document.getElementById('pdGenBtn').disabled=true;
+  pdHidePhrase();
+  let pR=pd.bloquesADibujar.length-pd.indiceActual,dR=pd.TOTAL_DIAS-pd.diaActual+1,pH=Math.ceil(pR/dR),pc=0;
+  pdUpdateUI();
+  if(pdPxSketch)pdPxSketch.loop();
+  let timer=setInterval(()=>{
+    for(let i=0;i<pd.bloquesPorCiclo;i++){if(pc<pH&&pd.indiceActual<pd.bloquesADibujar.length){pd.bloquesADibujar[pd.indiceActual].activo=true;pd.bloquesADibujar[pd.indiceActual].parte=pd.diaActual;pd.indiceActual++;pc++;}}
+    if(pc>=pH||pd.indiceActual>=pd.bloquesADibujar.length){clearInterval(timer);pd.construyendo=false;pdActualizarBotones();if(pdPxSketch){pdPxSketch.redraw();pdPxSketch.noLoop();}}
+  },pd.intervalSpeed);
+}
+
+function pdAnimarRevelado(bloques,cb){
+  if(!bloques.length){if(cb)cb();pdUpdateUI();return;}
+  pd.construyendo=true;let ind=0;
+  if(pdPxSketch)pdPxSketch.loop();
+  let timer=setInterval(()=>{
+    for(let i=0;i<pd.bloquesPorCiclo;i++){if(ind<bloques.length){bloques[ind].colorActual=bloques[ind].colorOriginal.slice();bloques[ind].esEspecial=false;ind++;}}
+    if(ind>=bloques.length){clearInterval(timer);pd.construyendo=false;if(cb)cb();pdUpdateUI();if(pdPxSketch){pdPxSketch.redraw();pdPxSketch.noLoop();}}
+  },pd.intervalSpeed);
+}
+
+function pdRevelarColorActual(){
+  if(pd.diasRevelados.includes(pd.diaActual)||pd.construyendo)return;
+  pd.monedas++;paxelWallet.monedas=pd.monedas;
+  pd.diasReveladosNativos.push(pd.diaActual);
+  document.getElementById('pdRevealBtn').disabled=true;
+  let bl=pd.bloquesADibujar.filter(b=>b.activo&&b.parte===pd.diaActual&&b.esEspecial);
+  pdAnimarRevelado(bl,()=>{
+    pd.diasRevelados.push(pd.diaActual);
+    document.getElementById('pdRevealBtn').textContent='Phrase revealed \u2713';
+    if(pd.diaActual>=pd.TOTAL_DIAS)document.getElementById('pdDlBtn').disabled=false;
+    pdMostrarFraseAleatoria();
+    pdUpdateUI();
+  });
+}
+
+function pdUsarHolyWater(){
+  if(pd.construyendo)return;
+  let d=-1;for(let i=1;i<=pd.diaActual;i++){if(!pd.diasRevelados.includes(i)){d=i;break;}}
+  if(d===-1||pd.monedas<pd.costoHolyWater)return;
+  pd.monedas-=pd.costoHolyWater;paxelWallet.monedas=pd.monedas;
+  document.getElementById('pdHolyBtn').disabled=true;
+  let bl=pd.bloquesADibujar.filter(b=>b.activo&&b.parte===d);
+  pdAnimarRevelado(bl,()=>{
+    pd.diasRevelados.push(d);
+    if(d===pd.diaActual){
+      document.getElementById('pdRevealBtn').textContent='Phrase revealed ✓';
+      document.getElementById('pdRevealBtn').disabled=true;
+      // Holy Water on current day also reveals a phrase
+      pdMostrarFraseAleatoria();
+    }
+    if(pd.diaActual>=pd.TOTAL_DIAS)document.getElementById('pdDlBtn').disabled=false;
+    pdUpdateUI();
+  });
+}
+
+function pdExtraPhrase(){
+  if(pd.diaActual<=0||pd.monedas<10||pd.construyendo)return;
+  pd.monedas-=10;paxelWallet.monedas=pd.monedas;
+  pdMostrarFraseExtra();
+  pdUpdateUI();
+}
+
+function pdActualizarBotones(){
+  const g=document.getElementById('pdGenBtn');
+  if(pd.diaActual<pd.TOTAL_DIAS){g.disabled=false;g.textContent='Generate Day '+(pd.diaActual+1);}
+  else{g.disabled=true;g.textContent='COMPLETE!';document.getElementById('pdDlBtn').disabled=false;}
+  const r=document.getElementById('pdRevealBtn');
+  if(pd.diasRevelados.includes(pd.diaActual)){r.disabled=true;r.textContent='Phrase revealed ✓';}
+  else if(pd.diaActual>0){r.disabled=false;r.textContent='◎ Reveal phrase';}
+  pdUpdateUI();
+}
+
+function pdUpdateUI(){
+  if(pd.diaActual>=8)pd.costoMaximoAlcanzado=2;
+  pd.costoHolyWater=pd.costoMaximoAlcanzado;
+  let pending=0;for(let i=1;i<=pd.diaActual;i++){if(!pd.diasRevelados.includes(i))pending++;}
+  const totalCollect=Object.values(pd.coleccion).reduce((a,b)=>a+b,0);
+  document.getElementById('pdHudDay').textContent    =pd.diaActual===0?'\u2014':pd.diaActual+' / '+pd.TOTAL_DIAS;
+  pd.monedas=paxelWallet.monedas;document.getElementById('pdHudCoins').textContent  =pd.monedas;
+  document.getElementById('pdHudPending').textContent=pending;
+  document.getElementById('pdCostBadge').textContent =pd.costoHolyWater;
+  document.getElementById('pdHolyCount').textContent =pending;
+  const pi=document.getElementById('pdPendingInfo');
+  if(pi)pi.innerHTML=pending>0?'<span>'+pending+'</span> day'+(pending>1?'s':'')+' unrevealed':(pd.diaActual>0?'All days revealed \u2713':'');
+  document.getElementById('pdHolyBtn').disabled =(pd.monedas<pd.costoHolyWater||pending===0||pd.construyendo);
+  document.getElementById('pdExtraBtn').disabled=(pd.monedas<10||pd.diaActual<=0||pd.construyendo);
+  // Inventory button collectibles count
+  // Update count in both the top-row trigger and the action-btns button
+  ['pdInventoryCount'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.textContent=totalCollect>0?'('+totalCollect+')':'';
+  });
+  // Day pips
+  const track=document.getElementById('pdDayTrack');
+  if(track){track.innerHTML='';for(let i=1;i<=pd.TOTAL_DIAS;i++){const pip=document.createElement('div');pip.className='wt-day-pip';pip.textContent=i;if(i===pd.diaActual&&!pd.diasRevelados.includes(i)&&pd.diaActual>0)pip.classList.add('active');else if(pd.diasRevelados.includes(i))pip.classList.add('revealed');else if(i<pd.diaActual&&!pd.diasRevelados.includes(i))pip.classList.add('unrevealed');track.appendChild(pip);}}
+}
+
+// ── Phrase display: EXACTLY as sketch.js, fixed inside pdPhraseArea ──
+let pdActivePopup=null;
+
+function pdMostrarFraseAleatoria(){
+  const rareza=pdRarezaAleatoria();
+  let cands=pdFrases.filter(f=>pdCategorias[rareza].some(p=>new RegExp('\\b'+p+'\\b').test(f)));
+  let disp=cands.filter(f=>!pd.frasesUsadas.includes(f));
+  if(!disp.length){pd.frasesUsadas=pd.frasesUsadas.filter(f=>!cands.includes(f));disp=cands;}
+  if(!disp.length)disp=pdFrases;
+  const chosen=disp[Math.floor(Math.random()*disp.length)];
+  pd.frasesUsadas.push(chosen);
+  pdMostrarFrase(chosen);
+}
+
+function pdMostrarFraseExtra(){
+  // Stage 1: 60% new (uncollected), 40% old (already collected)
+  // "Collected" = frase has already been shown (frasesUsadas)
+  const nuevas=pdFrases.filter(f=>!pd.frasesUsadas.includes(f));
+  const viejas=pdFrases.filter(f=>pd.frasesUsadas.includes(f));
+
+  // Edge cases: fall back if one pool is empty
+  let pool;
+  if(!nuevas.length && !viejas.length){ pool=pdFrases; }
+  else if(!nuevas.length){ pool=viejas; }
+  else if(!viejas.length){ pool=nuevas; }
+  else{ pool=Math.random()<0.6 ? nuevas : viejas; }
+
+  // Stage 2: apply rarity weighting INSIDE the chosen pool
+  const chosen=pdSeleccionarConRareza(pool);
+  pd.frasesUsadas.push(chosen);
+  pdMostrarFrase(chosen);
+}
+
+// Pick a phrase from a given pool using the existing rarity system.
+// Rolls a rarity first, then picks a phrase from the pool that contains
+// a keyword of that rarity. Falls back gracefully if none available.
+function pdSeleccionarConRareza(pool){
+  if(!pool.length) return pdFrases[Math.floor(Math.random()*pdFrases.length)];
+
+  const rareza=pdRarezaAleatoria();  // uses existing drop rates: 1% legendary, 19% rare, 80% common
+  // Find diary in the pool that contain a keyword of the rolled rarity
+  const cands=pool.filter(f=>pdCategorias[rareza].some(p=>new RegExp('\\b'+p+'\\b').test(f)));
+
+  if(cands.length){
+    // Pick randomly among matching diary in this pool
+    return cands[Math.floor(Math.random()*cands.length)];
+  }
+  // Rarity not available in this pool — fall back to any phrase in the pool
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function pdMostrarFrase(frase){
+  // Collect keywords (same logic as sketch.js)
+  let found=[];
+  pdPalabrasClave.forEach(p=>{
+    let m=frase.match(new RegExp('\\b'+p+'\\b','g'));
+    if(m)for(let i=0;i<m.length;i++)found.push(p);
+  });
+  if(!found.length)found=[pdCategorias.common[Math.floor(Math.random()*pdCategorias.common.length)]];
+
+  // Highlight keywords in text
+  let texto=frase;
+  [...new Set(found)].forEach(p=>{
+    texto=texto.replace(new RegExp('\\b('+p+')\\b','g'),
+      '<span style="font-weight:700;color:rgb(71,190,238);">$1</span>');
+  });
+
+  // Remove previous popup
+  if(pdActivePopup&&pdActivePopup.parentNode)pdActivePopup.parentNode.removeChild(pdActivePopup);
+
+  // Create popup DOM element (absolute inside pdPhraseArea)
+  const area=document.getElementById('pdPhraseArea');
+  if(!area)return;
+  area.style.zIndex='30';
+  const areaRect=area.getBoundingClientRect();
+  const areaW=area.offsetWidth||400;
+  const areaH=area.offsetHeight||400;
+
+  // Position: random within the full phrase area (60px padding all sides + canvas)
+  const CARD_W=300,CARD_EST_H=200;
+  // Fallback size if area hasn't painted yet
+  const fallbackW=(document.getElementById('pdCanvasWrap')||{offsetWidth:540}).offsetWidth+120;
+  const fallbackH=(document.getElementById('pdCanvasWrap')||{offsetHeight:540}).offsetHeight+120;
+  const effectiveW=areaW>50?areaW:fallbackW;
+  const effectiveH=areaH>50?areaH:fallbackH;
+  const maxX=Math.max(0,effectiveW-CARD_W);
+  const maxY=Math.max(0,effectiveH-CARD_EST_H);
+  let posX,posY;
+  if(window.innerWidth<=640){
+    // Mobile: fixed "toast" spot instead of random — centered, low enough
+    // over the canvas to reach into the action buttons below it.
+    const MOBILE_CARD_W=220,MOBILE_CARD_H=150;
+    posX=Math.max(0,(effectiveW-MOBILE_CARD_W)/2);
+    posY=Math.max(0,effectiveH-MOBILE_CARD_H+30);
+  }else{
+    posX=Math.random()*maxX;
+    posY=Math.random()*maxY;
+  }
+
+  const popup=document.createElement('div');
+  popup.className='pd-phrase-popup';
+  popup.style.left=posX+'px';
+  popup.style.top=(posY+20)+'px';
+
+  const card=document.createElement('div');
+  card.className='pd-phrase-card';
+
+  // Day label
+  const dayEl=document.createElement('div');
+  dayEl.className='pd-phrase-day';
+  dayEl.textContent='DAY '+pd.diaActual;
+  card.appendChild(dayEl);
+
+  // Phrase text
+  const txtEl=document.createElement('div');
+  txtEl.className='pd-phrase-text';
+  txtEl.innerHTML=texto;
+  card.appendChild(txtEl);
+
+  // Collectibles row (with delay, matching sketch.js)
+  const collRow=document.createElement('div');
+  collRow.className='pd-phrase-collectibles';
+  card.appendChild(collRow);
+
+  card.onclick=()=>pdHidePhrase();
+  popup.appendChild(card);
+  area.appendChild(popup);
+  pdActivePopup=popup;
+
+  // Fade in
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    popup.style.opacity='1';
+    popup.style.top=posY+'px';
+  }));
+
+  // Build collectible tags with delay (matching sketch.js)
+  setTimeout(()=>{
+    found.forEach(p=>{
+      const esNueva=!pd.coleccion[p]||pd.coleccion[p]===0;
+      pd.coleccion[p]=(pd.coleccion[p]||0)+1;
+      const color=pdColorRareza(p);
+
+      const tag=document.createElement('span');
+      tag.className='pd-collectible-tag';
+      tag.style.color=color;
+      tag.style.borderColor=color;
+      tag.innerHTML='<span style="font-weight:normal;">+1 Collectible: </span><span style="font-weight:bold;">'+p+'</span>';
+      tag.onclick=(e)=>{e.stopPropagation();pdHidePhrase();};
+      collRow.appendChild(tag);
+
+      if(esNueva){
+        const newBadge=document.createElement('span');
+        newBadge.className='pd-collectible-new';
+        newBadge.textContent='NEW';
+        newBadge.onclick=(e)=>{e.stopPropagation();pdHidePhrase();};
+        collRow.appendChild(newBadge);
+      }
+    });
+    pdUpdateUI();
+  },600);
+}
+
+function pdHidePhrase(){
+  if(!pdActivePopup)return;
+  pdActivePopup.style.opacity='0';
+  const p=pdActivePopup;
+  setTimeout(()=>{if(p&&p.parentNode)p.parentNode.removeChild(p);const area=document.getElementById('pdPhraseArea');if(area)area.style.zIndex='1';},500);
+  pdActivePopup=null;
+}
+
+// ── Inventory ──
+// ── "My diary" book interface ──
+const PD_BOOK_KEY='paxel_pd_diary_book';
+let pdBook=null;
+let pdPickerView='words';
+
+// ── Data model: a flat, 0-based array of pages (matches ZineJS page
+// indices directly). Each page holds its own placed stickers. ──
+function pdLoadBook(){
+  try{
+    const s=localStorage.getItem(PD_BOOK_KEY);
+    if(s){
+      const b=JSON.parse(s);
+      if(b&&Array.isArray(b.pages)&&b.pages.length) return b;
+      // Migrate older saved books: two-page-spread format (left/right per
+      // spread) or the earlier flat single-page format.
+      if(b&&Array.isArray(b.spreads)&&b.spreads.length){
+        const pages=[];
+        b.spreads.forEach(function(sp){
+          pages.push({stickers:(sp.left&&sp.left.stickers)||sp.stickers||[]});
+          pages.push({stickers:(sp.right&&sp.right.stickers)||[]});
+        });
+        return {pages:pages};
+      }
+    }
+  }catch(e){}
+  return {pages:[{stickers:[]}]};
+}
+function pdSaveBook(){
+  try{ localStorage.setItem(PD_BOOK_KEY, JSON.stringify(pdBook)); }catch(e){}
+}
+
+let pdDiaryInitialized=false;
+let pdZineBook=null;
+let pdEditingPage=null; // page index currently shown in the edit overlay, or null
+
+function pdOpenInventory(){
+  if(!pdBook) pdBook=pdLoadBook();
+  const floatEl=document.getElementById('pdDiaryFloat');
+  if(!floatEl) return;
+  floatEl.classList.add('pd-diary-open');
+  const totalCollect=Object.values(pd.coleccion).reduce((a,b)=>a+b,0);
+  const sub=document.getElementById('pdDiarySub');
+  if(sub) sub.textContent=totalCollect+' collectible'+(totalCollect!==1?'s':'')+' collected';
+  pdRenderPicker();
+  pdBuildZine(0);
+  if(!pdDiaryInitialized){
+    pdMakeDiaryDraggable();
+    pdMakeDiaryResizable();
+    pdDiaryInitialized=true;
+  }
+}
+function pdCloseInventory(){
+  const floatEl=document.getElementById('pdDiaryFloat');
+  if(floatEl) floatEl.classList.remove('pd-diary-open');
+  const popup=document.getElementById('pdStickerPickerPopup');
+  if(popup) popup.style.display='none';
+  if(pdEditingPage!==null) pdExitEditMode();
+}
+
+function pdToggleStickerPicker(){
+  const popup=document.getElementById('pdStickerPickerPopup');
+  if(!popup) return;
+  if(pdEditingPage===null) pdEnterEditMode(pdZineBook?pdZineBook.getPage():0);
+  popup.style.display = (popup.style.display==='none' || !popup.style.display) ? 'flex' : 'none';
+}
+
+// Dragging the diary by its handle — moves the whole floating panel.
+function pdMakeDiaryDraggable(){
+  const handle=document.getElementById('pdDiaryDragHandle');
+  const floatEl=document.getElementById('pdDiaryFloat');
+  if(!handle||!floatEl) return;
+  handle.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.pd-diary-close')) return;
+    e.preventDefault();
+    const rect=floatEl.getBoundingClientRect();
+    floatEl.style.left=rect.left+'px';
+    floatEl.style.top=rect.top+'px';
+    floatEl.style.margin='0';
+    const startX=e.clientX, startY=e.clientY;
+    const startLeft=rect.left, startTop=rect.top;
+    function move(ev){
+      floatEl.style.left=(startLeft + ev.clientX - startX)+'px';
+      floatEl.style.top=(startTop + ev.clientY - startY)+'px';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
+// Resizing the WHOLE diary via its corner handle — one transform:scale on
+// the scale-wrap, so the book, controls, and picker popup all stay
+// perfectly proportional to each other at any size.
+let pdDiaryScale=1;
+function pdMakeDiaryResizable(){
+  const handle=document.getElementById('pdDiaryResizeHandle');
+  const scaleWrap=document.getElementById('pdDiaryScaleWrap');
+  if(!handle||!scaleWrap) return;
+  handle.addEventListener('pointerdown', function(e){
+    e.preventDefault(); e.stopPropagation();
+    const startX=e.clientX, startY=e.clientY;
+    const startScale=pdDiaryScale;
+    const startDist=180;
+    function move(ev){
+      const delta=((ev.clientX-startX)+(ev.clientY-startY))/2;
+      let newScale=startScale + delta/startDist;
+      newScale=Math.max(0.55, Math.min(2, newScale));
+      pdDiaryScale=newScale;
+      scaleWrap.style.transform='scale('+newScale+')';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      if(pdZineBook) pdZineBook.update();
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
+// Keyboard shortcuts (matching the labels drawn on the book itself): Q = previous, E = next.
+document.addEventListener('keydown', function(e){
+  const floatEl=document.getElementById('pdDiaryFloat');
+  if(!floatEl || !floatEl.classList.contains('pd-diary-open')) return;
+  const tag=(e.target && e.target.tagName || '').toLowerCase();
+  if(tag==='input' || tag==='textarea') return;
+  const key=e.key.toLowerCase();
+  if(key==='q') pdBookTurn(-1);
+  else if(key==='e') pdBookTurn(1);
+});
+
+function pdSetPickerView(view){
+  pdPickerView=view;
+  const wTab=document.getElementById('pdPickerTabWords');
+  const pTab=document.getElementById('pdPickerTabPhrases');
+  const list=document.getElementById('pdPickerList');
+  if(wTab) wTab.classList.toggle('active', view==='words');
+  if(pTab) pTab.classList.toggle('active', view==='phrases');
+  if(list) list.classList.toggle('pd-view-phrases', view==='phrases');
+  if(list) list.classList.toggle('pd-view-words', view==='words');
+  pdRenderPicker();
+}
+
+// How many of this exact word/phrase are already placed as stickers,
+// across every page of the whole diary (not just the page being edited).
+function pdCountPlaced(kind, text){
+  let count=0;
+  (pdBook.pages||[]).forEach(function(pg){
+    (pg.stickers||[]).forEach(function(st){
+      if(st.kind===kind && st.text===text) count++;
+    });
+  });
+  return count;
+}
+// How many of this word/phrase the user has actually collected.
+function pdCountCollected(kind, text){
+  if(kind==='word') return pd.coleccion[text]||0;
+  return (pd.frasesUsadas||[]).filter(function(f){ return f===text; }).length;
+}
+
+function pdRenderPicker(){
+  const list=document.getElementById('pdPickerList');
+  if(!list) return;
+  list.innerHTML='';
+  if(pdPickerView==='words'){
+    const getPrio=function(p){if(pdCategorias.legendary.includes(p))return 3;if(pdCategorias.rare.includes(p))return 2;return 1;};
+    const found=pdPalabrasClave.filter(function(p){return (pd.coleccion[p]||0)>0;}).sort(function(a,b){return getPrio(b)-getPrio(a);});
+    const available=found.filter(function(w){ return pdCountCollected('word',w)-pdCountPlaced('word',w) > 0; });
+    if(!available.length){
+      const empty=document.createElement('div');
+      empty.className='pd-picker-empty';
+      empty.textContent = found.length ? "You've placed all your collected words!" : "You haven't collected any words yet.";
+      list.appendChild(empty);
+      return;
+    }
+    available.forEach(function(word){
+      const remaining=pdCountCollected('word',word)-pdCountPlaced('word',word);
+      const chip=document.createElement('div');
+      chip.className='pd-sticker-chip pd-word';
+      chip.style.color=pdColorRareza(word);
+      chip.setAttribute('data-kind','word');
+      chip.setAttribute('data-text',word);
+      const label=document.createElement('span');
+      label.textContent=word;
+      chip.appendChild(label);
+      if(remaining>1){
+        const badge=document.createElement('span');
+        badge.className='pd-chip-count';
+        badge.textContent='\u00d7'+remaining;
+        chip.appendChild(badge);
+      }
+      pdMakeChipTappable(chip);
+      list.appendChild(chip);
+    });
+  }else{
+    const distinct=Array.from(new Set(pd.frasesUsadas||[]));
+    const available=distinct.filter(function(p){ return pdCountCollected('phrase',p)-pdCountPlaced('phrase',p) > 0; });
+    if(!available.length){
+      const empty=document.createElement('div');
+      empty.className='pd-picker-empty';
+      empty.textContent = distinct.length ? "You've placed all your collected phrases!" : "You haven't collected any phrases yet.";
+      list.appendChild(empty);
+      return;
+    }
+    available.forEach(function(phrase){
+      const remaining=pdCountCollected('phrase',phrase)-pdCountPlaced('phrase',phrase);
+      const chip=document.createElement('div');
+      chip.className='pd-sticker-chip pd-phrase';
+      chip.setAttribute('data-kind','phrase');
+      chip.setAttribute('data-text',phrase);
+      const label=document.createElement('span');
+      label.textContent=phrase;
+      chip.appendChild(label);
+      if(remaining>1){
+        const badge=document.createElement('span');
+        badge.className='pd-chip-count';
+        badge.textContent='\u00d7'+remaining;
+        chip.appendChild(badge);
+      }
+      pdMakeChipTappable(chip);
+      list.appendChild(chip);
+    });
+  }
+}
+
+// ── Baking a page (dot-grid background + its stickers) into a PNG data
+// URL — this is what ZineJS actually displays and curls in read mode. ──
+function pdBakePageImage(pageIndex){
+  const W=600, H=800;
+  const canvas=document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#ffffff';
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(71,190,238,.35)';
+  for(let y=10;y<H;y+=20){
+    for(let x=10;x<W;x+=20){
+      ctx.beginPath();
+      ctx.arc(x,y,1.6,0,Math.PI*2);
+      ctx.fill();
+    }
+  }
+  const page=(pdBook.pages&&pdBook.pages[pageIndex])||{stickers:[]};
+  (page.stickers||[]).forEach(function(st){
+    ctx.save();
+    ctx.translate(st.x/100*W, st.y/100*H);
+    ctx.rotate((st.rot||0)*Math.PI/180);
+    ctx.scale(st.scale||1, st.scale||1);
+    ctx.font='700 20px Cairo, sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    if(st.kind==='word'){
+      const textW=ctx.measureText(st.text).width;
+      const padX=18, h=40;
+      const w=textW+padX*2;
+      ctx.fillStyle='#fff';
+      ctx.strokeStyle='#000';
+      ctx.lineWidth=2;
+      pdRoundRectPath(ctx,-w/2,-h/2,w,h,h/2);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle=pdColorRareza(st.text);
+      ctx.fillText(st.text,0,1);
+    }else{
+      const maxW=260;
+      const words=st.text.split(' ');
+      const lines=[]; let line='';
+      ctx.font='600 16px Cairo, sans-serif';
+      words.forEach(function(w){
+        const test=line?line+' '+w:w;
+        if(ctx.measureText(test).width>maxW && line){ lines.push(line); line=w; }
+        else line=test;
+      });
+      if(line) lines.push(line);
+      const lineH=22, padY=16, padX=14;
+      const boxW=maxW+padX*2, boxH=lines.length*lineH+padY*2;
+      ctx.fillStyle='#fff';
+      ctx.strokeStyle='#000';
+      ctx.lineWidth=2;
+      pdRoundRectPath(ctx,-boxW/2,-boxH/2,boxW,boxH,8);
+      ctx.fill(); ctx.stroke();
+      ctx.fillStyle='#000';
+      lines.forEach(function(ln,i){
+        ctx.fillText(ln,0,-boxH/2+padY+lineH/2+i*lineH);
+      });
+    }
+    ctx.restore();
+  });
+  return canvas.toDataURL('image/png');
+}
+function pdRoundRectPath(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+
+// ── ZineJS lifecycle: (re)builds the flipbook from freshly baked page
+// images. Rebuilt (not just updated) whenever a page's content changes,
+// since ImageSource takes its URLs once at construction. ──
+function pdBuildZine(startPage){
+  const container=document.getElementById('pdZineContainer');
+  if(!container || typeof ZineJS==='undefined') return;
+  if(pdZineBook){ try{ pdZineBook.destroy(); }catch(e){} pdZineBook=null; }
+  container.innerHTML='';
+  const urls=(pdBook.pages||[{stickers:[]}]).map(function(_,i){ return pdBakePageImage(i); });
+  pdZineBook=new ZineJS.Zine(container, {
+    source:new ZineJS.ImageSource(urls),
+    spreadMode:'double',
+    singlePageThreshold:640,
+    curl:'cone',
+    controls:false,
+    loading:false,
+    deepLink:false,
+    zoom:{enabled:false},
+    clickToFlip:'edge',
+    startPage:Math.max(0,Math.min(startPage||0,urls.length-1)),
+  });
+  pdZineBook.on('pageChanged', pdSyncControls);
+  pdZineBook.on('flipEnd', pdSyncControls);
+  pdZineBook.ready.then(pdSyncControls).catch(function(){});
+  container.addEventListener('click', pdHandleZineClick);
+}
+
+function pdSyncControls(){
+  if(!pdZineBook) return;
+  const indicator=document.getElementById('pdSpreadIndicator');
+  if(indicator) indicator.textContent='Page '+(pdZineBook.getPage()+1)+' of '+pdZineBook.getPageCount();
+  const prevBtn=document.getElementById('pdPagePrev');
+  const nextBtn=document.getElementById('pdPageNext');
+  if(prevBtn) prevBtn.disabled=!pdZineBook.canFlipPrev();
+  if(nextBtn) nextBtn.disabled=!pdZineBook.canFlipNext();
+}
+
+// Tapping the current page away from the edge-flip zones enters edit mode
+// for whichever page (left or right) was tapped.
+function pdHandleZineClick(e){
+  if(!pdZineBook) return;
+  const box=pdZineBook.getPageBox();
+  const container=document.getElementById('pdZineContainer');
+  if(!box || !container) return;
+  const rect=container.getBoundingClientRect();
+  const localX=e.clientX-rect.left-box.x;
+  const localY=e.clientY-rect.top-box.y;
+  if(localX<0||localY<0||localX>box.width||localY>box.height) return;
+  const edgeZone=64;
+  if(localX<edgeZone || localX>box.width-edgeZone) return; // let ZineJS flip
+  const spreads=pdZineBook.getSpreads();
+  const spread=spreads[pdZineBook.getSpreadIndex()];
+  if(!spread) return;
+  let pageIndex;
+  if(spread.left!==null && spread.right!==null){
+    pageIndex = localX<box.width/2 ? spread.left : spread.right;
+  }else{
+    pageIndex = spread.left!==null ? spread.left : spread.right;
+  }
+  if(pageIndex!==null && pageIndex!==undefined) pdEnterEditMode(pageIndex);
+}
+
+function pdEnterEditMode(pageIndex){
+  if(!pdBook.pages[pageIndex]) pdBook.pages[pageIndex]={stickers:[]};
+  pdEditingPage=pageIndex;
+  const overlay=document.getElementById('pdEditOverlay');
+  if(overlay) overlay.style.display='block';
+  pdRenderEditPage();
+}
+
+function pdExitEditMode(){
+  if(pdEditingPage===null) return;
+  const popup=document.getElementById('pdStickerPickerPopup');
+  if(popup) popup.style.display='none';
+  pdDeselectSticker();
+  const editedPage=pdEditingPage;
+  pdEditingPage=null;
+  const overlay=document.getElementById('pdEditOverlay');
+  if(overlay) overlay.style.display='none';
+  pdSaveBook();
+  const targetPage=pdZineBook?pdZineBook.getPage():editedPage;
+  pdBuildZine(targetPage);
+}
+
+function pdRenderEditPage(){
+  const pageEl=document.getElementById('pdEditPage');
+  if(!pageEl || pdEditingPage===null) return;
+  pageEl.querySelectorAll('.pd-placed-sticker').forEach(function(el){ el.remove(); });
+  const page=pdBook.pages[pdEditingPage]||{stickers:[]};
+  (page.stickers||[]).forEach(function(st){
+    pageEl.appendChild(pdBuildPlacedSticker(st));
+  });
+}
+
+// Tapping empty page area (not a sticker) deselects the current sticker's handles.
+function pdPageBackgroundClick(evt){
+  if(evt && evt.target && evt.target.closest('.pd-placed-sticker')) return;
+  pdDeselectSticker();
+}
+
+function pdBuildPlacedSticker(st){
+  if(typeof st.scale!=='number') st.scale=1;
+  const el=document.createElement('div');
+  el.className='pd-placed-sticker';
+  el.setAttribute('data-sticker-id', st.id);
+  el.style.left=st.x+'%';
+  el.style.top=st.y+'%';
+  el.style.transform='translate(-50%,-50%) rotate('+(st.rot||0)+'deg) scale('+st.scale+')';
+  const inner=document.createElement('div');
+  inner.className='pd-sticker-chip pd-'+st.kind;
+  inner.textContent=st.text;
+  if(st.kind==='word') inner.style.color=pdColorRareza(st.text);
+  inner.style.cursor='inherit';
+  const rm=document.createElement('span');
+  rm.className='pd-sticker-remove';
+  rm.textContent='\u2715';
+  rm.onclick=function(e){
+    e.stopPropagation();
+    const page=pdBook.pages[pdEditingPage];
+    page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
+    pdSaveBook();
+    pdRenderEditPage();
+    pdRenderPicker();
+  };
+  const rotHandle=document.createElement('span');
+  rotHandle.className='pd-sticker-handle pd-sticker-rotate';
+  rotHandle.innerHTML='&#8635;';
+  const resizeHandle=document.createElement('span');
+  resizeHandle.className='pd-sticker-handle pd-sticker-resize';
+  resizeHandle.innerHTML='&#8690;';
+  el.appendChild(inner);
+  el.appendChild(rm);
+  el.appendChild(rotHandle);
+  el.appendChild(resizeHandle);
+  el.addEventListener('pointerdown', function(){ pdSelectSticker(el); }, {capture:true});
+  pdMakePlacedDraggable(el, st);
+  pdMakeRotatable(el, rotHandle, st);
+  pdMakeResizable(el, resizeHandle, st);
+  return el;
+}
+
+// Only one sticker shows its handles at a time — tap it to select (works on
+// touch, unlike :hover), tap the page background to deselect.
+let pdSelectedStickerEl=null;
+function pdSelectSticker(el){
+  if(pdSelectedStickerEl && pdSelectedStickerEl!==el) pdSelectedStickerEl.classList.remove('pd-selected');
+  pdSelectedStickerEl=el;
+  el.classList.add('pd-selected');
+}
+function pdDeselectSticker(){
+  if(pdSelectedStickerEl) pdSelectedStickerEl.classList.remove('pd-selected');
+  pdSelectedStickerEl=null;
+}
+
+function pdMakeRotatable(el, handle, st){
+  handle.addEventListener('pointerdown', function(e){
+    e.preventDefault(); e.stopPropagation();
+    function move(ev){
+      const r=el.getBoundingClientRect();
+      const cx=r.left+r.width/2, cy=r.top+r.height/2;
+      const angle=Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI + 90;
+      st.rot=Math.round(angle*10)/10;
+      el.style.transform='translate(-50%,-50%) rotate('+st.rot+'deg) scale('+st.scale+')';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      pdSaveBook();
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
+function pdMakeResizable(el, handle, st){
+  handle.addEventListener('pointerdown', function(e){
+    e.preventDefault(); e.stopPropagation();
+    const pageEl=el.parentNode;
+    const r0=el.getBoundingClientRect();
+    const cx=r0.left+r0.width/2, cy=r0.top+r0.height/2;
+    const d0=Math.max(20, Math.hypot(e.clientX-cx, e.clientY-cy));
+    const s0=st.scale;
+    function move(ev){
+      const d1=Math.hypot(ev.clientX-cx, ev.clientY-cy);
+      let newScale=s0*(d1/d0);
+      newScale=Math.max(0.5, Math.min(2.6, newScale));
+      const pr=pageEl.getBoundingClientRect();
+      const naturalW=r0.width/s0, naturalH=r0.height/s0;
+      const maxScaleW=pr.width/naturalW, maxScaleH=pr.height/naturalH;
+      newScale=Math.min(newScale, maxScaleW, maxScaleH);
+      st.scale=Math.round(newScale*100)/100;
+      el.style.transform='translate(-50%,-50%) rotate('+(st.rot||0)+'deg) scale('+st.scale+')';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      pdSaveBook();
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
+// Tap-to-place (Instagram Stories style): tapping a chip closes the picker
+// and places that item centered on the page being edited, immediately
+// selected and ready to drag/resize/rotate.
+function pdMakeChipTappable(chip){
+  chip.addEventListener('click', function(){
+    const kind=chip.getAttribute('data-kind');
+    const text=chip.getAttribute('data-text');
+    if(pdCountCollected(kind,text)-pdCountPlaced(kind,text) <= 0) return;
+    if(pdEditingPage===null) pdEnterEditMode(pdZineBook?pdZineBook.getPage():0);
+    const popup=document.getElementById('pdStickerPickerPopup');
+    if(popup) popup.style.display='none';
+    const page=pdBook.pages[pdEditingPage];
+    page.stickers=page.stickers||[];
+    const newSticker={
+      id:'st_'+Date.now()+'_'+Math.floor(Math.random()*1000),
+      kind:kind, text:text,
+      x:50, y:50,
+      rot: Math.round((Math.random()*10-5)*10)/10,
+      scale:1
+    };
+    page.stickers.push(newSticker);
+    pdSaveBook();
+    pdRenderEditPage();
+    pdRenderPicker();
+    const pageEl=document.getElementById('pdEditPage');
+    if(pageEl){
+      const placedEl=pageEl.querySelector('[data-sticker-id="'+newSticker.id+'"]');
+      if(placedEl) pdSelectSticker(placedEl);
+    }
+  });
+}
+
+// Unified gesture handler on each placed sticker: one finger repositions,
+// two fingers pinch to resize + rotate together — tracked via pointer
+// capture so multi-touch works reliably even off-element.
+function pdMakePlacedDraggable(el, st){
+  const pointers={};
+  let mode=null;
+  let dragStart=null;
+  let pinchStart=null;
+
+  el.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.pd-sticker-remove') || e.target.closest('.pd-sticker-handle')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+    pointers[e.pointerId]={x:e.clientX, y:e.clientY};
+    const ids=Object.keys(pointers);
+    if(ids.length===1){
+      mode='drag';
+      el.classList.add('pd-dragging');
+      dragStart={clientX:e.clientX, clientY:e.clientY, x:st.x, y:st.y};
+    }else if(ids.length===2){
+      mode='pinch';
+      const pts=ids.map(function(id){ return pointers[id]; });
+      const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
+      const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
+      pinchStart={dist:dist, angle:angle, scale:st.scale, rot:st.rot||0};
+    }
+  });
+
+  el.addEventListener('pointermove', function(e){
+    if(!pointers[e.pointerId]) return;
+    pointers[e.pointerId]={x:e.clientX, y:e.clientY};
+    const ids=Object.keys(pointers);
+    const pageEl=el.parentNode;
+    if(mode==='drag' && ids.length===1 && dragStart){
+      const r=pageEl.getBoundingClientRect();
+      const dxPct=(e.clientX-dragStart.clientX)/r.width*100;
+      const dyPct=(e.clientY-dragStart.clientY)/r.height*100;
+      st.x=Math.max(4,Math.min(96, dragStart.x+dxPct));
+      st.y=Math.max(4,Math.min(96, dragStart.y+dyPct));
+      el.style.left=st.x+'%';
+      el.style.top=st.y+'%';
+    }else if(mode==='pinch' && ids.length===2 && pinchStart){
+      const pts=ids.map(function(id){ return pointers[id]; });
+      const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
+      const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
+      let newScale=pinchStart.scale*(dist/pinchStart.dist);
+      newScale=Math.max(0.5, Math.min(2.6, newScale));
+      const pr=pageEl.getBoundingClientRect();
+      const naturalW=el.offsetWidth/st.scale, naturalH=el.offsetHeight/st.scale;
+      if(naturalW>0) newScale=Math.min(newScale, pr.width/naturalW);
+      if(naturalH>0) newScale=Math.min(newScale, pr.height/naturalH);
+      st.scale=Math.round(newScale*100)/100;
+      st.rot=Math.round((pinchStart.rot+(angle-pinchStart.angle))*10)/10;
+      el.style.transform='translate(-50%,-50%) rotate('+st.rot+'deg) scale('+st.scale+')';
+    }
+  });
+
+  function endPointer(e){
+    delete pointers[e.pointerId];
+    const ids=Object.keys(pointers);
+    if(ids.length===0){
+      el.classList.remove('pd-dragging');
+      mode=null; dragStart=null; pinchStart=null;
+      pdSaveBook();
+    }else if(ids.length===1){
+      mode='drag';
+      const id=ids[0];
+      dragStart={clientX:pointers[id].x, clientY:pointers[id].y, x:st.x, y:st.y};
+      pinchStart=null;
+    }
+  }
+  el.addEventListener('pointerup', endPointer);
+  el.addEventListener('pointercancel', endPointer);
+}
+
+function pdBookTurn(delta){
+  if(!pdZineBook) return;
+  if(pdEditingPage!==null) pdExitEditMode();
+  if(delta<0) pdZineBook.flipPrev(); else pdZineBook.flipNext();
+}
+function pdAddPage(){
+  pdBook.pages.push({stickers:[]});
+  const newIndex=pdBook.pages.length-1;
+  pdSaveBook();
+  pdBuildZine(newIndex);
+}
+
+
+
+// ── Format & resolution ──
+function pdSetFmt(tipo,w,h,btn){
+  document.querySelectorAll('#page-diary .fmt-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  pd.canvasW=w;pd.canvasH=h;
+  const wrap=document.getElementById('pdCanvasWrap');
+  wrap.style.aspectRatio=w+'/'+h;
+  wrap.classList.toggle('fmt-portrait',tipo==='3:4');
+  if(pdP5Instance&&pdPxSketch){pdPxSketch.resizeCanvas(w,h);if(pd.img){pdPxSketch.background(255);pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;pdUpdateUI();}document.getElementById('pdDlBtn').disabled=true;}
+  const sel=document.getElementById('pdResSelect');sel.innerHTML='';
+  const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
+  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});
+  pdOnResChange();
+}
+function pdOnResChange(){const v=document.getElementById('pdResSelect').value;if(!v)return;const p=v.split('x');pd.COLS=parseInt(p[0]);pd.ROWS=parseInt(p[1]);if(pd.img)pdProcesarImagen();}
+
+// ── Download: PNG + PDF + ZIP (same as waterer) ──
+function pdCalcPurity(){if(pd.TOTAL_DIAS===0)return'0%';return Math.round(((pd.diasReveladosNativos||[]).length/pd.TOTAL_DIAS)*100)+'%';}
+
+async function pdDownloadCanvas(){
+  if(!pdPxSketch)return;
+  const hash=wtGenerateHash(8);
+  const longHash=await wtNextCertSerial();
+  const isoDate=new Date().toISOString().split('T')[0];
+  const purity=pdCalcPurity();
+
+  // PNG
+  const cont=document.getElementById('pdP5Container');
+  const raw=cont?cont.querySelector('canvas'):null;
+  const p5c=raw||pdPxSketch.elt;
+  const off=document.createElement('canvas');off.width=pd.canvasW;off.height=pd.canvasH;
+  const ctx=off.getContext('2d');ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(p5c,0,0,off.width,off.height);
+  const pngDataUrl=off.toDataURL('image/png');
+  const pngB64=pngDataUrl.split(',')[1];
+
+  // PDF (reuse same certificate design)
+  const{jsPDF}=window.jspdf;
+  if(!jsPDF){console.error('jsPDF not loaded');return;}
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const PW=210,PH=297;
+  const WHITE=[255,255,255],GREY_BG=[240,240,240],DARK_GREY=[74,74,74];
+  const RULE=[214,208,188],LABEL=[136,136,136],BLUE=[30,143,190];
+  const INK=[17,17,17],BTN_BG=[240,240,240],BTN_BD=[187,187,187],EMPTY=[204,204,204];
+  const BLACK=[0,0,0];
+  const ML=14,MR=14,CW=PW-ML-MR,FL=ML,FR=PW-MR,FV=FL+CW*0.38;
+  doc.setFillColor(...WHITE);doc.rect(0,0,PW,PH,'F');
+  const HDR_H=24;
+  const ART_GAP=10,ratio=pd.canvasH/pd.canvasW;
+  const ART_W=90,ART_H=Math.round(ART_W*ratio);
+  const ART_X=(PW-ART_W)/2,artTop=HDR_H+ART_GAP;
+  const artMidY=artTop+ART_H/2;
+  const BAN_W=36,BAN_X=ML-2,BAN_NOTCH=10,midBan=BAN_X+BAN_W/2;
+  const banBotY=artMidY,banTipY=banBotY-BAN_NOTCH;
+  doc.setFillColor(...GREY_BG);doc.rect(0,0,PW,HDR_H,'F');
+  doc.setDrawColor(...RULE);doc.setLineWidth(0.35);doc.line(0,HDR_H,PW,HDR_H);
+  doc.setFont('helvetica','bold');doc.setFontSize(19);doc.setTextColor(...INK);
+  doc.text('Pre-Certificate of Authenticity',PW/2,HDR_H*0.60,{align:'center'});
+  // ── Banner emblem: grey ∧ ribbon shape (kept empty — no logo inside) ──
+  doc.setFillColor(...DARK_GREY);
+  doc.rect(BAN_X,0,BAN_W,banTipY,'F');
+  doc.triangle(BAN_X,banTipY,midBan,banTipY,BAN_X,banBotY,'F');
+  doc.triangle(midBan,banTipY,BAN_X+BAN_W,banTipY,BAN_X+BAN_W,banBotY,'F');
+  doc.setDrawColor(...BLACK);doc.setLineWidth(0.6);
+  doc.line(BAN_X,0,BAN_X+BAN_W,0);doc.line(BAN_X,0,BAN_X,banBotY);
+  doc.line(BAN_X+BAN_W,0,BAN_X+BAN_W,banBotY);
+  doc.line(BAN_X,banBotY,midBan,banTipY);doc.line(midBan,banTipY,BAN_X+BAN_W,banBotY);
+  doc.setFillColor(70,182,226);doc.rect(ART_X,artTop,ART_W,ART_H,'F');
+  doc.addImage(pngDataUrl,'PNG',ART_X,artTop,ART_W,ART_H);
+  doc.setDrawColor(...INK);doc.setLineWidth(0.3);doc.rect(ART_X,artTop,ART_W,ART_H);
+  const BTN_H=9,FTR_PAD=4,FTR_TOTAL=FTR_PAD+BTN_H+FTR_PAD;
+  const FLD_TOP=artTop+ART_H+5,FLD_BOT=PH-FTR_TOTAL;
+  const N=9,ROW_H=(FLD_BOT-FLD_TOP)/N;
+  doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_TOP,FR,FLD_TOP);
+  const ptToMm=0.3528,labelFS=7,valueFS=11;
+  const labelCapH=labelFS*ptToMm*0.35,valueCapH=valueFS*ptToMm*0.35;
+  const fields=[['USERNAME','\u2014','empty'],['HASH',longHash,'hash'],['DATE OF CREATION',isoDate,'value'],['IMAGE TITLE','\u2014','empty'],['THEME','\u2014','empty'],['EDITION','\u2014','empty'],['COLLECTION','\u2014','empty'],['PURITY',purity,'value'],['GENESIS','\u2014','empty']];
+  fields.forEach(([label,value,type],i)=>{
+    const rT=FLD_TOP+i*ROW_H,rowMid=rT+ROW_H/2,labelY=rowMid+labelCapH,valueY=rowMid+valueCapH;
+    if(i>0){doc.setDrawColor(...RULE);doc.setLineWidth(0.2);doc.line(FL,rT,FR,rT);}
+    doc.setFont('helvetica','bold');doc.setFontSize(labelFS);doc.setTextColor(...LABEL);doc.text(label,FL,labelY);
+    if(type==='empty'){doc.setFont('helvetica','bold');doc.setFontSize(valueFS);doc.setTextColor(...EMPTY);doc.text(value,FV,valueY);}
+    else if(type==='hash'){doc.setFont('helvetica','bold');doc.setFontSize(valueFS);doc.setTextColor(...BLUE);doc.text(String(value),FV,valueY);}
+    else{doc.setFont('helvetica','bold');doc.setFontSize(valueFS);doc.setTextColor(...INK);doc.text(String(value),FV,valueY);}
+  });
+  doc.setDrawColor(...RULE);doc.setLineWidth(0.25);doc.line(FL,FLD_BOT,FR,FLD_BOT);
+  const fRowY=PH-FTR_TOTAL+FTR_PAD,BTN_W=32,BTN_BX=FL,BTN_BY=fRowY;
+  doc.setFillColor(...BTN_BG);doc.setDrawColor(...BTN_BD);doc.setLineWidth(0.3);
+  doc.roundedRect(BTN_BX,BTN_BY,BTN_W,BTN_H,3,3,'FD');
+  doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.text('paxelart.eu',BTN_BX+BTN_W/2,BTN_BY+BTN_H*0.62,{align:'center'});
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(...INK);
+  doc.text('PAXEL \u00B7 Slow art system',FR,BTN_BY+BTN_H*0.62,{align:'right'});
+  const pdfB64=doc.output('datauristring').split(',')[1];
+
+  // ZIP
+  const zip=new JSZip();
+  zip.file('paxel_phrases_'+hash+'.png',pngB64,{base64:true});
+  zip.file('paxel_phrases_certificate_'+hash+'.pdf',pdfB64,{base64:true});
+  const zipBlob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
+  const url=URL.createObjectURL(zipBlob);
+  const a=document.createElement('a');a.href=url;a.download='paxel_phrases_'+hash+'.zip';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+// ── Init ──
+window.addEventListener('DOMContentLoaded',()=>{
+  var invBtn=document.getElementById('pdInventoryBtn');
+  if(invBtn) invBtn.addEventListener('click', function(){ pdOpenInventory(); });
+
+
+  pdSetFmt('1:1',600,600,document.getElementById('pd-fmt-1-1'));
+  pdUpdateUI();
+  const pdZ=document.getElementById('pdUploadZone');
+  if(pdZ){
+    pdZ.addEventListener('dragover',e=>{e.preventDefault();pdZ.classList.add('dragover');});
+    pdZ.addEventListener('dragleave',()=>pdZ.classList.remove('dragover'));
+    pdZ.addEventListener('drop',e=>{e.preventDefault();pdZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('pdFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;pdHandleFile(inp);}});
+  }
+});
+
 </script>
 <script>
 /* Isolated, additive behavior only — does not touch any tool logic above.
@@ -2473,7 +4104,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   // Tool pages: watch for showPage() adding the 'active' class, and mark
   // each one entered only the very first time that happens.
   var enteredTool = {};
-  ['page-tool','page-waterer','page-phrases'].forEach(function(id){
+  ['page-tool','page-waterer','page-phrases','page-diary'].forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
     if(el.classList.contains('active')){ el.classList.add('entered'); enteredTool[id]=true; return; }
@@ -2529,5 +4160,126 @@ window.addEventListener('DOMContentLoaded',()=>{
   }, {passive:true});
 })();
 </script>
+<script>
+/* Isolated, additive behavior only — does not touch pdToggleControls() or
+   any other tool logic (mirrors the exact same behavior already in place
+   for Pixel phrases). Mobile only: moves the "My collection" button
+   between the controls panel and the canvas while controls are visible,
+   and back to its original spot once they're hidden — by observing the
+   same pd-ctrl-hidden class the existing toggle function already manages.
+   Also makes sure #pdPhraseArea never stays stuck at its elevated z-index
+   (used while a phrase popup is showing) across a controls toggle, so it
+   can never linger above later page content like the footer. */
+(function(){
+  var btn = document.getElementById('pdCollectionTrigger');
+  var slot = document.getElementById('pdCollectionSlot');
+  var anchor = document.getElementById('pdCollectionAnchor');
+  var grid = document.getElementById('pdLayoutGrid');
+  var phraseArea = document.getElementById('pdPhraseArea');
+  if(!btn || !slot || !anchor || !grid) return;
+
+  function update(){
+    var mobile = window.innerWidth <= 640;
+    var hidden = grid.classList.contains('pd-ctrl-hidden');
+    if(mobile && !hidden){
+      if(btn.parentNode !== slot) slot.appendChild(btn);
+    }else{
+      if(btn.parentNode !== anchor.parentNode) anchor.parentNode.insertBefore(btn, anchor.nextSibling);
+    }
+    if(phraseArea) phraseArea.style.zIndex='1';
+  }
+
+  update();
+
+  var obs = new MutationObserver(update);
+  obs.observe(grid, {attributes:true, attributeFilter:['class']});
+
+  var resizeT;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeT);
+    resizeT = setTimeout(update, 150);
+  }, {passive:true});
+})();
+</script>
+<script>
+/* Isolated, additive behavior only — does not touch showPage() or any
+   other tool logic. Pixel tool no longer has a permanent nav tab; instead,
+   a temporary one is inserted into #tempToolTabSlot for as long as
+   #page-tool stays active, and removed the moment the user navigates
+   to any other page. showPage() already null-checks getElementById('tab-'+id)
+   before touching it, so it's completely safe whether this tab exists or not. */
+(function(){
+  var pageTool = document.getElementById('page-tool');
+  var slot = document.getElementById('tempToolTabSlot');
+  if(!pageTool || !slot) return;
+
+  function sync(){
+    var isActive = pageTool.classList.contains('active');
+    if(isActive && !slot.firstChild){
+      var btn = document.createElement('button');
+      btn.className = 'tab active-tab';
+      btn.id = 'tab-tool';
+      btn.setAttribute('onclick', "showPage('tool')");
+      btn.textContent = 'Pixel tool';
+      slot.appendChild(btn);
+    } else if(!isActive && slot.firstChild){
+      slot.removeChild(slot.firstChild);
+    }
+  }
+
+  sync();
+  new MutationObserver(sync).observe(pageTool, {attributes:true, attributeFilter:['class']});
+})();
+</script>
+
+<!-- PIXEL DIARY — "My diary" popup: book and collections as two independent boxes -->
+<div class="pd-diary-float" id="pdDiaryFloat">
+  <div class="pd-diary-scale-wrap" id="pdDiaryScaleWrap">
+    <div class="pd-book-wrap" id="pdBookWrap">
+      <!-- The book's own blue cover, extended upward — this whole strip is
+           the drag handle for moving the diary around. -->
+      <div class="pd-diary-drag-handle" id="pdDiaryDragHandle">
+        <span class="pd-diary-sub" id="pdDiarySub"></span>
+        <button class="pd-diary-close" onclick="pdCloseInventory()">&#10005;</button>
+      </div>
+      <div class="pd-page-tab" id="pdSpreadIndicator">Page 1 of 1</div>
+
+      <!-- Read mode: ZineJS renders realistic page-curl flipping between
+           baked page snapshots. Tapping the current page (away from the
+           edge-flip zones) enters edit mode for that page. -->
+      <div class="pd-zine-shell" id="pdZineShell">
+        <div class="pd-zine-container" id="pdZineContainer"></div>
+        <div class="pd-zine-hint" id="pdZineHint">Tap a page to edit it</div>
+      </div>
+
+      <!-- Edit mode: our existing interactive single-page sticker canvas,
+           shown on top while editing; baked back into an image on exit. -->
+      <div class="pd-edit-overlay" id="pdEditOverlay" style="display:none;">
+        <div class="pd-edit-page" id="pdEditPage" onclick="pdPageBackgroundClick(event)">
+          <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerPicker()">&#127912;</button>
+          <button class="pd-edit-done-btn" onclick="event.stopPropagation();pdExitEditMode()">Done &#10003;</button>
+        </div>
+
+        <!-- Sticker picker: appears directly over the page being edited,
+             tapping an item closes it and places that item, ready to
+             drag/resize — same pattern as Instagram Stories' sticker tray. -->
+        <div class="pd-sticker-picker-popup" id="pdStickerPickerPopup" style="display:none;">
+          <div class="pd-picker-toggle">
+            <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
+            <button class="pd-picker-tab" id="pdPickerTabPhrases" onclick="pdSetPickerView('phrases')">Phrases</button>
+          </div>
+          <div class="pd-picker-list pd-view-words" id="pdPickerList"></div>
+        </div>
+      </div>
+    </div>
+    <div class="pd-book-controls">
+      <button class="pd-book-nav-btn pd-book-nav-prev" id="pdPagePrev" onclick="pdBookTurn(-1)">&larr; Previous <span class="pd-key-hint">[Q]</span></button>
+      <button class="pd-add-page-btn" id="pdAddPageBtn" onclick="pdAddPage()">+ New page</button>
+      <button class="pd-book-nav-btn pd-book-nav-next" id="pdPageNext" onclick="pdBookTurn(1)"><span class="pd-key-hint">[E]</span> Next &rarr;</button>
+    </div>
+  </div>
+  <div class="pd-diary-resize-handle" id="pdDiaryResizeHandle">&#8690;</div>
+</div>
+
 </body>
 </html>
