@@ -15,11 +15,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<!-- ZineJS core (flipbook engine) — not on a public CDN, so it's self-hosted:
-     upload zinejs-core.js next to this index.html. Licensed PolyForm
-     Noncommercial 1.0.0 — free for non-commercial use only; a commercial
-     PAXEL launch needs a license from the author (github.com/awecode/zinejs). -->
-<script src="zinejs-core.js"></script>
 <style>
 /* ============================================================
    PAXEL — "SWISS ARCADE" SYSTEM (v3 — simplified)
@@ -714,78 +709,65 @@ footer .foot-tabs button:hover{color:var(--ink);}
   #pdPhraseArea{padding:20px;margin:-20px;}
 }
 
-/* ── "My diary" — a floating panel, not a modal. No dark backdrop, no
-   framing chrome: only the flipbook itself and its button row are
-   visible. Draggable via a minimal transparent strip (grip + close),
-   resizable via one corner handle that scales everything proportionally. */
-.pd-diary-float{position:fixed;top:6vh;left:50%;margin-left:-380px;z-index:9999;display:none;}
-.pd-diary-float.pd-diary-open{display:block;}
+/* ── "My diary" popup: book and collections as two independent floating
+   boxes (not one shared panel), so each reads as its own window. The
+   book is sized noticeably larger, especially on desktop. ── */
+.pd-diary-overlay{position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:20px;}
+.pd-diary-overlay.pd-diary-open{display:flex;}
+.pd-diary-popups{display:flex;gap:18px;align-items:flex-start;max-width:96vw;max-height:92vh;}
 
-.pd-diary-scale-wrap{position:relative;width:760px;transform-origin:top left;font-family:var(--font);}
+.pd-book-modal{flex:0 0 clamp(440px,58vw,760px);display:flex;flex-direction:column;align-items:center;font-family:var(--font);font-size:clamp(11px,1.6vw,16px);max-height:92vh;}
 
-.pd-diary-drag-handle{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:2px 4px 6px;cursor:grab;touch-action:none;user-select:none;}
-.pd-diary-drag-handle:active{cursor:grabbing;}
-.pd-diary-drag-grip{flex:1;text-align:center;opacity:.35;font-size:13px;letter-spacing:2px;}
-.pd-diary-close{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);cursor:pointer;font-size:10px;display:flex;align-items:center;justify-content:center;box-shadow:var(--s-sm);transition:background .15s,color .15s;}
-.pd-diary-close:hover{background:var(--ink);color:#fff;}
+.pd-book-wrap{position:relative;width:100%;display:flex;flex-direction:column;align-items:flex-start;flex-shrink:1;min-height:0;}
+.pd-page-tab{background:var(--blue);color:var(--ink);border:var(--bw2) solid var(--ink);border-bottom:none;border-radius:var(--r1) var(--r1) 0 0;padding:0.5em 1em;font-weight:800;font-size:0.85em;box-shadow:var(--s-sm);position:relative;z-index:1;margin-left:1.2em;flex-shrink:0;}
 
-.pd-book-wrap{position:relative;}
+/* One shared border/shadow around both pages, like a real open book — a thin
+   seam divides them instead of each page carrying its own full border. */
+.pd-spread-wrap{display:flex;width:100%;max-height:calc(92vh - 6em);border:var(--bw2) solid var(--ink);border-radius:0 var(--r0) var(--r0) var(--r0);box-shadow:var(--s-md);overflow:hidden;background:#fff;}
+.pd-book-page{position:relative;flex:1;min-width:0;aspect-ratio:3/4;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1px,transparent 1px);background-size:20px 20px;overflow:hidden;}
+.pd-page-left{border-right:1px solid var(--dormant);}
 
-/* Read mode: ZineJS mounts here and owns the whole realistic page-curl
-   experience, sized to a true DIN A4 double-spread ratio (420:297mm). No
-   border/shadow of our own — the rendered pages are the only visible frame. */
-.pd-zine-shell{position:relative;width:100%;aspect-ratio:420/297;overflow:hidden;}
-.pd-zine-container{position:absolute;inset:0;}
+@media(max-width:640px){
+  .pd-page-left{flex:0 0 16%;aspect-ratio:auto;opacity:.55;cursor:pointer;transition:opacity .15s;}
+  .pd-page-left:hover{opacity:.8;}
+  .pd-page-right{flex:1;}
+}
 
-/* Edit mode: our own interactive single-page canvas, shown on top of the
-   ZineJS shell while editing one page. Baked back into an image on exit.
-   Also borderless, matching a single A4 page's own proportion. */
-.pd-edit-overlay{position:absolute;inset:0;z-index:5;}
-.pd-edit-page{position:relative;width:100%;height:100%;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;overflow:hidden;}
-
-/* Sticker picker trigger: a small icon button sitting in the top-left
-   corner of the page being edited. */
-.pd-sticker-picker-btn{position:absolute;top:10px;left:10px;width:32px;height:32px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);box-shadow:var(--s-sm);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:2;transition:transform .12s,box-shadow .12s;}
-.pd-sticker-picker-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
-.pd-edit-done-btn{position:absolute;top:10px;right:10px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 13px;cursor:pointer;box-shadow:var(--s-sm);z-index:2;transition:transform .12s,box-shadow .12s;}
-.pd-edit-done-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
-
-/* Controls: a plain row of buttons, no wrapping box/border of its own. */
-.pd-book-controls{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;width:100%;padding-top:12px;}
-.pd-book-nav-btn{font-family:var(--font);font-weight:700;font-size:12px;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:0.3em;white-space:nowrap;background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:7px 12px;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
+/* Controls live in normal flow, completely outside the book art, sized in
+   em relative to .pd-book-modal's own font-size — which itself scales with
+   the same clamp() driving the book's width, so everything grows/shrinks
+   together proportionally. */
+.pd-book-controls{display:flex;align-items:center;justify-content:center;gap:0.7em;flex-wrap:wrap;width:100%;margin-top:0.9em;}
+.pd-book-nav-btn{font-family:var(--font);font-weight:700;font-size:0.85em;color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:0.4em;white-space:nowrap;background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:0.6em 1.1em;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
 .pd-book-nav-btn:disabled{opacity:.35;cursor:not-allowed;}
-.pd-book-nav-btn:not(:disabled):hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
-.pd-key-hint{font-size:0.8em;font-weight:800;color:var(--ink-soft);background:var(--paper-alt);border:1px solid var(--dormant);border-radius:4px;padding:0.05em 0.3em;}
-.pd-add-page-btn{font-family:var(--font);font-weight:700;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap;background:var(--blue);border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:7px 13px;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;order:1;}
-.pd-add-page-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+.pd-book-nav-btn:not(:disabled):hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
+.pd-key-hint{font-size:0.75em;font-weight:800;color:var(--ink-soft);background:var(--paper-alt);border:1px solid var(--dormant);border-radius:4px;padding:0.05em 0.35em;}
+.pd-add-page-btn{font-family:var(--font);font-weight:700;font-size:0.85em;color:var(--ink);cursor:pointer;white-space:nowrap;background:var(--blue);border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:0.6em 1.3em;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;order:1;}
+.pd-add-page-btn:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
 .pd-book-nav-next{order:2;}
 .pd-book-nav-prev{order:-1;}
-.pd-book-page-indicator{font-family:var(--font);font-weight:700;font-size:12px;color:var(--ink-soft);order:0;min-width:6em;text-align:center;}
 
-/* Resize handle for the WHOLE diary (bottom-right corner of the panel). */
-.pd-diary-resize-handle{position:absolute;bottom:-10px;right:-10px;width:26px;height:26px;background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:50%;box-shadow:var(--s-sm);cursor:nwse-resize;display:flex;align-items:center;justify-content:center;font-size:12px;touch-action:none;z-index:2;}
-
-/* Sticker picker: pops up over the page being edited. */
-.pd-sticker-picker-popup{position:absolute;top:0;left:0;right:0;bottom:0;background:#fff;border:var(--bw2) solid var(--ink);border-radius:var(--r0);box-shadow:var(--s-md);padding:16px;display:flex;flex-direction:column;z-index:6;}
+.pd-collections-modal{flex:0 0 240px;background:#fff;border:var(--bw2) solid var(--ink);border-radius:var(--r0);box-shadow:var(--s-md);padding:14px;display:flex;flex-direction:column;max-height:92vh;font-family:var(--font);}
+.pd-collections-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.pd-diary-sub{font-size:11px;font-weight:600;color:var(--ink-soft);}
+.pd-diary-close{font-family:var(--font);font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--blue);color:var(--ink);border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:5px 11px;cursor:pointer;transition:background .15s,color .15s;flex-shrink:0;}
+.pd-diary-close:hover{background:var(--ink);color:#fff;}
 .pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
-.pd-picker-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:7px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
+.pd-picker-tab{flex:1;font-family:var(--font);font-size:10.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:6px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
 .pd-picker-tab.active{background:var(--blue);color:var(--ink);}
-.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:7px;padding-right:2px;min-height:100px;align-content:flex-start;}
+.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:6px;padding-right:2px;min-height:100px;align-content:flex-start;}
 .pd-picker-list.pd-view-words{flex-direction:row;flex-wrap:wrap;}
 .pd-picker-list.pd-view-phrases{flex-direction:column;}
-.pd-picker-empty{font-size:13px;color:var(--ink-soft);font-weight:600;text-align:center;padding:20px 8px;margin:auto;}
+.pd-picker-empty{font-size:12px;color:var(--ink-soft);font-weight:600;text-align:center;padding:20px 8px;margin:auto;}
 
-.pd-sticker-chip{cursor:pointer;user-select:none;touch-action:none;}
-.pd-sticker-chip.pd-word{display:inline-flex;font-family:var(--font);font-weight:700;font-size:12.5px;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 11px;box-shadow:var(--s-sm);}
-.pd-sticker-chip.pd-phrase{background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:8px 10px;box-shadow:var(--s-sm);font-size:12px;line-height:1.4;color:var(--ink);font-weight:600;}
+.pd-sticker-chip{cursor:grab;user-select:none;touch-action:none;}
+.pd-sticker-chip.pd-word{display:inline-flex;font-family:var(--font);font-weight:700;font-size:11.5px;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:4px 10px;box-shadow:var(--s-sm);}
+.pd-sticker-chip.pd-phrase{background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:7px 9px;box-shadow:var(--s-sm);font-size:11px;line-height:1.4;color:var(--ink);font-weight:600;}
 .pd-picker-list .pd-sticker-chip.pd-phrase{width:100%;}
-.pd-placed-sticker .pd-sticker-chip.pd-phrase{max-width:220px;}
-.pd-sticker-chip:hover{transform:translate(-1px,-1px);}
-.pd-chip-count{font-size:0.85em;font-weight:800;color:var(--ink-soft);margin-left:0.4em;}
+.pd-placed-sticker .pd-sticker-chip.pd-phrase{max-width:150px;}
+.pd-sticker-chip:active{cursor:grabbing;}
 
-/* Stickers placed on the page being edited — draggable with one finger,
-   pinch with two to resize + rotate together (handled in JS); dedicated
-   handles remain for precise mouse control. */
+/* Stickers placed on the book */
 .pd-placed-sticker{position:absolute;cursor:grab;touch-action:none;}
 .pd-placed-sticker.pd-dragging{cursor:grabbing;z-index:60;}
 .pd-placed-sticker.pd-selected{z-index:55;}
@@ -797,13 +779,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pd-placed-sticker.pd-selected .pd-sticker-handle{display:flex;}
 .pd-sticker-rotate{top:-30px;left:50%;transform:translateX(-50%);cursor:grab;}
 .pd-sticker-resize{bottom:-9px;right:-9px;cursor:nwse-resize;}
+.pd-chip-count{font-size:0.85em;font-weight:800;color:var(--ink-soft);margin-left:0.4em;}
 
-@media(max-width:820px){
-  .pd-diary-float{left:50%;margin-left:-46vw;top:5vh;}
-  .pd-diary-scale-wrap{width:92vw;}
-}
-@media(max-width:640px){
-  .pd-sticker-picker-btn{width:26px;height:26px;font-size:13px;}
+@media(max-width:900px){
+  .pd-diary-popups{flex-direction:column;width:100%;max-height:none;overflow-y:auto;}
+  .pd-book-modal{flex-basis:auto;width:100%;max-height:none;}
+  .pd-collections-modal{flex-basis:auto;width:100%;max-height:220px;}
 }
 
 </style>
@@ -3292,125 +3273,50 @@ const PD_BOOK_KEY='paxel_pd_diary_book';
 let pdBook=null;
 let pdPickerView='words';
 
-// ── Data model: a flat, 0-based array of pages (matches ZineJS page
-// indices directly). Each page holds its own placed stickers. ──
 function pdLoadBook(){
   try{
     const s=localStorage.getItem(PD_BOOK_KEY);
     if(s){
       const b=JSON.parse(s);
-      if(b&&Array.isArray(b.pages)&&b.pages.length) return b;
-      // Migrate older saved books: two-page-spread format (left/right per
-      // spread) or the earlier flat single-page format.
       if(b&&Array.isArray(b.spreads)&&b.spreads.length){
-        const pages=[];
+        // Normalize: older saved books may have a flat `stickers` array
+        // from the single-page version — migrate that into `.right`.
         b.spreads.forEach(function(sp){
-          pages.push({stickers:(sp.left&&sp.left.stickers)||sp.stickers||[]});
-          pages.push({stickers:(sp.right&&sp.right.stickers)||[]});
+          if(!sp.left) sp.left={stickers:[]};
+          if(!sp.right) sp.right={stickers: sp.stickers||[]};
+          delete sp.stickers;
         });
-        return {pages:pages};
+        return b;
       }
     }
   }catch(e){}
-  return {pages:[{stickers:[]}]};
+  return {spreads:[{left:{stickers:[]},right:{stickers:[]}}],current:0};
 }
 function pdSaveBook(){
   try{ localStorage.setItem(PD_BOOK_KEY, JSON.stringify(pdBook)); }catch(e){}
 }
 
-let pdDiaryInitialized=false;
-let pdZineBook=null;
-let pdEditingPage=null; // page index currently shown in the edit overlay, or null
-
 function pdOpenInventory(){
   if(!pdBook) pdBook=pdLoadBook();
-  const floatEl=document.getElementById('pdDiaryFloat');
-  if(!floatEl) return;
-  floatEl.classList.add('pd-diary-open');
+  const overlay=document.getElementById('pdDiaryOverlay');
+  if(!overlay) return;
+  overlay.classList.add('pd-diary-open');
+  const totalCollect=Object.values(pd.coleccion).reduce((a,b)=>a+b,0);
+  const sub=document.getElementById('pdDiarySub');
+  if(sub) sub.textContent=totalCollect+' collectible'+(totalCollect!==1?'s':'')+' collected';
   pdRenderPicker();
-  pdBuildZine(0);
-  if(!pdDiaryInitialized){
-    pdMakeDiaryDraggable();
-    pdMakeDiaryResizable();
-    pdDiaryInitialized=true;
-  }
+  pdRenderBook();
 }
 function pdCloseInventory(){
-  const floatEl=document.getElementById('pdDiaryFloat');
-  if(floatEl) floatEl.classList.remove('pd-diary-open');
-  const popup=document.getElementById('pdStickerPickerPopup');
-  if(popup) popup.style.display='none';
-  if(pdEditingPage!==null) pdExitEditMode();
-}
-
-function pdToggleStickerPicker(){
-  const popup=document.getElementById('pdStickerPickerPopup');
-  if(!popup) return;
-  if(pdEditingPage===null) pdEnterEditMode(pdZineBook?pdZineBook.getPage():0);
-  popup.style.display = (popup.style.display==='none' || !popup.style.display) ? 'flex' : 'none';
-}
-
-// Dragging the diary by its handle — moves the whole floating panel.
-function pdMakeDiaryDraggable(){
-  const handle=document.getElementById('pdDiaryDragHandle');
-  const floatEl=document.getElementById('pdDiaryFloat');
-  if(!handle||!floatEl) return;
-  handle.addEventListener('pointerdown', function(e){
-    if(e.target.closest('.pd-diary-close')) return;
-    e.preventDefault();
-    const rect=floatEl.getBoundingClientRect();
-    floatEl.style.left=rect.left+'px';
-    floatEl.style.top=rect.top+'px';
-    floatEl.style.margin='0';
-    const startX=e.clientX, startY=e.clientY;
-    const startLeft=rect.left, startTop=rect.top;
-    function move(ev){
-      floatEl.style.left=(startLeft + ev.clientX - startX)+'px';
-      floatEl.style.top=(startTop + ev.clientY - startY)+'px';
-    }
-    function up(){
-      document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
-    }
-    document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', up);
-  });
-}
-
-// Resizing the WHOLE diary via its corner handle — one transform:scale on
-// the scale-wrap, so the book, controls, and picker popup all stay
-// perfectly proportional to each other at any size.
-let pdDiaryScale=1;
-function pdMakeDiaryResizable(){
-  const handle=document.getElementById('pdDiaryResizeHandle');
-  const scaleWrap=document.getElementById('pdDiaryScaleWrap');
-  if(!handle||!scaleWrap) return;
-  handle.addEventListener('pointerdown', function(e){
-    e.preventDefault(); e.stopPropagation();
-    const startX=e.clientX, startY=e.clientY;
-    const startScale=pdDiaryScale;
-    const startDist=180;
-    function move(ev){
-      const delta=((ev.clientX-startX)+(ev.clientY-startY))/2;
-      let newScale=startScale + delta/startDist;
-      newScale=Math.max(0.55, Math.min(2, newScale));
-      pdDiaryScale=newScale;
-      scaleWrap.style.transform='scale('+newScale+')';
-    }
-    function up(){
-      document.removeEventListener('pointermove', move);
-      document.removeEventListener('pointerup', up);
-      if(pdZineBook) pdZineBook.update();
-    }
-    document.addEventListener('pointermove', move);
-    document.addEventListener('pointerup', up);
-  });
+  const overlay=document.getElementById('pdDiaryOverlay');
+  if(overlay) overlay.classList.remove('pd-diary-open');
 }
 
 // Keyboard shortcuts (matching the labels drawn on the book itself): Q = previous, E = next.
+// Only active while the diary popup is open, and never while typing in a field.
 document.addEventListener('keydown', function(e){
-  const floatEl=document.getElementById('pdDiaryFloat');
-  if(!floatEl || !floatEl.classList.contains('pd-diary-open')) return;
+  const overlay=document.getElementById('pdDiaryOverlay');
+  if(!overlay || !overlay.classList.contains('pd-diary-open')) return;
   const tag=(e.target && e.target.tagName || '').toLowerCase();
   if(tag==='input' || tag==='textarea') return;
   const key=e.key.toLowerCase();
@@ -3431,12 +3337,14 @@ function pdSetPickerView(view){
 }
 
 // How many of this exact word/phrase are already placed as stickers,
-// across every page of the whole diary (not just the page being edited).
+// across every page of the whole diary (not just the current spread).
 function pdCountPlaced(kind, text){
   let count=0;
-  (pdBook.pages||[]).forEach(function(pg){
-    (pg.stickers||[]).forEach(function(st){
-      if(st.kind===kind && st.text===text) count++;
+  (pdBook.spreads||[]).forEach(function(sp){
+    ['left','right'].forEach(function(side){
+      ((sp[side]&&sp[side].stickers)||[]).forEach(function(st){
+        if(st.kind===kind && st.text===text) count++;
+      });
     });
   });
   return count;
@@ -3478,7 +3386,7 @@ function pdRenderPicker(){
         badge.textContent='\u00d7'+remaining;
         chip.appendChild(badge);
       }
-      pdMakeChipTappable(chip);
+      pdMakeChipDraggable(chip);
       list.appendChild(chip);
     });
   }else{
@@ -3506,191 +3414,58 @@ function pdRenderPicker(){
         badge.textContent='\u00d7'+remaining;
         chip.appendChild(badge);
       }
-      pdMakeChipTappable(chip);
+      pdMakeChipDraggable(chip);
       list.appendChild(chip);
     });
   }
 }
 
-// ── Baking a page (dot-grid background + its stickers) into a PNG data
-// URL — this is what ZineJS actually displays and curls in read mode. ──
-function pdBakePageImage(pageIndex){
-  const W=600, H=800;
-  const canvas=document.createElement('canvas');
-  canvas.width=W; canvas.height=H;
-  const ctx=canvas.getContext('2d');
-  ctx.fillStyle='#ffffff';
-  ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(71,190,238,.35)';
-  for(let y=10;y<H;y+=20){
-    for(let x=10;x<W;x+=20){
-      ctx.beginPath();
-      ctx.arc(x,y,1.6,0,Math.PI*2);
-      ctx.fill();
-    }
-  }
-  const page=(pdBook.pages&&pdBook.pages[pageIndex])||{stickers:[]};
-  (page.stickers||[]).forEach(function(st){
-    ctx.save();
-    ctx.translate(st.x/100*W, st.y/100*H);
-    ctx.rotate((st.rot||0)*Math.PI/180);
-    ctx.scale(st.scale||1, st.scale||1);
-    ctx.font='700 20px Cairo, sans-serif';
-    ctx.textAlign='center';
-    ctx.textBaseline='middle';
-    if(st.kind==='word'){
-      const textW=ctx.measureText(st.text).width;
-      const padX=18, h=40;
-      const w=textW+padX*2;
-      ctx.fillStyle='#fff';
-      ctx.strokeStyle='#000';
-      ctx.lineWidth=2;
-      pdRoundRectPath(ctx,-w/2,-h/2,w,h,h/2);
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle=pdColorRareza(st.text);
-      ctx.fillText(st.text,0,1);
-    }else{
-      const maxW=260;
-      const words=st.text.split(' ');
-      const lines=[]; let line='';
-      ctx.font='600 16px Cairo, sans-serif';
-      words.forEach(function(w){
-        const test=line?line+' '+w:w;
-        if(ctx.measureText(test).width>maxW && line){ lines.push(line); line=w; }
-        else line=test;
-      });
-      if(line) lines.push(line);
-      const lineH=22, padY=16, padX=14;
-      const boxW=maxW+padX*2, boxH=lines.length*lineH+padY*2;
-      ctx.fillStyle='#fff';
-      ctx.strokeStyle='#000';
-      ctx.lineWidth=2;
-      pdRoundRectPath(ctx,-boxW/2,-boxH/2,boxW,boxH,8);
-      ctx.fill(); ctx.stroke();
-      ctx.fillStyle='#000';
-      lines.forEach(function(ln,i){
-        ctx.fillText(ln,0,-boxH/2+padY+lineH/2+i*lineH);
-      });
-    }
-    ctx.restore();
-  });
-  return canvas.toDataURL('image/png');
-}
-function pdRoundRectPath(ctx,x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
+function pdCurrentSpread(){
+  if(!pdBook.spreads[pdBook.current]) pdBook.current=0;
+  return pdBook.spreads[pdBook.current];
 }
 
-// ── ZineJS lifecycle: (re)builds the flipbook from freshly baked page
-// images. Rebuilt (not just updated) whenever a page's content changes,
-// since ImageSource takes its URLs once at construction. ──
-function pdBuildZine(startPage){
-  const container=document.getElementById('pdZineContainer');
-  if(!container || typeof ZineJS==='undefined') return;
-  if(pdZineBook){ try{ pdZineBook.destroy(); }catch(e){} pdZineBook=null; }
-  container.innerHTML='';
-  const urls=(pdBook.pages||[{stickers:[]}]).map(function(_,i){ return pdBakePageImage(i); });
-  pdZineBook=new ZineJS.Zine(container, {
-    source:new ZineJS.ImageSource(urls),
-    spreadMode:'double',
-    singlePageThreshold:640,
-    curl:'cone',
-    controls:false,
-    loading:false,
-    deepLink:false,
-    zoom:{enabled:false},
-    clickToFlip:'edge',
-    startPage:Math.max(0,Math.min(startPage||0,urls.length-1)),
-  });
-  pdZineBook.on('pageChanged', pdSyncControls);
-  pdZineBook.on('flipEnd', pdSyncControls);
-  pdZineBook.ready.then(pdSyncControls).catch(function(){});
-  container.addEventListener('click', pdHandleZineClick);
-}
-
-function pdSyncControls(){
-  if(!pdZineBook) return;
+function pdRenderBook(){
+  const left=document.getElementById('pdBookPageLeft');
+  const right=document.getElementById('pdBookPageRight');
+  if(!left||!right) return;
+  left.innerHTML='';
+  right.innerHTML='';
+  const spread=pdCurrentSpread();
+  (spread.left.stickers||[]).forEach(function(st){ left.appendChild(pdBuildPlacedSticker(st,'left')); });
+  (spread.right.stickers||[]).forEach(function(st){ right.appendChild(pdBuildPlacedSticker(st,'right')); });
   const indicator=document.getElementById('pdSpreadIndicator');
-  if(indicator) indicator.textContent='Page '+(pdZineBook.getPage()+1)+' of '+pdZineBook.getPageCount();
+  if(indicator) indicator.textContent='Page '+(pdBook.current+1)+' of '+pdBook.spreads.length;
   const prevBtn=document.getElementById('pdPagePrev');
   const nextBtn=document.getElementById('pdPageNext');
-  if(prevBtn) prevBtn.disabled=!pdZineBook.canFlipPrev();
-  if(nextBtn) nextBtn.disabled=!pdZineBook.canFlipNext();
+  const isLast=(pdBook.current>=pdBook.spreads.length-1);
+  if(prevBtn) prevBtn.disabled=(pdBook.current<=0);
+  if(nextBtn) nextBtn.disabled=isLast;
+  const addBtn=document.getElementById('pdAddPageBtn');
+  if(addBtn) addBtn.style.display=isLast?'inline-flex':'none';
 }
 
-// Tapping the current page away from the edge-flip zones enters edit mode
-// for whichever page (left or right) was tapped.
-function pdHandleZineClick(e){
-  if(!pdZineBook) return;
-  const box=pdZineBook.getPageBox();
-  const container=document.getElementById('pdZineContainer');
-  if(!box || !container) return;
-  const rect=container.getBoundingClientRect();
-  const localX=e.clientX-rect.left-box.x;
-  const localY=e.clientY-rect.top-box.y;
-  if(localX<0||localY<0||localX>box.width||localY>box.height) return;
-  const edgeZone=64;
-  if(localX<edgeZone || localX>box.width-edgeZone) return; // let ZineJS flip
-  const spreads=pdZineBook.getSpreads();
-  const spread=spreads[pdZineBook.getSpreadIndex()];
-  if(!spread) return;
-  let pageIndex;
-  if(spread.left!==null && spread.right!==null){
-    pageIndex = localX<box.width/2 ? spread.left : spread.right;
-  }else{
-    pageIndex = spread.left!==null ? spread.left : spread.right;
-  }
-  if(pageIndex!==null && pageIndex!==undefined) pdEnterEditMode(pageIndex);
+// Mobile only: tapping the peeking left-page sliver goes back a spread,
+// the same as pressing Previous — matching how flipbook readers let you
+// tap the visible edge of the previous page to flip back to it.
+function pdMobilePeekBack(evt){
+  if(evt && evt.target && evt.target.closest('.pd-placed-sticker')) return;
+  if(window.innerWidth>640) return;
+  pdBookTurn(-1);
 }
 
-function pdEnterEditMode(pageIndex){
-  if(!pdBook.pages[pageIndex]) pdBook.pages[pageIndex]={stickers:[]};
-  pdEditingPage=pageIndex;
-  const overlay=document.getElementById('pdEditOverlay');
-  if(overlay) overlay.style.display='block';
-  pdRenderEditPage();
-}
-
-function pdExitEditMode(){
-  if(pdEditingPage===null) return;
-  const popup=document.getElementById('pdStickerPickerPopup');
-  if(popup) popup.style.display='none';
-  pdDeselectSticker();
-  const editedPage=pdEditingPage;
-  pdEditingPage=null;
-  const overlay=document.getElementById('pdEditOverlay');
-  if(overlay) overlay.style.display='none';
-  pdSaveBook();
-  const targetPage=pdZineBook?pdZineBook.getPage():editedPage;
-  pdBuildZine(targetPage);
-}
-
-function pdRenderEditPage(){
-  const pageEl=document.getElementById('pdEditPage');
-  if(!pageEl || pdEditingPage===null) return;
-  pageEl.querySelectorAll('.pd-placed-sticker').forEach(function(el){ el.remove(); });
-  const page=pdBook.pages[pdEditingPage]||{stickers:[]};
-  (page.stickers||[]).forEach(function(st){
-    pageEl.appendChild(pdBuildPlacedSticker(st));
-  });
-}
-
-// Tapping empty page area (not a sticker) deselects the current sticker's handles.
-function pdPageBackgroundClick(evt){
+// Tapping empty page area (not a sticker) deselects the current sticker's
+// handles; on the left page specifically, it also triggers the mobile peek-back.
+function pdPageBackgroundClick(evt, isLeftSide){
   if(evt && evt.target && evt.target.closest('.pd-placed-sticker')) return;
   pdDeselectSticker();
+  if(isLeftSide) pdMobilePeekBack(evt);
 }
 
-function pdBuildPlacedSticker(st){
+function pdBuildPlacedSticker(st, side){
   if(typeof st.scale!=='number') st.scale=1;
   const el=document.createElement('div');
   el.className='pd-placed-sticker';
-  el.setAttribute('data-sticker-id', st.id);
   el.style.left=st.x+'%';
   el.style.top=st.y+'%';
   el.style.transform='translate(-50%,-50%) rotate('+(st.rot||0)+'deg) scale('+st.scale+')';
@@ -3704,10 +3479,11 @@ function pdBuildPlacedSticker(st){
   rm.textContent='\u2715';
   rm.onclick=function(e){
     e.stopPropagation();
-    const page=pdBook.pages[pdEditingPage];
-    page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
+    const spread=pdCurrentSpread();
+    const bucket=spread[side];
+    bucket.stickers=bucket.stickers.filter(function(s){return s.id!==st.id;});
     pdSaveBook();
-    pdRenderEditPage();
+    pdRenderBook();
     pdRenderPicker();
   };
   const rotHandle=document.createElement('span');
@@ -3772,6 +3548,7 @@ function pdMakeResizable(el, handle, st){
       const d1=Math.hypot(ev.clientX-cx, ev.clientY-cy);
       let newScale=s0*(d1/d0);
       newScale=Math.max(0.5, Math.min(2.6, newScale));
+      // Keep the resized sticker from growing past the page it's on.
       const pr=pageEl.getBoundingClientRect();
       const naturalW=r0.width/s0, naturalH=r0.height/s0;
       const maxScaleW=pr.width/naturalW, maxScaleH=pr.height/naturalH;
@@ -3789,127 +3566,106 @@ function pdMakeResizable(el, handle, st){
   });
 }
 
-// Tap-to-place (Instagram Stories style): tapping a chip closes the picker
-// and places that item centered on the page being edited, immediately
-// selected and ready to drag/resize/rotate.
-function pdMakeChipTappable(chip){
-  chip.addEventListener('click', function(){
+function pdMakeChipDraggable(chip){
+  chip.addEventListener('pointerdown', function(e){
+    e.preventDefault();
     const kind=chip.getAttribute('data-kind');
     const text=chip.getAttribute('data-text');
-    if(pdCountCollected(kind,text)-pdCountPlaced(kind,text) <= 0) return;
-    if(pdEditingPage===null) pdEnterEditMode(pdZineBook?pdZineBook.getPage():0);
-    const popup=document.getElementById('pdStickerPickerPopup');
-    if(popup) popup.style.display='none';
-    const page=pdBook.pages[pdEditingPage];
-    page.stickers=page.stickers||[];
-    const newSticker={
-      id:'st_'+Date.now()+'_'+Math.floor(Math.random()*1000),
-      kind:kind, text:text,
-      x:50, y:50,
-      rot: Math.round((Math.random()*10-5)*10)/10,
-      scale:1
-    };
-    page.stickers.push(newSticker);
-    pdSaveBook();
-    pdRenderEditPage();
-    pdRenderPicker();
-    const pageEl=document.getElementById('pdEditPage');
-    if(pageEl){
-      const placedEl=pageEl.querySelector('[data-sticker-id="'+newSticker.id+'"]');
-      if(placedEl) pdSelectSticker(placedEl);
+    const rect=chip.getBoundingClientRect();
+    const ghost=chip.cloneNode(true);
+    ghost.style.position='fixed';
+    ghost.style.zIndex='10000';
+    ghost.style.pointerEvents='none';
+    ghost.style.opacity='.9';
+    ghost.style.width=rect.width+'px';
+    ghost.style.left=e.clientX+'px';
+    ghost.style.top=e.clientY+'px';
+    ghost.style.transform='translate(-50%,-50%)';
+    document.body.appendChild(ghost);
+
+    function move(ev){
+      ghost.style.left=ev.clientX+'px';
+      ghost.style.top=ev.clientY+'px';
     }
+    function up(ev){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      ghost.remove();
+      const zones=[
+        {el:document.getElementById('pdBookPageLeft'), side:'left'},
+        {el:document.getElementById('pdBookPageRight'), side:'right'}
+      ];
+      zones.forEach(function(zone){
+        const pageEl=zone.el;
+        if(!pageEl) return;
+        const r=pageEl.getBoundingClientRect();
+        if(ev.clientX>=r.left && ev.clientX<=r.right && ev.clientY>=r.top && ev.clientY<=r.bottom){
+          if(pdCountCollected(kind,text)-pdCountPlaced(kind,text) <= 0) return; // out of copies
+          const xPct=(ev.clientX-r.left)/r.width*100;
+          const yPct=(ev.clientY-r.top)/r.height*100;
+          const spread=pdCurrentSpread();
+          const bucket=spread[zone.side];
+          bucket.stickers=bucket.stickers||[];
+          bucket.stickers.push({
+            id:'st_'+Date.now()+'_'+Math.floor(Math.random()*1000),
+            kind:kind, text:text,
+            x: Math.max(4,Math.min(96,xPct)),
+            y: Math.max(4,Math.min(96,yPct)),
+            rot: Math.round((Math.random()*10-5)*10)/10,
+            scale: 1
+          });
+          pdSaveBook();
+          pdRenderBook();
+          pdRenderPicker();
+        }
+      });
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
   });
 }
-
-// Unified gesture handler on each placed sticker: one finger repositions,
-// two fingers pinch to resize + rotate together — tracked via pointer
-// capture so multi-touch works reliably even off-element.
 function pdMakePlacedDraggable(el, st){
-  const pointers={};
-  let mode=null;
-  let dragStart=null;
-  let pinchStart=null;
-
   el.addEventListener('pointerdown', function(e){
-    if(e.target.closest('.pd-sticker-remove') || e.target.closest('.pd-sticker-handle')) return;
+    if(e.target.classList.contains('pd-sticker-remove')) return;
     e.preventDefault();
     e.stopPropagation();
-    try{ el.setPointerCapture(e.pointerId); }catch(err){}
-    pointers[e.pointerId]={x:e.clientX, y:e.clientY};
-    const ids=Object.keys(pointers);
-    if(ids.length===1){
-      mode='drag';
-      el.classList.add('pd-dragging');
-      dragStart={clientX:e.clientX, clientY:e.clientY, x:st.x, y:st.y};
-    }else if(ids.length===2){
-      mode='pinch';
-      const pts=ids.map(function(id){ return pointers[id]; });
-      const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
-      const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
-      pinchStart={dist:dist, angle:angle, scale:st.scale, rot:st.rot||0};
-    }
-  });
-
-  el.addEventListener('pointermove', function(e){
-    if(!pointers[e.pointerId]) return;
-    pointers[e.pointerId]={x:e.clientX, y:e.clientY};
-    const ids=Object.keys(pointers);
+    el.classList.add('pd-dragging');
     const pageEl=el.parentNode;
-    if(mode==='drag' && ids.length===1 && dragStart){
+    function move(ev){
       const r=pageEl.getBoundingClientRect();
-      const dxPct=(e.clientX-dragStart.clientX)/r.width*100;
-      const dyPct=(e.clientY-dragStart.clientY)/r.height*100;
-      st.x=Math.max(4,Math.min(96, dragStart.x+dxPct));
-      st.y=Math.max(4,Math.min(96, dragStart.y+dyPct));
+      const xPct=(ev.clientX-r.left)/r.width*100;
+      const yPct=(ev.clientY-r.top)/r.height*100;
+      st.x=Math.max(4,Math.min(96,xPct));
+      st.y=Math.max(4,Math.min(96,yPct));
       el.style.left=st.x+'%';
       el.style.top=st.y+'%';
-    }else if(mode==='pinch' && ids.length===2 && pinchStart){
-      const pts=ids.map(function(id){ return pointers[id]; });
-      const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
-      const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
-      let newScale=pinchStart.scale*(dist/pinchStart.dist);
-      newScale=Math.max(0.5, Math.min(2.6, newScale));
-      const pr=pageEl.getBoundingClientRect();
-      const naturalW=el.offsetWidth/st.scale, naturalH=el.offsetHeight/st.scale;
-      if(naturalW>0) newScale=Math.min(newScale, pr.width/naturalW);
-      if(naturalH>0) newScale=Math.min(newScale, pr.height/naturalH);
-      st.scale=Math.round(newScale*100)/100;
-      st.rot=Math.round((pinchStart.rot+(angle-pinchStart.angle))*10)/10;
-      el.style.transform='translate(-50%,-50%) rotate('+st.rot+'deg) scale('+st.scale+')';
     }
-  });
-
-  function endPointer(e){
-    delete pointers[e.pointerId];
-    const ids=Object.keys(pointers);
-    if(ids.length===0){
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
       el.classList.remove('pd-dragging');
-      mode=null; dragStart=null; pinchStart=null;
       pdSaveBook();
-    }else if(ids.length===1){
-      mode='drag';
-      const id=ids[0];
-      dragStart={clientX:pointers[id].x, clientY:pointers[id].y, x:st.x, y:st.y};
-      pinchStart=null;
     }
-  }
-  el.addEventListener('pointerup', endPointer);
-  el.addEventListener('pointercancel', endPointer);
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
 }
 
 function pdBookTurn(delta){
-  if(!pdZineBook) return;
-  if(pdEditingPage!==null) pdExitEditMode();
-  if(delta<0) pdZineBook.flipPrev(); else pdZineBook.flipNext();
-}
-function pdAddPage(){
-  pdBook.pages.push({stickers:[]});
-  const newIndex=pdBook.pages.length-1;
+  const next=pdBook.current+delta;
+  if(next<0||next>=pdBook.spreads.length) return;
+  pdBook.current=next;
   pdSaveBook();
-  pdBuildZine(newIndex);
+  pdRenderBook();
+}
+function pdAddSpread(){
+  pdBook.spreads.push({left:{stickers:[]},right:{stickers:[]}});
+  pdBook.current=pdBook.spreads.length-1;
+  pdSaveBook();
+  pdRenderBook();
 }
 
-
+// ── Format & resolution ──
 
 // ── Format & resolution ──
 function pdSetFmt(tipo,w,h,btn){
@@ -4230,52 +3986,35 @@ window.addEventListener('DOMContentLoaded',()=>{
 </script>
 
 <!-- PIXEL DIARY — "My diary" popup: book and collections as two independent boxes -->
-<div class="pd-diary-float" id="pdDiaryFloat">
-  <div class="pd-diary-scale-wrap" id="pdDiaryScaleWrap">
-    <!-- Minimal drag strip: no border or fill, just a grip icon and a close
-         button, so the flipbook itself stays the only visible frame. -->
-    <div class="pd-diary-drag-handle" id="pdDiaryDragHandle">
-      <span class="pd-diary-drag-grip">&#8942;&#8942;</span>
-      <button class="pd-diary-close" onclick="pdCloseInventory()">&#10005;</button>
-    </div>
-
-    <div class="pd-book-wrap" id="pdBookWrap">
-      <!-- Read mode: ZineJS renders realistic page-curl flipping between
-           baked page snapshots, at a DIN A4 double-spread proportion.
-           Tapping the current page (away from the edge-flip zones) enters
-           edit mode for that page. -->
-      <div class="pd-zine-shell" id="pdZineShell">
-        <div class="pd-zine-container" id="pdZineContainer"></div>
-      </div>
-
-      <!-- Edit mode: our existing interactive single-page sticker canvas,
-           shown on top while editing; baked back into an image on exit. -->
-      <div class="pd-edit-overlay" id="pdEditOverlay" style="display:none;">
-        <div class="pd-edit-page" id="pdEditPage" onclick="pdPageBackgroundClick(event)">
-          <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerPicker()">&#127912;</button>
-          <button class="pd-edit-done-btn" onclick="event.stopPropagation();pdExitEditMode()">Done &#10003;</button>
-        </div>
-
-        <!-- Sticker picker: appears directly over the page being edited,
-             tapping an item closes it and places that item, ready to
-             drag/resize — same pattern as Instagram Stories' sticker tray. -->
-        <div class="pd-sticker-picker-popup" id="pdStickerPickerPopup" style="display:none;">
-          <div class="pd-picker-toggle">
-            <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
-            <button class="pd-picker-tab" id="pdPickerTabPhrases" onclick="pdSetPickerView('phrases')">Phrases</button>
-          </div>
-          <div class="pd-picker-list pd-view-words" id="pdPickerList"></div>
+<div class="pd-diary-overlay" id="pdDiaryOverlay">
+  <div class="pd-diary-popups">
+    <div class="pd-book-modal">
+      <div class="pd-book-wrap" id="pdBookWrap">
+        <div class="pd-page-tab" id="pdSpreadIndicator">Page 1 of 1</div>
+        <div class="pd-spread-wrap">
+          <div class="pd-book-page pd-page-left" id="pdBookPageLeft" onclick="pdPageBackgroundClick(event,true)"></div>
+          <div class="pd-book-page pd-page-right" id="pdBookPageRight" onclick="pdPageBackgroundClick(event,false)"></div>
         </div>
       </div>
+      <div class="pd-book-controls">
+        <button class="pd-book-nav-btn pd-book-nav-prev" id="pdPagePrev" onclick="pdBookTurn(-1)">&larr; Previous <span class="pd-key-hint">[Q]</span></button>
+        <button class="pd-add-page-btn" id="pdAddPageBtn" onclick="pdAddSpread()" style="display:none;">+ New page</button>
+        <button class="pd-book-nav-btn pd-book-nav-next" id="pdPageNext" onclick="pdBookTurn(1)"><span class="pd-key-hint">[E]</span> Next &rarr;</button>
+      </div>
     </div>
-    <div class="pd-book-controls">
-      <button class="pd-book-nav-btn pd-book-nav-prev" id="pdPagePrev" onclick="pdBookTurn(-1)">&larr; Previous <span class="pd-key-hint">[Q]</span></button>
-      <span class="pd-book-page-indicator" id="pdSpreadIndicator">Page 1 of 1</span>
-      <button class="pd-add-page-btn" id="pdAddPageBtn" onclick="pdAddPage()">+ New page</button>
-      <button class="pd-book-nav-btn pd-book-nav-next" id="pdPageNext" onclick="pdBookTurn(1)"><span class="pd-key-hint">[E]</span> Next &rarr;</button>
+
+    <div class="pd-collections-modal">
+      <div class="pd-collections-head">
+        <span class="pd-diary-sub" id="pdDiarySub"></span>
+        <button class="pd-diary-close" onclick="pdCloseInventory()">CLOSE</button>
+      </div>
+      <div class="pd-picker-toggle">
+        <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
+        <button class="pd-picker-tab" id="pdPickerTabPhrases" onclick="pdSetPickerView('phrases')">Phrases</button>
+      </div>
+      <div class="pd-picker-list pd-view-words" id="pdPickerList"></div>
     </div>
   </div>
-  <div class="pd-diary-resize-handle" id="pdDiaryResizeHandle">&#8690;</div>
 </div>
 
 </body>
