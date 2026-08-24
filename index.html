@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Playfair+Display:wght@500;700;800&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="dougie.webp">
 <link rel="preload" as="image" href="kirara.webp">
 <link rel="preload" as="image" href="deerek.webp">
@@ -923,16 +923,6 @@ a{color:inherit;text-decoration:none;}
 .nav{opacity:0;transform:translateY(-26px);transition:opacity .85s cubic-bezier(.25,.7,.4,1),transform .85s cubic-bezier(.25,.7,.4,1);}
 body.entered-nav .nav{opacity:1;transform:translateY(0);}
 
-/* Tool pages — reveal order (first visit only):
-   1) title  2) description  3) hide-controls (if present)
-   4) left settings  5) canvas + right-side buttons/interfaces
-   6) my collection (Pixel phrases only)                                    */
-#page-tool .tool-hero h1, #page-waterer .tool-hero h1, #page-phrases .tool-hero h1{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .15s,transform .8s cubic-bezier(.25,.7,.4,1) .15s;}
-#page-tool.entered .tool-hero h1, #page-waterer.entered .tool-hero h1, #page-phrases.entered .tool-hero h1{opacity:1;transform:translateY(0);}
-
-#page-tool .tool-hero p, #page-waterer .tool-hero p, #page-phrases .tool-hero p{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .5s,transform .8s cubic-bezier(.25,.7,.4,1) .5s;}
-#page-tool.entered .tool-hero p, #page-waterer.entered .tool-hero p, #page-phrases.entered .tool-hero p{opacity:1;transform:translateY(0);}
-
 /* Hide-controls toggle (waterer + phrases only) — fades only, same reason as above */
 #page-waterer .btn-toggle-ctrl, #page-phrases .btn-toggle-ctrl{opacity:0;}
 #page-waterer.entered .btn-toggle-ctrl, #page-phrases.entered .btn-toggle-ctrl{opacity:1;}
@@ -1004,14 +994,12 @@ body.scrolled .ticker{max-height:0;opacity:0;transform:translateY(-12px);border-
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;cursor:pointer;flex-shrink:0;padding-right:6px;}
 .logo img{height:30px;width:108px;display:block;image-rendering:pixelated;transition:height .25s cubic-bezier(.4,0,.2,1),width .25s cubic-bezier(.4,0,.2,1);}
 .tabs{display:flex;align-items:center;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;justify-content:flex-end;}
+.tab.pd-bmc-btn{display:inline-flex;align-items:center;gap:6px;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab{font-family:var(--font);font-size:13px;font-weight:700;padding:9px 16px;border-radius:var(--r1);white-space:nowrap;transition:transform .12s,background .15s,padding .2s ease,font-size .2s ease;cursor:pointer;border:var(--bw) solid var(--ink);background:#fff;color:var(--ink);flex-shrink:0;}
 .tab:hover{background:var(--paper-alt);}
 .tab.active-tab{background:var(--blue);color:var(--ink);}
 .tab.active-tab:hover{background:var(--blue);}
-.tab.soon{color:var(--ink-soft);display:inline-flex;align-items:center;gap:5px;cursor:default;border-style:dashed;}
-.tab.soon:hover{background:none;}
-.tab.soon .pill{font-family:var(--font);font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;background:var(--dormant);color:var(--ink-soft);padding:2px 6px;border-radius:var(--r1);}
 
 /* Scroll-compact nav: shrinks on scroll, restores on hover; ticker follows */
 body.nav-compact .nav-inner{height:44px;}
@@ -1143,7 +1131,6 @@ body.nav-compact .nav:hover .tab{padding:9px 16px;font-size:13px;}
 .roadmap-card.pixel-featured-wt .r-pill{background:var(--blue);color:var(--ink);}
 .pixel-open-btn{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;font-family:var(--font);background:var(--blue);color:var(--ink);border:var(--bw) solid var(--ink);padding:10px 18px;border-radius:var(--r1);cursor:pointer;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
 .pixel-open-btn:hover{transform:translate(-2px,-2px);box-shadow:var(--s-md);}
-.roadmap-card .soon-tag{margin-top:16px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;font-family:var(--font);background:var(--paper-alt);color:var(--ink-soft);border:var(--bw) dashed var(--dormant-2);padding:9px 16px;border-radius:var(--r1);flex-shrink:0;}
 
 /* ── Closing — the one bold BLUE moment, no black fill ── */
 .closing{background:var(--blue);color:var(--ink);padding:96px 0 64px;text-align:left;position:relative;overflow:hidden;}
@@ -1175,12 +1162,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
    TOOL PAGES — shared console chrome, quiet version
    ============================================================ */
 .tool-page{background:var(--paper);}
-.tool-hero{background:var(--paper-alt);color:var(--ink);padding:0;border-bottom:var(--bw) solid var(--ink);}
-.tool-hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap;padding-top:48px;padding-bottom:32px;}
-@media(max-width:640px){.tool-hero-inner{align-items:flex-start;padding-top:32px;padding-bottom:26px;}}
-.tool-hero h1{font-weight:800;font-size:clamp(28px,4.2vw,46px);line-height:1.05;margin-bottom:10px;color:var(--ink);}
-.tool-hero h1 .accent{color:var(--blue-deep);}
-.tool-hero p{color:var(--ink-soft);font-size:15px;line-height:1.7;max-width:480px;font-weight:500;}
 
 .tool-controls-section{padding:44px 0;}
 .tool-grid{display:grid;grid-template-columns:.86fr 1.14fr;gap:36px;align-items:start;}
@@ -1206,7 +1187,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .upload-zone:hover,.upload-zone.dragover{border-color:var(--blue-deep);background:#fff;}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-zone-icon{font-size:22px;margin-bottom:10px;transition:transform .3s ease;display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:#fff;border:var(--bw) solid var(--ink);border-radius:50%;}
-.upload-zone.wt-uploading .upload-zone-icon,.upload-zone.pt-uploading .upload-zone-icon,.upload-zone.pp-uploading .upload-zone-icon{animation:spin-icon .7s linear infinite;}
+.upload-zone.wt-uploading .upload-zone-icon,.upload-zone.pt-uploading .upload-zone-icon,.upload-zone.pp-uploading .upload-zone-icon,.upload-zone.pd-uploading .upload-zone-icon{animation:spin-icon .7s linear infinite;}
 @keyframes spin-icon{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .upload-zone p{font-size:14px;font-weight:700;color:var(--ink);transition:color .25s ease;}
 .upload-zone span{font-size:12px;color:var(--ink-soft);font-weight:500;}
@@ -1396,18 +1377,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 /* ── Pixel diary CSS (mirrors Pixel phrases exactly) ── */
 
 
-
-#page-tool .tool-hero h1, #page-waterer .tool-hero h1, #page-diary .tool-hero h1{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .15s,transform .8s cubic-bezier(.25,.7,.4,1) .15s;}
-
-#page-tool.entered .tool-hero h1, #page-waterer.entered .tool-hero h1, #page-diary.entered .tool-hero h1{opacity:1;transform:translateY(0);}
-
-
-#page-tool .tool-hero p, #page-waterer .tool-hero p, #page-diary .tool-hero p{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.25,.7,.4,1) .5s,transform .8s cubic-bezier(.25,.7,.4,1) .5s;}
-
-#page-tool.entered .tool-hero p, #page-waterer.entered .tool-hero p, #page-diary.entered .tool-hero p{opacity:1;transform:translateY(0);}
-
-
-
 #page-waterer .btn-toggle-ctrl, #page-diary .btn-toggle-ctrl{opacity:0;}
 
 #page-waterer.entered .btn-toggle-ctrl, #page-diary.entered .btn-toggle-ctrl{opacity:1;}
@@ -1431,8 +1400,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #page-diary .pd-my-collection-btn{opacity:0;}
 
 #page-diary.entered .pd-my-collection-btn{opacity:1;}
-
-.upload-zone.wt-uploading .upload-zone-icon,.upload-zone.pt-uploading .upload-zone-icon,.upload-zone.pd-uploading .upload-zone-icon{animation:spin-icon .7s linear infinite;}
 
 
 
@@ -1567,6 +1534,7 @@ footer .foot-tabs button:hover{color:var(--ink);}
    same fixed geometry ZineJS itself is built to produce. */
 .pd-zine-shell{position:relative;width:100%;aspect-ratio:420/297;overflow:visible;background:transparent;}
 .pd-zine-container{position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
+.pd-zine-container,.pd-zine-container *{outline:none;}
 
 /* Close + resize: stuck to the visible content's own corners — animating
    from the shell's outer edge (0%/100%, a spread) to where the centered
@@ -1584,11 +1552,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
    for the cover, two side by side for a spread. Baked back into images
    (via pdBakePageImage) on exit, which ZineJS then displays. No border of
    its own — it's meant to sit flush and plain, not add visual weight. */
-.pd-edit-overlay{position:absolute;z-index:5;pointer-events:none;}
-.pd-edit-page{position:absolute;display:none;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;border:2px solid #000;border-radius:var(--r1);box-sizing:border-box;overflow:hidden;pointer-events:auto;}
+.pd-edit-overlay{position:absolute;z-index:5;pointer-events:none;border:2px solid #000;border-radius:var(--r1);box-sizing:border-box;overflow:hidden;}
+.pd-edit-page{position:absolute;display:none;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;box-sizing:border-box;overflow:hidden;pointer-events:auto;}
 .pd-edit-page.pd-flip-page-cover{background-image:none;}
 
-.pd-edit-done-btn{position:absolute;top:8px;right:48px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 13px;cursor:pointer;box-shadow:var(--s-sm);z-index:9;transition:transform .12s,box-shadow .12s;}
+.pd-edit-done-btn{position:absolute;top:8px;right:48px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 13px;cursor:pointer;box-shadow:var(--s-sm);z-index:9;transition:transform .12s,box-shadow .12s,right .4s ease;}
+.pd-zine-shell.pd-book-cover .pd-edit-done-btn{right:calc(25% + 40px);}
 .pd-edit-done-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 
 /* Sticker picker: this is now the ONLY way into edit mode (tapping a page
@@ -1609,14 +1578,18 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pd-zine-shell.pd-book-cover .pd-flip-nav-btn{right:25%;}
 .pd-flip-nav-addpage{background:var(--blue);font-size:16px;font-weight:800;}
 
-/* Resize + rotate, both from this one handle at the book's own corner
-   (not the whole panel) so it visibly belongs to the flipbook. */
-.pd-diary-resize-handle{position:absolute;transform:translate(50%,50%);width:26px;height:26px;background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:50%;box-shadow:var(--s-sm);cursor:nwse-resize;display:flex;align-items:center;justify-content:center;font-size:12px;touch-action:none;z-index:9;transition:left .3s ease,top .3s ease;}
-
 /* Words/Phrases picker: an independent floating panel, not tied to the
    book's own position — draggable anywhere on screen. */
 .pd-sticker-panel{position:fixed;top:8vh;left:calc(50% + 200px);z-index:10000;width:260px;background:#fff;border:2px solid #000;border-radius:var(--r1);box-shadow:var(--s-md);padding:14px;display:flex;flex-direction:column;font-family:var(--font);animation:pdPanelSlideIn .22s cubic-bezier(.25,.7,.4,1) forwards;}
+@media(max-width:900px){
+  .pd-sticker-panel{left:50%;transform:translateX(-50%);width:min(88vw,300px);top:10vh;max-height:78vh;overflow-y:auto;animation:pdPanelSlideInMobile .22s cubic-bezier(.25,.7,.4,1) forwards;}
+}
+@keyframes pdPanelSlideInMobile{from{opacity:0;transform:translateX(-50%) translateY(14px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
 .pd-sticker-panel.pd-panel-closing{animation:pdPanelSlideOut .2s ease forwards;}
+@media(max-width:900px){
+  .pd-sticker-panel.pd-panel-closing{animation:pdPanelSlideOutMobile .2s ease forwards;}
+}
+@keyframes pdPanelSlideOutMobile{from{opacity:1;transform:translateX(-50%) translateY(0);}to{opacity:0;transform:translateX(-50%) translateY(14px);}}
 @keyframes pdPanelSlideIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pdPanelSlideOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(14px);}}
 .pd-sticker-panel-drag{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-14px -14px 10px;padding:8px 10px;cursor:grab;touch-action:none;user-select:none;border-bottom:1px solid var(--dormant);}
@@ -1627,6 +1600,25 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
 .pd-picker-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:7px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
 .pd-picker-tab.active{background:var(--blue);color:var(--ink);}
+.pd-add-text-btn{width:100%;font-family:var(--font);font-weight:700;font-size:13px;padding:10px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
+.pd-add-text-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+.pd-cover-text-hint{font-family:var(--font);font-size:11px;color:var(--ink-soft);margin:12px 0 8px;text-align:center;}
+.pd-font-row{display:flex;gap:6px;}
+.pd-font-choice{flex:1;padding:10px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-size:14px;transition:background .15s;}
+.pd-font-choice:hover{background:var(--paper-alt);}
+.pd-font-choice.pd-font-sans{font-family:var(--font);font-weight:700;}
+.pd-font-choice.pd-font-serif{font-family:'Playfair Display',Georgia,serif;font-weight:700;}
+.pd-font-choice.pd-font-script{font-family:'Dancing Script',cursive;font-weight:700;}
+.pd-text-ctrl-label{font-family:var(--font);font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin:12px 0 6px;}
+.pd-weight-choice{flex:1;padding:9px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-family:var(--font);font-size:12px;transition:background .15s;}
+.pd-weight-choice:hover{background:var(--paper-alt);}
+.pd-line-height-slider{width:100%;accent-color:var(--blue);cursor:pointer;}
+.pd-color-row{display:flex;gap:6px;align-items:center;}
+.pd-color-swatch{width:26px;height:26px;border-radius:50%;border:var(--bw) solid var(--ink);cursor:pointer;padding:0;flex-shrink:0;transition:transform .12s;}
+.pd-color-swatch:hover{transform:scale(1.1);}
+.pd-color-custom{width:26px;height:26px;border-radius:50%;border:var(--bw) solid var(--ink);cursor:pointer;padding:0;flex-shrink:0;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);}
+.pd-color-custom::-webkit-color-swatch-wrapper{padding:2px;}
+.pd-color-custom::-webkit-color-swatch{border:none;border-radius:50%;}
 .pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:7px;padding-right:2px;min-height:100px;max-height:50vh;align-content:flex-start;}
 .pd-picker-list.pd-view-words{flex-direction:row;flex-wrap:wrap;}
 .pd-picker-list.pd-view-phrases{flex-direction:column;}
@@ -1634,6 +1626,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
 .pd-sticker-chip{cursor:grab;user-select:none;touch-action:none;}
 .pd-sticker-chip.pd-word{display:inline-flex;font-family:var(--font);font-weight:700;font-size:12.5px;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 11px;box-shadow:var(--s-sm);}
+.pd-sticker-chip.pd-text{cursor:text;user-select:text;touch-action:auto;white-space:pre;outline:none;min-width:1ch;text-align:center;padding:4px 8px;border-radius:var(--r0);border:1px dashed transparent;transition:border-color .12s,background .12s;}
+.pd-sticker-chip.pd-text.pd-text-wrapped{white-space:pre-wrap;}
+.pd-sticker-chip.pd-text:focus{border-color:var(--blue);background:rgba(71,190,238,.08);}
+.pd-sticker-chip.pd-text.pd-font-sans{font-family:var(--font);}
+.pd-sticker-chip.pd-text.pd-font-serif{font-family:'Playfair Display',Georgia,serif;}
+.pd-sticker-chip.pd-text.pd-font-script{font-family:'Dancing Script',cursive;font-weight:700;}
 .pd-sticker-chip.pd-phrase{background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:8px 10px;box-shadow:var(--s-sm);font-size:12px;line-height:1.4;color:var(--ink);font-weight:600;}
 .pd-picker-list .pd-sticker-chip.pd-phrase{width:100%;}
 .pd-sticker-chip:hover{transform:translate(-1px,-1px);}
@@ -1652,17 +1650,25 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .pd-placed-sticker:hover .pd-sticker-handle,
 .pd-placed-sticker.pd-selected .pd-sticker-handle{display:flex;}
 .pd-sticker-resize{bottom:-9px;right:-9px;cursor:nwse-resize;}
+.pd-sticker-width{top:50%;right:-9px;transform:translateY(-50%);cursor:ew-resize;font-size:9px;}
 
 @media(max-width:820px){
-  .pd-diary-float{left:50%;margin-left:-46vw;top:5vh;}
   .pd-diary-scale-wrap{width:92vw;}
-  .pd-diary-close{width:18px;height:18px;font-size:9px;}
-  .pd-diary-resize-handle{width:19px;height:19px;font-size:9px;}
+  .pd-diary-close{width:28px;height:28px;font-size:13px;}
+  .pd-diary-resize-handle{width:30px;height:30px;font-size:14px;}
 }
 @media(max-width:640px){
   .pd-sticker-picker-btn{width:26px;height:26px;font-size:13px;}
   .pd-edit-done-btn{font-size:10px;padding:5px 10px;}
   .pd-flip-nav-btn{width:26px;height:26px;font-size:13px;}
+  /* Sticker handles are comfortably small for a mouse cursor, but too
+     small to grab reliably with a fingertip — enlarged here, with their
+     corner/edge offsets recalculated so they stay centered at the new
+     size instead of drifting off the sticker's actual corner. */
+  .pd-sticker-handle{width:30px;height:30px;font-size:14px;}
+  .pd-sticker-resize{bottom:-14px;right:-14px;}
+  .pd-sticker-width{right:-14px;}
+  .pd-placed-sticker .pd-sticker-remove{width:26px;height:26px;font-size:13px;top:-12px;right:-12px;}
 }
 
 </style>
@@ -1674,9 +1680,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
     <div class="tabs">
       <button class="tab active-tab" id="tab-home" onclick="showPage('home')">Home</button>
       <span id="tempToolTabSlot"></span>
-      <button class="tab" id="tab-waterer" onclick="showPage('waterer')">Pixel waterer</button>
-      <button class="tab" id="tab-phrases" onclick="showPage('phrases')">Pixel phrases</button>
       <button class="tab" id="tab-diary" onclick="showPage('diary')">Pixel diary</button>
+      <button type="button" class="tab pd-bmc-btn" onclick="window.open('https://www.buymeacoffee.com/paxel','_blank','noopener')"><span aria-hidden="true">&#128519;</span> Buy me a coffee</button>
     </div>
   </div>
 </nav>
@@ -1711,9 +1716,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
       <p class="lede">Paxel Art is an upcoming project consisting in slowly rendering your pixel art day after day, until it settles into a piece nobody else will ever own. Check out our latest tools below or on the tabs to try out our Paxel prototypes to get the gist!</p>
       <div class="hero-actions">
         <a href="#roadmap" class="btn-ghost">Check what tools we have &darr;</a>
-        <div class="tool-promo-chip" onclick="showPage('phrases')">
-          <span class="tool-promo-icon">&#128172;</span>
-          <div><div class="tool-promo-title">Try Pixel Phrases!</div><div class="tool-promo-sub">Collect rare words as your art grows &rarr;</div></div>
+        <div class="tool-promo-chip" onclick="showPage('diary')">
+          <span class="tool-promo-icon">&#128214;</span>
+          <div><div class="tool-promo-title">Try Pixel Diary!</div><div class="tool-promo-sub">Turn your collected words into a living scrapbook &rarr;</div></div>
         </div>
       </div>
     </div>
@@ -1927,14 +1932,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <!-- PIXEL TOOL PAGE -->
 <div class="page" id="page-tool">
 <div class="tool-page">
-  <div class="tool-hero">
-    <div class="wrap tool-hero-inner">
-      <div>
-        <h1>Pixel <span class="accent">tool</span></h1>
-        <p>Upload any image, choose your format and resolution, control the generation speed &mdash; then watch it pixelate in real time and download it in high quality.</p>
-      </div>
-    </div>
-  </div>
   <div class="tool-controls-section">
     <div class="wrap">
       <div class="tool-grid">
@@ -2004,14 +2001,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <!-- PIXEL WATERER PAGE -->
 <div class="page" id="page-waterer">
 <div class="tool-page">
-  <div class="tool-hero">
-    <div class="wrap tool-hero-inner">
-      <div>
-        <h1>Pixel <span class="accent">waterer</span></h1>
-        <p>Upload any image and watch it grow day by day. Reveal today&rsquo;s hidden colors once per day to earn coins &mdash; and spend Holy Water to recover past days you missed. Once fully generated, download the image and receive a Pre-certificate! (which is only for testing!)</p>
-      </div>
-    </div>
-  </div>
   <div class="tool-controls-section">
     <div class="wrap">
 
@@ -2137,15 +2126,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <!-- PIXEL PHRASES PAGE -->
 <div class="page" id="page-phrases">
 <div class="tool-page">
-  <div class="tool-hero">
-    <div class="wrap tool-hero-inner">
-      <div>
-        <h1>Pixel <span class="accent">phrases</span></h1>
-        <p>Upload any image and watch it grow day by day. Each day you reveal a unique phrase and collect rare words &mdash; build your personal inventory as your pixel art settles.</p>
-      </div>
-    </div>
-  </div>
-
   <div class="tool-controls-section">
     <div class="wrap">
 
@@ -2326,15 +2306,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 <!-- PIXEL DIARY PAGE (clone of Pixel phrases) -->
 <div class="page" id="page-diary">
 <div class="tool-page">
-  <div class="tool-hero">
-    <div class="wrap tool-hero-inner">
-      <div>
-        <h1>Pixel <span class="accent">diary</span></h1>
-        <p>Open your diary and turn it into a scrapbook of everything you've collected. Drag your collected words and phrases onto the page like stickers, arrange them however you like, and flip through as many pages as you want.</p>
-      </div>
-    </div>
-  </div>
-
   <div class="tool-controls-section">
     <div class="wrap">
 
@@ -3763,7 +3734,6 @@ const pdPalabrasClave=[...pdCategorias.common,...pdCategorias.rare,...pdCategori
 
 function pdRarezaAleatoria(){const r=Math.random();if(r<0.01)return'legendary';if(r<0.20)return'rare';return'common';}
 function pdColorRareza(p){if(pdCategorias.legendary.includes(p))return'rgb(240,64,64)';if(pdCategorias.rare.includes(p))return'rgb(255,145,34)';return'rgb(151,151,151)';}
-function pdRarezaDe(p){if(pdCategorias.legendary.includes(p))return'legendary';if(pdCategorias.rare.includes(p))return'rare';return'common';}
 
 // ── Toggle controls (mirrors wtToggleControls) ──
 function pdToggleControls(){
@@ -4270,12 +4240,24 @@ function pdCloseInventory(){
 }
 
 let pdStickerPanelInitialized=false;
+// The 🎨 button does double duty: on the cover it edits title/subtitle,
+// on interior pages it opens the word/phrase picker.
+function pdToggleStickerOrText(){
+  if(!pdZineBook) return;
+  const spreads=pdZineBook.getSpreads();
+  const spread=spreads[pdZineBook.getSpreadIndex()]||{left:null,right:null};
+  const isCover = spread.left===null && spread.right===0;
+  if(isCover) pdToggleCoverText();
+  else pdToggleStickerPicker();
+}
+
 function pdToggleStickerPicker(){
   const panel=document.getElementById('pdStickerPanel');
   if(!panel) return;
   const isOpen = panel.style.display==='flex';
   if(!isOpen){
     if(pdEditingPage===null) pdEnterEditMode();
+    pdShowWordsPhrasesPanelBody();
     pdRenderPicker();
     panel.classList.remove('pd-panel-closing');
     panel.style.display='flex';
@@ -4302,6 +4284,7 @@ function pdMakeStickerPanelDraggable(){
     if(e.target.closest('.pd-sticker-panel-close')) return;
     e.preventDefault();
     const rect=panel.getBoundingClientRect();
+    panel.style.transform='none';
     panel.style.left=rect.left+'px';
     panel.style.top=rect.top+'px';
     const startX=e.clientX, startY=e.clientY;
@@ -4330,14 +4313,20 @@ function pdMakeDiaryDraggable(){
   const shell=document.getElementById('pdZineShell');
   const floatEl=document.getElementById('pdDiaryFloat');
   if(!shell||!floatEl) return;
-  const DRAG_THRESHOLD=6;
+  const DRAG_THRESHOLD=10;
+  // Kept clear of both edges — that's ZineJS's own edge-click-to-flip
+  // zone (clickZoneSize:34 in the init config below), and letting drag-
+  // detection also listen there was intercepting page-turn clicks (even a
+  // click with a few pixels of natural hand tremor could get misread as a
+  // drag and block the flip). Margin is 34 + a comfortable buffer.
+  const EDGE_MARGIN=50;
   shell.addEventListener('pointerdown', function(e){
     if(pdEditingPage!==null) return;
     const r=shell.getBoundingClientRect();
     const isCover=shell.classList.contains('pd-book-cover');
     const visLeft = isCover ? r.left + r.width*0.25 : r.left;
     const visRight = isCover ? r.left + r.width*0.75 : r.right;
-    if(e.clientX<visLeft || e.clientX>visRight || e.clientY<r.top || e.clientY>r.bottom) return;
+    if(e.clientX<visLeft+EDGE_MARGIN || e.clientX>visRight-EDGE_MARGIN || e.clientY<r.top || e.clientY>r.bottom) return;
 
     const startX=e.clientX, startY=e.clientY;
     const floatRect=floatEl.getBoundingClientRect();
@@ -4414,6 +4403,8 @@ document.addEventListener('keydown', function(e){
   if(!floatEl || !floatEl.classList.contains('pd-diary-open')) return;
   const tag=(e.target && e.target.tagName || '').toLowerCase();
   if(tag==='input' || tag==='textarea') return;
+  if(e.target && e.target.isContentEditable) return;
+  if(pdEditingPage!==null) return;
   const key=e.key.toLowerCase();
   if(key==='q') pdBookTurn(-1);
   else if(key==='e') pdBookTurn(1);
@@ -4576,7 +4567,41 @@ function pdBakePageImage(pageIndex){
     ctx.font='700 20px Cairo, sans-serif';
     ctx.textAlign='center';
     ctx.textBaseline='middle';
-    if(st.kind==='word'){
+    if(st.kind==='text'){
+      const fontMap={sans:'Cairo, sans-serif', serif:"'Playfair Display', Georgia, serif", script:"'Dancing Script', cursive"};
+      const fam=fontMap[st.font]||fontMap.sans;
+      const weight = st.weight||800;
+      const fontSize=28;
+      ctx.font=weight+' '+fontSize+'px '+fam;
+      ctx.fillStyle=st.color||'#000000';
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      // First split on explicit \n (Enter presses) — then, only if the
+      // user set an explicit wrap width via the dedicated width handle,
+      // further wrap each of those paragraphs at that width. Scaling the
+      // box via the resize handle never causes wrapping on its own.
+      const paragraphs=(st.text||'').split('\n');
+      let lines=paragraphs;
+      if(typeof st.maxWidth==='number'){
+        const maxW=st.maxWidth-16; // matches the live chip's 8px horizontal padding each side
+        lines=[];
+        paragraphs.forEach(function(p){
+          const words=p.split(' ');
+          let line='';
+          words.forEach(function(w){
+            const test=line?line+' '+w:w;
+            if(ctx.measureText(test).width>maxW && line){ lines.push(line); line=w; }
+            else line=test;
+          });
+          lines.push(line);
+        });
+      }
+      const lineH=fontSize*(st.lineHeight||1.25);
+      const totalH=lines.length*lineH;
+      lines.forEach(function(ln,i){
+        ctx.fillText(ln, 0, -totalH/2+lineH/2+i*lineH+1);
+      });
+    }else if(st.kind==='word'){
       const textW=ctx.measureText(st.text).width;
       const padX=18, h=40;
       const w=textW+padX*2;
@@ -4639,10 +4664,30 @@ function pdBakePageImage(pageIndex){
   // Thin, rounded black border baked right into the page itself, so the
   // flipbook reads as bordered pages regardless of how ZineJS sizes/
   // positions its own WebGL canvas relative to our outer container.
+  // Paired pages (everything except the cover, and an odd-length book's
+  // final page) only get the border on their outer 3 sides — the gutter-
+  // facing side is left unstroked by this same path, so the pair reads as
+  // one unified rectangle instead of two separate boxes. A second, thin
+  // straight stroke marks the gutter itself: a fold line, not a border —
+  // deliberately part of the same rendering pass, not a patch drawn over
+  // the seam.
   ctx.strokeStyle='#000';
   ctx.lineWidth=2;
-  pdRoundRectPath(ctx,1,1,W-2,H-2,14);
-  ctx.stroke();
+  const isLonePage = (pageIndex===0) || (pageIndex===totalPages-1 && (totalPages-1)%2===1);
+  if(isLonePage){
+    pdRoundRectPath(ctx,1,1,W-2,H-2,14);
+    ctx.stroke();
+  }else{
+    const omitSide = pdPageSide(pageIndex)==='left' ? 'right' : 'left';
+    pdPageBorderPath(ctx,1,1,W-2,H-2,14,omitSide);
+    ctx.stroke();
+    ctx.strokeStyle='#4B5563';
+    ctx.lineWidth=1;
+    ctx.beginPath();
+    const gutterX = omitSide==='right' ? W-1 : 1;
+    ctx.moveTo(gutterX,1); ctx.lineTo(gutterX,H-1);
+    ctx.stroke();
+  }
   return canvas.toDataURL('image/png');
 }
 function pdRoundRectPath(ctx,x,y,w,h,r){
@@ -4653,6 +4698,30 @@ function pdRoundRectPath(ctx,x,y,w,h,r){
   ctx.arcTo(x,y+h,x,y,r);
   ctx.arcTo(x,y,x+w,y,r);
   ctx.closePath();
+}
+
+// Same idea, but for a page that's paired with a neighbor: rounds only
+// the two OUTER corners and leaves the inner (gutter) edge completely
+// unstroked (an open path, never closed across that side) — so the pair
+// reads as one unified rectangle with rounded outer corners, not two
+// separate boxes meeting in the middle.
+function pdPageBorderPath(ctx,x,y,w,h,r,omitSide){
+  ctx.beginPath();
+  if(omitSide==='right'){
+    ctx.moveTo(x+w,y);
+    ctx.lineTo(x+r,y);
+    ctx.arcTo(x,y,x,y+r,r);
+    ctx.lineTo(x,y+h-r);
+    ctx.arcTo(x,y+h,x+r,y+h,r);
+    ctx.lineTo(x+w,y+h);
+  }else{
+    ctx.moveTo(x,y);
+    ctx.lineTo(x+w-r,y);
+    ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w,y+h-r);
+    ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x,y+h);
+  }
 }
 
 
@@ -4677,6 +4746,7 @@ function pdBuildZine(startPage){
     deepLink:false,
     zoom:{enabled:false},
     clickToFlip:'edge',
+    clickZoneSize:34,
     startPage:Math.max(0,Math.min(startPage||0,urls.length-1)),
   });
   pdZineBook.on('pageChanged', function(){ pdSuppressLayoutSync=false; pdSyncBookLayout(); });
@@ -4722,9 +4792,14 @@ function pdSyncBookLayout(){
   // lone page's own edge is, matching ZineJS's own built-in centering.
   if(shell) shell.classList.toggle('pd-book-cover', isLoneSpread);
 
-  // Stickers only belong on interior pages — hidden entirely on the true
-  // cover specifically (an odd book's lone last page still gets stickers).
-  if(stickerBtn) stickerBtn.style.display = isCover ? 'none' : 'flex';
+  // The 🎨 button now does double duty: word/phrase picker on interior
+  // pages, title/subtitle editor on the cover — always visible either
+  // way, so its position just animates smoothly between the two spots
+  // like every other button, instead of popping in/out abruptly.
+  if(stickerBtn){
+    stickerBtn.style.display='flex';
+    stickerBtn.title = isCover ? 'Edit title/subtitle' : 'Add stickers';
+  }
 
   // New page: only appears once there's nowhere left to flip forward to —
   // disappears again the moment there are more pages ahead. Not shown
@@ -4732,8 +4807,7 @@ function pdSyncBookLayout(){
   if(newPageBtn) newPageBtn.style.display = (pdEditingPage===null && !pdZineBook.canFlipNext()) ? 'flex' : 'none';
 
   if(pdEditingPage!==null){
-    const box=pdZineBook.getPageBox();
-    if(box) pdPositionEditPages(box);
+    pdPositionEditPages();
   }
 }
 
@@ -4741,13 +4815,20 @@ function pdSyncBookLayout(){
 // border) to match the box exactly, then fits the page slot(s) inside it
 // with simple percentages — one centered slot for the cover, or a
 // left/right pair for a spread. Never two separate bordered boxes.
-function pdPositionEditPages(box){
+function pdPositionEditPages(){
   const spreads=pdZineBook.getSpreads();
   const spread=spreads[pdZineBook.getSpreadIndex()];
   if(!spread) return;
+  const shell=document.getElementById('pdZineShell');
   const overlay=document.getElementById('pdEditOverlay');
   const leftEl=document.getElementById('pdEditPageLeft');
   const rightEl=document.getElementById('pdEditPageRight');
+  if(!shell) return;
+  const isLone=shell.classList.contains('pd-book-cover');
+  const shellW=shell.clientWidth, shellH=shell.clientHeight;
+  const box = isLone
+    ? {x:shellW*0.25, y:0, width:shellW*0.5, height:shellH}
+    : {x:0, y:0, width:shellW, height:shellH};
   if(overlay){
     overlay.style.left=box.x+'px'; overlay.style.top=box.y+'px';
     overlay.style.width=box.width+'px'; overlay.style.height=box.height+'px';
@@ -4761,6 +4842,7 @@ function pdPositionEditPages(box){
     onlyEl.style.display='block';
     onlyEl.style.left='0'; onlyEl.style.top='0';
     onlyEl.style.width='100%'; onlyEl.style.height='100%';
+    onlyEl.style.borderRight='none';
     const dotSize=Math.round((box.width/600)*22*10)/10;
     onlyEl.style.backgroundSize=dotSize+'px '+dotSize+'px';
   }else{
@@ -4769,6 +4851,9 @@ function pdPositionEditPages(box){
     leftEl.style.width='50%'; leftEl.style.height='100%';
     rightEl.style.left='50%'; rightEl.style.top='0';
     rightEl.style.width='50%'; rightEl.style.height='100%';
+    // Same fold line as the canvas baking (1px, #4B5563) — structurally
+    // part of the left page's own edge, not an overlay drawn on top.
+    leftEl.style.borderRight='1px solid #4B5563';
     const dotSize=Math.round((box.width/2/600)*22*10)/10;
     leftEl.style.backgroundSize=dotSize+'px '+dotSize+'px';
     rightEl.style.backgroundSize=dotSize+'px '+dotSize+'px';
@@ -4778,12 +4863,12 @@ function pdPositionEditPages(box){
 // Edit mode is reached only through the sticker-picker button (not by
 // tapping the page) — it opens for whichever spread ZineJS is currently
 // showing, at that same existing size and position (no zoom).
-function pdEnterEditMode(){
+function pdEnterEditMode(allowCover){
   if(!pdZineBook) return;
   const spreads=pdZineBook.getSpreads();
   const spread=spreads[pdZineBook.getSpreadIndex()];
   if(!spread) return;
-  if(spread.left===null && spread.right===0) return; // the cover: no editing, no stickers
+  if(spread.left===null && spread.right===0 && !allowCover) return; // the cover: no sticker editing (title/subtitle is a separate, allowed path)
   pdEditingSpread=spread;
   if(spread.left!==null && !pdBook.pages[spread.left]) pdBook.pages[spread.left]={stickers:[]};
   if(spread.right!==null && !pdBook.pages[spread.right]) pdBook.pages[spread.right]={stickers:[]};
@@ -4794,6 +4879,116 @@ function pdEnterEditMode(){
   if(doneBtn) doneBtn.style.display='flex';
   pdRenderEditPage();
   pdSyncBookLayout();
+}
+
+// Entry point for the 🎨 button on the cover: opens the "add text" tool
+// instead of the word/phrase picker. No text boxes are created up front —
+// the user adds as many as they want, each starting with placeholder text
+// they click into and replace.
+function pdToggleCoverText(){
+  if(!pdZineBook) return;
+  if(pdEditingPage===null){
+    pdEnterEditMode(true);
+    pdShowCoverTextPanelBody();
+    const panel=document.getElementById('pdStickerPanel');
+    if(panel){
+      panel.classList.remove('pd-panel-closing');
+      panel.style.display='flex';
+      if(!pdStickerPanelInitialized){
+        pdMakeStickerPanelDraggable();
+        pdStickerPanelInitialized=true;
+      }
+    }
+  }else{
+    pdExitEditMode();
+  }
+}
+
+// Swaps the shared floating panel's body between the words/phrases picker
+// and the cover text tool, so the same window is reused for both rather
+// than building a second, separate popup.
+function pdShowWordsPhrasesPanelBody(){
+  const toggle=document.querySelector('.pd-picker-toggle');
+  const list=document.getElementById('pdPickerList');
+  const textPanel=document.getElementById('pdCoverTextPanel');
+  if(toggle) toggle.style.display='flex';
+  if(list) list.style.display='';
+  if(textPanel) textPanel.style.display='none';
+}
+function pdShowCoverTextPanelBody(){
+  const toggle=document.querySelector('.pd-picker-toggle');
+  const list=document.getElementById('pdPickerList');
+  const textPanel=document.getElementById('pdCoverTextPanel');
+  if(toggle) toggle.style.display='none';
+  if(list) list.style.display='none';
+  if(textPanel) textPanel.style.display='block';
+}
+
+// Adds a new, freely-placed text box to the cover — offset a little from
+// the last one so several in a row don't start out perfectly stacked —
+// and selects it immediately so the font buttons and resize handle are
+// ready to use right away.
+function pdAddCoverTextBox(){
+  if(!pdBook.pages[0]) pdBook.pages[0]={stickers:[]};
+  const stickers=pdBook.pages[0].stickers;
+  const count=stickers.filter(function(s){return s.kind==='text';}).length;
+  const id='pd-text-'+Date.now()+'-'+Math.floor(Math.random()*1000);
+  stickers.push({id:id, kind:'text', text:'Text', font:'sans', x:50, y:Math.min(85,28+count*12), rot:0, scale:1});
+  pdSaveBook();
+  pdRenderEditPage();
+  const el=document.querySelector('[data-sticker-id="'+id+'"]');
+  if(el) pdSelectSticker(el);
+}
+
+// Applies a font to whichever text box is currently selected.
+function pdSetSelectedTextFont(font){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  st.font=font;
+  pdSaveBook();
+  pdRenderEditPage();
+  const el=document.querySelector('[data-sticker-id="'+id+'"]');
+  if(el) pdSelectSticker(el);
+}
+
+// Weight/line-height/color update the live element directly (no full
+// re-render) so dragging the slider or native color picker feels instant
+// instead of rebuilding every sticker on the page each tick.
+function pdSetSelectedTextWeight(weight){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  st.weight=weight;
+  const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
+  if(inner) inner.style.fontWeight=weight;
+  pdSaveBook();
+}
+function pdSetSelectedTextLineHeight(value){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  st.lineHeight=parseFloat(value);
+  const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
+  if(inner) inner.style.lineHeight=st.lineHeight;
+  pdSaveBook();
+}
+function pdSetSelectedTextColor(color){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  st.color=color;
+  const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
+  if(inner) inner.style.color=color;
+  pdSaveBook();
 }
 
 function pdExitEditMode(){
@@ -4836,6 +5031,7 @@ function pdPageBackgroundClick(evt){
 
 function pdBuildPlacedSticker(st, pageIndex){
   if(typeof st.scale!=='number') st.scale=1;
+  const isCoverText = st.kind==='text';
   const el=document.createElement('div');
   el.className='pd-placed-sticker';
   el.setAttribute('data-sticker-id', st.id);
@@ -4843,8 +5039,7 @@ function pdBuildPlacedSticker(st, pageIndex){
   el.style.top=st.y+'%';
   el.style.transform='translate(-50%,-50%) rotate('+(st.rot||0)+'deg) scale('+st.scale+')';
   const inner=document.createElement('div');
-  inner.className='pd-sticker-chip pd-'+st.kind;
-  inner.textContent=st.text;
+  inner.className='pd-sticker-chip pd-'+st.kind+(isCoverText?' pd-font-'+(st.font||'sans'):'');
   if(st.kind==='word') inner.style.color=pdColorRareza(st.text);
   inner.style.cursor='inherit';
   // Anchor the live font size to the exact same 600px-wide reference frame
@@ -4857,31 +5052,85 @@ function pdBuildPlacedSticker(st, pageIndex){
     || (rightPageEl && rightPageEl.style.display!=='none' ? rightPageEl.offsetWidth : 0) || 0;
   const refWidth = editPageW || 300;
   const scaleFactor = refWidth/600;
-  inner.style.fontSize = (st.kind==='word' ? 20*scaleFactor : 16*scaleFactor)+'px';
+  if(st.kind==='text'){
+    inner.contentEditable='true';
+    inner.textContent=st.text;
+    inner.style.fontSize=(28*scaleFactor)+'px';
+    inner.style.fontWeight=st.weight||800;
+    inner.style.lineHeight=st.lineHeight||1.25;
+    inner.style.color=st.color||'#000000';
+    inner.spellcheck=false;
+    inner.addEventListener('input', function(){ st.text=inner.textContent; });
+    inner.addEventListener('blur', function(){ pdSaveBook(); });
+    // Enter should insert a real line break the same way the canvas will
+    // bake it — a plain \n text node (not a <br> element), so .textContent
+    // and the stored string always agree and white-space:pre-wrap renders
+    // it identically live.
+    inner.addEventListener('keydown', function(e){
+      if(e.key==='Enter'){
+        e.preventDefault();
+        const sel=window.getSelection();
+        if(sel && sel.rangeCount>0){
+          const range=sel.getRangeAt(0);
+          range.deleteContents();
+          const nl=document.createTextNode('\n');
+          range.insertNode(nl);
+          range.setStartAfter(nl);
+          range.setEndAfter(nl);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        // Update immediately rather than relying on a resulting input
+        // event — execCommand's cross-browser behavior for reporting
+        // this kind of edit isn't consistent enough to trust alone.
+        st.text=inner.textContent;
+        pdSaveBook();
+      }
+    });
+  }else{
+    inner.textContent=st.text;
+    inner.style.fontSize = (st.kind==='word' ? 20*scaleFactor : 16*scaleFactor)+'px';
+  }
   // Phrases wrap at a fixed line width (PD_PHRASE_BOX_W, in the 600px
   // reference) — resizing scales the whole phrase up/down like a word,
   // it doesn't reflow the text at a different width.
   if(st.kind==='phrase') inner.style.width=(PD_PHRASE_BOX_W*scaleFactor)+'px';
-  const rm=document.createElement('span');
-  rm.className='pd-sticker-remove';
-  rm.textContent='\u2715';
-  rm.onclick=function(e){
-    e.stopPropagation();
-    const page=pdBook.pages[pageIndex];
-    page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
-    pdSaveBook();
-    pdRenderEditPage();
-    pdRenderPicker();
-  };
+  if(isCoverText && typeof st.maxWidth==='number'){
+    inner.classList.add('pd-text-wrapped');
+    inner.style.width=(st.maxWidth*scaleFactor)+'px';
+  }
   const resizeHandle=document.createElement('span');
   resizeHandle.className='pd-sticker-handle pd-sticker-resize';
   resizeHandle.innerHTML='&#8690;';
+  let widthHandle=null;
+  if(isCoverText){
+    widthHandle=document.createElement('span');
+    widthHandle.className='pd-sticker-handle pd-sticker-width';
+    widthHandle.innerHTML='&#8596;';
+    widthHandle.title='Drag to set a wrap width';
+  }
   el.appendChild(inner);
-  el.appendChild(rm);
+  if(!isCoverText){
+    const rm=document.createElement('span');
+    rm.className='pd-sticker-remove';
+    rm.textContent='\u2715';
+    rm.onclick=function(e){
+      e.stopPropagation();
+      const page=pdBook.pages[pageIndex];
+      page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
+      pdSaveBook();
+      pdRenderEditPage();
+      pdRenderPicker();
+    };
+    el.appendChild(rm);
+  }
   el.appendChild(resizeHandle);
+  if(widthHandle) el.appendChild(widthHandle);
   el.addEventListener('pointerdown', function(){ pdSelectSticker(el); }, {capture:true});
-  pdMakePlacedDraggable(el, st, pageIndex);
+  if(isCoverText) pdMakeCoverTextDraggable(el, st, pageIndex);
+  else pdMakePlacedDraggable(el, st, pageIndex);
   pdMakeResizeRotatable(el, resizeHandle, st, pageIndex);
+  if(widthHandle) pdMakeTextWidthAdjustable(el, widthHandle, st, inner, scaleFactor);
   return el;
 }
 
@@ -4892,6 +5141,17 @@ function pdSelectSticker(el){
   if(pdSelectedStickerEl && pdSelectedStickerEl!==el) pdSelectedStickerEl.classList.remove('pd-selected');
   pdSelectedStickerEl=el;
   el.classList.add('pd-selected');
+  // Keep the line-height slider and custom color swatch showing this
+  // box's own current values, not whatever the last-selected box had.
+  const id=el.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(st && st.kind==='text'){
+    const slider=document.getElementById('pdLineHeightSlider');
+    if(slider) slider.value=st.lineHeight||1.25;
+    const colorInput=document.getElementById('pdColorCustom');
+    if(colorInput) colorInput.value=st.color||'#000000';
+  }
 }
 function pdDeselectSticker(){
   if(pdSelectedStickerEl) pdSelectedStickerEl.classList.remove('pd-selected');
@@ -4906,6 +5166,32 @@ function pdDeselectSticker(){
 // paragraph, and scaling the whole box used to hit the page's own bounds
 // awkwardly for wide phrases; resizing the box itself doesn't have that
 // problem, and the canvas baking mirrors it exactly (see pdBakePageImage).
+// Dedicated horizontal-only control for setting an explicit wrap width on
+// a text box — deliberately separate from the resize/rotate handle, so
+// scaling a text box bigger or smaller never triggers wrapping by itself.
+// Wrapping only ever happens once the user drags this handle.
+function pdMakeTextWidthAdjustable(el, handle, st, inner, scaleFactor){
+  handle.addEventListener('pointerdown', function(e){
+    e.preventDefault(); e.stopPropagation();
+    const startX=e.clientX;
+    const startWidth = typeof st.maxWidth==='number' ? st.maxWidth : (inner.offsetWidth/scaleFactor);
+    function move(ev){
+      const dx=(ev.clientX-startX)/scaleFactor;
+      let newWidth=Math.max(60, Math.min(560, startWidth+dx*2));
+      st.maxWidth=Math.round(newWidth);
+      inner.classList.add('pd-text-wrapped');
+      inner.style.width=(st.maxWidth*scaleFactor)+'px';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      pdSaveBook();
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
 function pdMakeResizeRotatable(el, handle, st, pageIndex){
   handle.addEventListener('pointerdown', function(e){
     e.preventDefault(); e.stopPropagation();
@@ -5008,6 +5294,43 @@ function pdMakeChipTappable(chip){
 // Unified gesture handler on each placed sticker: one finger repositions,
 // two fingers pinch to resize + rotate together — tracked via pointer
 // capture so multi-touch works reliably even off-element.
+// Title/subtitle need to support two different gestures on the same
+// element: a plain click should place a text cursor (normal contenteditable
+// behavior), while a press-and-drag should reposition the box — so unlike
+// the sticker drag handler, this never preventDefaults on pointerdown, and
+// only takes over once real movement crosses a small threshold.
+function pdMakeCoverTextDraggable(el, st, pageIndex){
+  const DRAG_THRESHOLD=10;
+  el.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.pd-sticker-handle')) return;
+    const startX=e.clientX, startY=e.clientY;
+    const startXPct=st.x, startYPct=st.y;
+    let dragging=false;
+    function move(ev){
+      const dx=ev.clientX-startX, dy=ev.clientY-startY;
+      if(!dragging){
+        if(Math.hypot(dx,dy)<DRAG_THRESHOLD) return;
+        dragging=true;
+        el.classList.add('pd-dragging');
+        if(document.activeElement && el.contains(document.activeElement)) document.activeElement.blur();
+      }
+      const pageEl=el.parentNode;
+      const r=pageEl.getBoundingClientRect();
+      const dxPct=dx/r.width*100, dyPct=dy/r.height*100;
+      st.x=Math.max(4,Math.min(96, startXPct+dxPct));
+      st.y=Math.max(4,Math.min(96, startYPct+dyPct));
+      el.style.left=st.x+'%'; el.style.top=st.y+'%';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      if(dragging){ el.classList.remove('pd-dragging'); pdSaveBook(); }
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
 function pdMakePlacedDraggable(el, st, pageIndex){
   const pointers={};
   let mode=null;
@@ -5469,7 +5792,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 
         <!-- These float on the shell too, and hide via JS based on the
              cover vs. a spread — but their base position is plain CSS. -->
-        <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerPicker()">&#127912;</button>
+        <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerOrText()">&#127912;</button>
         <button class="pd-edit-done-btn" id="pdEditDoneBtn" onclick="event.stopPropagation();pdExitEditMode()" style="display:none;">Done &#10003;</button>
         <button class="pd-flip-nav-btn pd-flip-nav-addpage" id="pdNewPageBtn" onclick="event.stopPropagation();pdAddPage()" title="New page" style="display:none;">&#43;</button>
       </div>
@@ -5483,13 +5806,39 @@ window.addEventListener('DOMContentLoaded',()=>{
 <div class="pd-sticker-panel" id="pdStickerPanel" style="display:none;">
   <div class="pd-sticker-panel-drag" id="pdStickerPanelDrag">
     <span class="pd-diary-drag-grip">&#8942;&#8942;</span>
-    <button class="pd-sticker-panel-close" onclick="pdToggleStickerPicker()">&#10005;</button>
+    <button class="pd-sticker-panel-close" onclick="pdToggleStickerOrText()">&#10005;</button>
   </div>
   <div class="pd-picker-toggle">
     <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
     <button class="pd-picker-tab" id="pdPickerTabPhrases" onclick="pdSetPickerView('phrases')">Phrases</button>
   </div>
   <div class="pd-picker-list pd-view-words" id="pdPickerList"></div>
+  <div class="pd-cover-text-panel" id="pdCoverTextPanel" style="display:none;">
+    <button class="pd-add-text-btn" onclick="pdAddCoverTextBox()">&#43; Add text box</button>
+    <div class="pd-cover-text-hint">Tap a text box to select it, then style it:</div>
+    <div class="pd-font-row">
+      <button class="pd-font-choice pd-font-sans" onclick="pdSetSelectedTextFont('sans')">Sans</button>
+      <button class="pd-font-choice pd-font-serif" onclick="pdSetSelectedTextFont('serif')">Serif</button>
+      <button class="pd-font-choice pd-font-script" onclick="pdSetSelectedTextFont('script')">Script</button>
+    </div>
+    <div class="pd-text-ctrl-label">Weight</div>
+    <div class="pd-font-row">
+      <button class="pd-weight-choice" style="font-weight:500;" onclick="pdSetSelectedTextWeight(500)">Regular</button>
+      <button class="pd-weight-choice" style="font-weight:700;" onclick="pdSetSelectedTextWeight(700)">Bold</button>
+      <button class="pd-weight-choice" style="font-weight:900;" onclick="pdSetSelectedTextWeight(900)">Black</button>
+    </div>
+    <div class="pd-text-ctrl-label">Line spacing</div>
+    <input type="range" class="pd-line-height-slider" id="pdLineHeightSlider" min="0.9" max="2.2" step="0.05" value="1.25" oninput="pdSetSelectedTextLineHeight(this.value)">
+    <div class="pd-text-ctrl-label">Color</div>
+    <div class="pd-color-row">
+      <button class="pd-color-swatch" style="background:#000000;" onclick="pdSetSelectedTextColor('#000000')" title="Black"></button>
+      <button class="pd-color-swatch" style="background:#0B84B8;" onclick="pdSetSelectedTextColor('#0B84B8')" title="Blue"></button>
+      <button class="pd-color-swatch" style="background:#4B5563;" onclick="pdSetSelectedTextColor('#4B5563')" title="Gray"></button>
+      <button class="pd-color-swatch" style="background:#DC2626;" onclick="pdSetSelectedTextColor('#DC2626')" title="Red"></button>
+      <button class="pd-color-swatch" style="background:#15803D;" onclick="pdSetSelectedTextColor('#15803D')" title="Green"></button>
+      <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" title="Custom color">
+    </div>
+  </div>
 </div>
 
 </body>
