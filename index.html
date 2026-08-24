@@ -1475,7 +1475,6 @@ footer .foot-tabs button:hover{color:var(--ink);}
 
 
 .pd-my-collection-btn{font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border:var(--bw) solid var(--ink);background:var(--blue);color:var(--ink);cursor:pointer;border-radius:var(--r1);transition:transform .12s,background .2s ease,opacity .7s cubic-bezier(.25,.7,.4,1) 2.25s;white-space:nowrap;position:relative;z-index:1;box-shadow:var(--s-sm);}
-.pd-my-collection-btn.pd-diary-is-open{background:#FCA5A5;}
 
 .pd-my-collection-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 
@@ -1514,7 +1513,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
    framing chrome: only the flipbook itself and its button row are
    visible. Draggable via a minimal transparent strip (grip + close),
    resizable/rotatable via handles attached right at the book's corner. */
-.pd-diary-float{position:fixed;top:6vh;left:50%;margin-left:-380px;z-index:9999;display:none;}
+/* Locks the page's own scroll while the diary is open — the sticker
+   panel's overflow-y:auto (set on .pd-sticker-panel itself) is untouched
+   by this, so it keeps scrolling internally if its content runs tall. */
+body.pd-diary-active{overflow:hidden;touch-action:none;}
+
+.pd-diary-float{position:fixed;top:6vh;left:50%;transform:translateX(-50%);z-index:9999;display:none;}
 .pd-diary-float.pd-diary-open{display:block;}
 
 .pd-diary-scale-wrap{position:relative;width:760px;transform-origin:top left;font-family:var(--font);}
@@ -1532,8 +1536,21 @@ footer .foot-tabs button:hover{color:var(--ink);}
    one pd-book-cover class and eased with a plain CSS transition. This
    needs no runtime measurement of ZineJS's internals at all — just the
    same fixed geometry ZineJS itself is built to produce. */
-.pd-zine-shell{position:relative;width:100%;aspect-ratio:420/297;overflow:visible;background:transparent;}
+.pd-zine-shell{position:relative;width:100%;aspect-ratio:420/297;overflow:visible;background:transparent;touch-action:none;}
+@media(max-width:640px){
+  /* 210 (one page) * 1.15 (adding the 15% peek) : 297 — matches
+     PD_MOBILE_PEEK exactly, so the shell's own shape fits the mobile
+     page-view's actual content instead of the desktop double-spread ratio. */
+  .pd-zine-shell{aspect-ratio:241.5/297;}
+}
 .pd-zine-container{position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
+.pd-mobile-page-view{display:none;}
+.pd-mobile-track{position:relative;height:100%;display:flex;}
+.pd-mobile-slide{flex-shrink:0;height:100%;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#fff;}
+@media(max-width:640px){
+  #pdZineContainer{display:none;}
+  .pd-mobile-page-view{display:block;position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
+}
 .pd-zine-container,.pd-zine-container *{outline:none;}
 
 /* Close + resize: stuck to the visible content's own corners — animating
@@ -1590,6 +1607,18 @@ footer .foot-tabs button:hover{color:var(--ink);}
   .pd-sticker-panel.pd-panel-closing{animation:pdPanelSlideOutMobile .2s ease forwards;}
 }
 @keyframes pdPanelSlideOutMobile{from{opacity:1;transform:translateX(-50%) translateY(0);}to{opacity:0;transform:translateX(-50%) translateY(14px);}}
+/* True bottom sheet on phones — anchored to the bottom edge instead of
+   floating centered, which sits much better alongside a virtual keyboard
+   and doesn't need to be dragged into a reachable spot in the first
+   place. Overrides the 900px tier's centered-popup treatment. */
+@media(max-width:640px){
+  .pd-sticker-panel{left:0;right:0;bottom:0;top:auto;transform:none;width:100%;max-width:100%;border-radius:16px 16px 0 0;border-bottom:none;max-height:70vh;animation:pdSheetSlideIn .25s cubic-bezier(.22,.75,.32,1) forwards;}
+  .pd-sticker-panel.pd-panel-closing{animation:pdSheetSlideOut .2s ease forwards;}
+  .pd-sticker-panel-drag{cursor:default;}
+  .pd-sticker-panel-drag .pd-diary-drag-grip{display:none;}
+}
+@keyframes pdSheetSlideIn{from{opacity:0;transform:translateY(100%);}to{opacity:1;transform:translateY(0);}}
+@keyframes pdSheetSlideOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(100%);}}
 @keyframes pdPanelSlideIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 @keyframes pdPanelSlideOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(14px);}}
 .pd-sticker-panel-drag{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-14px -14px 10px;padding:8px 10px;cursor:grab;touch-action:none;user-select:none;border-bottom:1px solid var(--dormant);}
@@ -1657,6 +1686,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
   .pd-diary-close{width:28px;height:28px;font-size:13px;}
   .pd-diary-resize-handle{width:30px;height:30px;font-size:14px;}
 }
+@media(max-width:400px){
+  .pd-diary-scale-wrap{width:95vw;}
+}
 @media(max-width:640px){
   .pd-sticker-picker-btn{width:26px;height:26px;font-size:13px;}
   .pd-edit-done-btn{font-size:10px;padding:5px 10px;}
@@ -1669,6 +1701,9 @@ footer .foot-tabs button:hover{color:var(--ink);}
   .pd-sticker-resize{bottom:-14px;right:-14px;}
   .pd-sticker-width{right:-14px;}
   .pd-placed-sticker .pd-sticker-remove{width:26px;height:26px;font-size:13px;top:-12px;right:-12px;}
+  /* Non-functional on mobile now (pdMakeDiaryResizable no-ops below this
+     width) — hidden rather than left as a dead control. */
+  .pd-diary-resize-handle{display:none;}
 }
 
 </style>
@@ -4163,12 +4198,15 @@ function pdOpenInventory(){
   if(!pdBook) pdBook=pdLoadBook();
   const floatEl=document.getElementById('pdDiaryFloat');
   if(!floatEl) return;
+  document.body.classList.add('pd-diary-active');
   floatEl.classList.add('pd-diary-open');
+  pdAnimateDiaryIn(floatEl);
   pdRenderPicker();
   pdBuildZine(0);
   if(!pdDiaryInitialized){
     pdMakeDiaryDraggable();
     pdMakeDiaryResizable();
+    pdMobileWireTaps();
     pdDiaryInitialized=true;
   }
   // Safety net: keeps the floating buttons correctly positioned even if a
@@ -4178,11 +4216,6 @@ function pdOpenInventory(){
   if(!pdBookLayoutInterval){
     pdBookLayoutInterval=setInterval(function(){ if(pdZineBook && !pdSuppressLayoutSync) pdSyncBookLayout(); }, 350);
   }
-  const triggerBtn=document.getElementById('pdCollectionTrigger');
-  const triggerLabel=document.getElementById('pdCollectionTriggerLabel');
-  if(triggerBtn) triggerBtn.classList.add('pd-diary-is-open');
-  if(triggerLabel) triggerLabel.textContent='Close';
-  pdAnimateDiaryIn(floatEl);
 }
 
 // Slides + fades the diary in from the page's left edge to roughly over
@@ -4190,22 +4223,31 @@ function pdOpenInventory(){
 // rest. Target position is measured live against the controls column's
 // real position, not a fixed guess.
 function pdAnimateDiaryIn(floatEl){
-  const controlsCol=document.getElementById('pdControlsCol');
   const fRect=floatEl.getBoundingClientRect();
   let targetLeft, targetTop;
-  if(controlsCol){
-    const cRect=controlsCol.getBoundingClientRect();
-    targetLeft=cRect.left+cRect.width/2-fRect.width/2;
-    targetTop=Math.max(20, cRect.top);
+  if(pdIsMobile()){
+    // Mobile: simply centered, viewport-controlled — not "positioned
+    // over the controls column," a desktop-only concept that doesn't
+    // apply once the diary isn't a draggable floating object anymore.
+    targetLeft=window.innerWidth/2-fRect.width/2;
+    targetTop=window.innerHeight*0.04;
   }else{
-    targetLeft=window.innerWidth*0.12;
-    targetTop=window.innerHeight*0.08;
+    const controlsCol=document.getElementById('pdControlsCol');
+    if(controlsCol){
+      const cRect=controlsCol.getBoundingClientRect();
+      targetLeft=cRect.left+cRect.width/2-fRect.width/2;
+      targetTop=Math.max(20, cRect.top);
+    }else{
+      targetLeft=window.innerWidth*0.12;
+      targetTop=window.innerHeight*0.08;
+    }
   }
   // Starts off-screen below the actual viewport (window.innerHeight — the
   // computer screen itself, not the page's full scrollable height), and
   // rises straight up to its resting spot near the top, over the controls.
   const startTop=window.innerHeight+40;
   floatEl.style.transition='none';
+  floatEl.style.transform='none';
   floatEl.style.margin='0';
   floatEl.style.left=targetLeft+'px';
   floatEl.style.top=startTop+'px';
@@ -4218,6 +4260,7 @@ function pdAnimateDiaryIn(floatEl){
 }
 
 function pdCloseInventory(){
+  document.body.classList.remove('pd-diary-active');
   const floatEl=document.getElementById('pdDiaryFloat');
   if(floatEl && floatEl.classList.contains('pd-diary-open')){
     // Slide + fade back down to the bottom of the viewport, same path in
@@ -4233,10 +4276,6 @@ function pdCloseInventory(){
   if(panel) panel.style.display='none';
   if(pdEditingPage!==null) pdExitEditMode();
   if(pdBookLayoutInterval){ clearInterval(pdBookLayoutInterval); pdBookLayoutInterval=null; }
-  const triggerBtn=document.getElementById('pdCollectionTrigger');
-  const triggerLabel=document.getElementById('pdCollectionTriggerLabel');
-  if(triggerBtn) triggerBtn.classList.remove('pd-diary-is-open');
-  if(triggerLabel) triggerLabel.innerHTML='&#128214; My diary';
 }
 
 let pdStickerPanelInitialized=false;
@@ -4277,6 +4316,7 @@ function pdToggleStickerPicker(){
 // Dragging the sticker panel by its own strip — an independent floating
 // window, not tied to the diary's position, movable anywhere on screen.
 function pdMakeStickerPanelDraggable(){
+  if(pdIsMobile()) return;
   const handle=document.getElementById('pdStickerPanelDrag');
   const panel=document.getElementById('pdStickerPanel');
   if(!handle||!panel) return;
@@ -4309,7 +4349,159 @@ function pdMakeStickerPanelDraggable(){
 // beside a centered cover. A small movement threshold distinguishes a
 // genuine drag from a plain tap, so ZineJS's own click-to-flip still works
 // normally when the pointer barely moves. Not available while editing.
+// Mobile gets a fundamentally different interaction model for the diary
+// panel — not a scaled-down version of desktop's. On mobile the diary is
+// fully viewport-controlled: no drag, no manual resize, no rotation. That
+// removes the whole compound-transform system (scale + rotate + drag)
+// that desktop relies on, which is also the most likely source of sizing
+// inconsistencies when combined with the edit overlay on a small screen.
+function pdIsMobile(){ return window.innerWidth<=640; }
+
+// ── Mobile page view: an independent, single-page-at-a-time renderer with
+// a peeking sliver of the next page — deliberately separate from ZineJS's
+// own spread/cover model, which is built around full page-curl spreads,
+// not a "peek and slide" interaction. ZineJS still mounts underneath
+// (hidden via CSS) so all of its existing desktop logic keeps working
+// completely unmodified; this reads the very same pdBook data and the
+// very same pdBakePageImage() output, just displays it differently. ──
+let pdMobileCurrentPage=0;
+let pdMobileAnimating=false;
+let pdBakedPageUrlsCache=null;
+const PD_MOBILE_PEEK=0.15; // the next page peeks in at 15% of the main page's own width
+
+function pdMobilePageUrl(idx){
+  if(pdBakedPageUrlsCache && pdBakedPageUrlsCache[idx]!==undefined) return pdBakedPageUrlsCache[idx];
+  return pdBakePageImage(idx);
+}
+
+function pdMobileMainSlideWidth(){
+  const view=document.getElementById('pdMobilePageView');
+  if(!view) return 0;
+  return view.clientWidth/(1+PD_MOBILE_PEEK);
+}
+
+// Repaints both slides at the current page and syncs the 🎨/Done buttons
+// to the current slide's own edge — called after every navigation, edit,
+// or rebuild. Resets the track's transform instantly (no visible jump,
+// since the freshly-painted content matches the reset position).
+function pdMobileRenderPageView(){
+  if(!pdIsMobile()) return;
+  const view=document.getElementById('pdMobilePageView');
+  const track=document.getElementById('pdMobileTrack');
+  const curSlide=document.getElementById('pdMobileSlideCurrent');
+  const nextSlide=document.getElementById('pdMobileSlideNext');
+  if(!view||!track||!curSlide||!nextSlide||!pdBook) return;
+  const total=pdBook.pages.length;
+  pdMobileCurrentPage=Math.max(0,Math.min(total-1,pdMobileCurrentPage));
+  const mainW=pdMobileMainSlideWidth();
+  track.style.transition='none';
+  track.style.transform='translateX(0)';
+  curSlide.style.width=mainW+'px';
+  nextSlide.style.width=mainW+'px';
+  curSlide.style.backgroundImage="url('"+pdMobilePageUrl(pdMobileCurrentPage)+"')";
+  if(pdMobileCurrentPage<total-1){
+    nextSlide.style.backgroundImage="url('"+pdMobilePageUrl(pdMobileCurrentPage+1)+"')";
+  }else{
+    nextSlide.style.backgroundImage='none';
+  }
+  void track.offsetWidth; // force reflow before re-enabling transition, so a later animated move doesn't pick up this reset
+  track.style.transition='';
+  pdMobileSyncUI();
+}
+
+// Advance: the classic "peek becomes the new current" slide — animates by
+// repositioning the track exactly one main-slide-width to the left, not
+// by recalculating any size, matching the spec directly.
+function pdMobileGoNext(){
+  if(pdMobileAnimating||pdEditingPage!==null) return;
+  if(!pdBook||pdMobileCurrentPage>=pdBook.pages.length-1) return;
+  pdMobileAnimating=true;
+  const track=document.getElementById('pdMobileTrack');
+  const mainW=pdMobileMainSlideWidth();
+  track.style.transition='transform .38s cubic-bezier(.22,.75,.32,1)';
+  track.style.transform='translateX(-'+mainW+'px)';
+  setTimeout(function(){
+    pdMobileCurrentPage++;
+    pdMobileAnimating=false;
+    pdMobileRenderPageView();
+  }, 380);
+}
+
+// Back: no mirrored peek is kept on the left (the spec only describes one
+// on the right), so this is a quick cross-fade rather than a slide — still
+// a deliberate transition, not an instant cut, matching "una pequeña
+// animación" from the spec.
+function pdMobileGoPrev(){
+  if(pdMobileAnimating||pdEditingPage!==null) return;
+  if(pdMobileCurrentPage<=0) return;
+  pdMobileAnimating=true;
+  const view=document.getElementById('pdMobilePageView');
+  if(view) view.style.transition='opacity .18s ease';
+  if(view) view.style.opacity='0';
+  setTimeout(function(){
+    pdMobileCurrentPage--;
+    pdMobileRenderPageView();
+    if(view) view.style.opacity='1';
+    pdMobileAnimating=false;
+  }, 180);
+}
+
+// The two tap zones from the spec: the fully-visible current page goes
+// back, the partially-visible peek advances. Wired once — the slides
+// themselves are repainted in place, never recreated, so this listener
+// stays valid across every render.
+function pdMobileWireTaps(){
+  const curSlide=document.getElementById('pdMobileSlideCurrent');
+  const nextSlide=document.getElementById('pdMobileSlideNext');
+  if(curSlide) curSlide.addEventListener('click', function(){
+    if(pdEditingPage!==null) return;
+    pdMobileGoPrev();
+  });
+  if(nextSlide) nextSlide.addEventListener('click', function(){
+    if(pdEditingPage!==null) return;
+    pdMobileGoNext();
+  });
+  let resizeT;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeT);
+    resizeT=setTimeout(function(){
+      const floatEl=document.getElementById('pdDiaryFloat');
+      if(!floatEl || !floatEl.classList.contains('pd-diary-open')) return;
+      if(pdIsMobile()) pdMobileRenderPageView();
+    }, 150);
+  }, {passive:true});
+}
+
+// Positions the 🎨/Done buttons against the current slide's own right
+// edge instead of the full shell — the spec's point that these should
+// visually belong to the active page, not a fixed shell-relative spot.
+function pdMobileSyncUI(){
+  if(!pdIsMobile()) return;
+  const view=document.getElementById('pdMobilePageView');
+  if(!view) return;
+  const mainW=pdMobileMainSlideWidth();
+  const rightGap=view.clientWidth-mainW;
+  const stickerBtn=document.getElementById('pdStickerPickerBtn');
+  const doneBtn=document.getElementById('pdEditDoneBtn');
+  const newPageBtn=document.getElementById('pdNewPageBtn');
+  const closeBtn=document.getElementById('pdDiaryCloseBtn');
+  const isCover = pdMobileCurrentPage===0;
+  if(stickerBtn){
+    stickerBtn.style.right=(rightGap+8)+'px';
+    stickerBtn.style.display='flex';
+    stickerBtn.title = isCover ? 'Edit title/subtitle' : 'Add stickers';
+  }
+  if(doneBtn) doneBtn.style.right=(rightGap+48)+'px';
+  if(newPageBtn){
+    newPageBtn.style.right=(rightGap+8)+'px';
+    const isLast = pdBook && pdMobileCurrentPage>=pdBook.pages.length-1;
+    newPageBtn.style.display = (pdEditingPage===null && isLast) ? 'flex' : 'none';
+  }
+  if(closeBtn) closeBtn.style.left='0px';
+}
+
 function pdMakeDiaryDraggable(){
+  if(pdIsMobile()) return;
   const shell=document.getElementById('pdZineShell');
   const floatEl=document.getElementById('pdDiaryFloat');
   if(!shell||!floatEl) return;
@@ -4318,8 +4510,13 @@ function pdMakeDiaryDraggable(){
   // zone (clickZoneSize:34 in the init config below), and letting drag-
   // detection also listen there was intercepting page-turn clicks (even a
   // click with a few pixels of natural hand tremor could get misread as a
-  // drag and block the flip). Margin is 34 + a comfortable buffer.
-  const EDGE_MARGIN=50;
+  // drag and block the flip). A finger is much wider than a cursor, so
+  // this margin is generous rather than the bare minimum above 34.
+  const EDGE_MARGIN=64;
+  // Keeps at least this many px of the panel on-screen on every edge, so
+  // it can never be dragged somewhere the user can no longer reach it —
+  // especially easy to do by accident on a small touch screen.
+  const VISIBLE_MARGIN=60;
   shell.addEventListener('pointerdown', function(e){
     if(pdEditingPage!==null) return;
     const r=shell.getBoundingClientRect();
@@ -4331,6 +4528,7 @@ function pdMakeDiaryDraggable(){
     const startX=e.clientX, startY=e.clientY;
     const floatRect=floatEl.getBoundingClientRect();
     const startLeft=floatRect.left, startTop=floatRect.top;
+    const panelW=floatRect.width, panelH=floatRect.height;
     let dragging=false;
 
     function move(ev){
@@ -4339,13 +4537,16 @@ function pdMakeDiaryDraggable(){
         if(Math.hypot(dx,dy)<DRAG_THRESHOLD) return;
         dragging=true;
         floatEl.style.transition='none';
+        floatEl.style.transform='none';
         floatEl.style.left=startLeft+'px';
         floatEl.style.top=startTop+'px';
         floatEl.style.margin='0';
       }
       ev.stopImmediatePropagation();
-      floatEl.style.left=(startLeft+dx)+'px';
-      floatEl.style.top=(startTop+dy)+'px';
+      const minLeft=VISIBLE_MARGIN-panelW, maxLeft=window.innerWidth-VISIBLE_MARGIN;
+      const minTop=0, maxTop=window.innerHeight-VISIBLE_MARGIN;
+      floatEl.style.left=Math.max(minLeft,Math.min(maxLeft,startLeft+dx))+'px';
+      floatEl.style.top=Math.max(minTop,Math.min(maxTop,startTop+dy))+'px';
     }
     function up(ev){
       document.removeEventListener('pointermove', move, true);
@@ -4364,10 +4565,12 @@ function pdMakeDiaryDraggable(){
 let pdDiaryScale=1;
 let pdDiaryRotation=0;
 function pdMakeDiaryResizable(){
+  if(pdIsMobile()) return;
   const handle=document.getElementById('pdDiaryResizeHandle');
   const scaleWrap=document.getElementById('pdDiaryScaleWrap');
   const bookWrap=document.getElementById('pdBookWrap');
-  if(!handle||!scaleWrap||!bookWrap) return;
+  const floatEl=document.getElementById('pdDiaryFloat');
+  if(!handle||!scaleWrap||!bookWrap||!floatEl) return;
   handle.addEventListener('pointerdown', function(e){
     e.preventDefault(); e.stopPropagation();
     const r=bookWrap.getBoundingClientRect();
@@ -4384,8 +4587,29 @@ function pdMakeDiaryResizable(){
       scaleWrap.style.transform='scale('+newScale+')';
 
       const angle=Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI;
-      pdDiaryRotation=Math.round(startRotation+(angle-startAngle));
+      let rot=startRotation+(angle-startAngle);
+      // A few degrees of drift is very likely just finger imprecision
+      // while the intent was purely to resize — snap back to the
+      // starting angle instead of applying a tiny accidental tilt.
+      if(Math.abs(rot-startRotation)<4) rot=startRotation;
+      pdDiaryRotation=Math.round(rot);
       bookWrap.style.transform='rotate('+pdDiaryRotation+'deg)';
+
+      // Scaling up can push the panel — and this very handle — past the
+      // viewport edge. Nudge the position back so it stays reachable.
+      const fr=floatEl.getBoundingClientRect();
+      let dxAdj=0, dyAdj=0;
+      if(fr.right>window.innerWidth) dxAdj=window.innerWidth-fr.right;
+      if(fr.bottom>window.innerHeight) dyAdj=window.innerHeight-fr.bottom;
+      if(fr.left<0) dxAdj=Math.max(dxAdj,-fr.left);
+      if(fr.top<0) dyAdj=Math.max(dyAdj,-fr.top);
+      if(dxAdj||dyAdj){
+        const curLeft=parseFloat(floatEl.style.left);
+        const curTop=parseFloat(floatEl.style.top);
+        floatEl.style.left=((isNaN(curLeft)?fr.left:curLeft)+dxAdj)+'px';
+        floatEl.style.top=((isNaN(curTop)?fr.top:curTop)+dyAdj)+'px';
+        floatEl.style.margin='0';
+      }
     }
     function up(){
       document.removeEventListener('pointermove', move);
@@ -4406,6 +4630,11 @@ document.addEventListener('keydown', function(e){
   if(e.target && e.target.isContentEditable) return;
   if(pdEditingPage!==null) return;
   const key=e.key.toLowerCase();
+  if(pdIsMobile()){
+    if(key==='q') pdMobileGoPrev();
+    else if(key==='e') pdMobileGoNext();
+    return;
+  }
   if(key==='q') pdBookTurn(-1);
   else if(key==='e') pdBookTurn(1);
 });
@@ -4736,6 +4965,7 @@ function pdBuildZine(startPage){
   if(pdZineBook){ try{ pdZineBook.destroy(); }catch(e){} pdZineBook=null; }
   container.innerHTML='';
   const urls=(pdBook.pages||[{stickers:[]}]).map(function(_,i){ return pdBakePageImage(i); });
+  pdBakedPageUrlsCache=urls; // reused by the mobile page view instead of re-baking the same pages again
   pdZineBook=new ZineJS.Zine(container, {
     source:new ZineJS.ImageSource(urls),
     spreadMode:'cover',
@@ -4751,7 +4981,16 @@ function pdBuildZine(startPage){
   });
   pdZineBook.on('pageChanged', function(){ pdSuppressLayoutSync=false; pdSyncBookLayout(); });
   pdZineBook.on('flipEnd', function(){ pdSuppressLayoutSync=false; pdSyncBookLayout(); });
+  // ZineJS watches its own container with a ResizeObserver and can switch
+  // single/double page mode on its own (e.g. a mobile orientation change),
+  // independent of any flip we triggered — sync immediately rather than
+  // waiting for the next periodic safety-net tick.
+  pdZineBook.on('spreadChanged', function(){ pdSyncBookLayout(); });
   pdZineBook.ready.then(function(){ pdSyncBookLayoutRetrying(8); }).catch(function(){});
+  if(pdIsMobile()){
+    pdMobileCurrentPage=Math.max(0,Math.min((urls.length||1)-1,startPage||0));
+    pdMobileRenderPageView();
+  }
 }
 
 // getPageBox() can still report null right when `ready` resolves — the
@@ -4767,14 +5006,16 @@ function pdSyncBookLayoutRetrying(framesLeft){
   requestAnimationFrame(function(){ pdSyncBookLayoutRetrying(framesLeft-1); });
 }
 
-// Keeps the sticker-picker/Previous/Next/close/resize buttons animating
-// between the spread's outer edges and the centered cover's own edges —
-// and, while editing, the two edit-page slots pinned to ZineJS's current
 // Keeps the sticker-picker button and the shell's cover-vs-spread state in
 // sync — and, while editing, the two edit-page slots pinned to ZineJS's
 // current page geometry. Re-run after every build, flip, and resize.
 function pdSyncBookLayout(){
   if(!pdZineBook) return;
+  if(pdIsMobile()){
+    pdMobileSyncUI();
+    if(pdEditingPage!==null) pdMobilePositionEditOverlay();
+    return;
+  }
   const shell=document.getElementById('pdZineShell');
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
@@ -4864,6 +5105,21 @@ function pdPositionEditPages(){
 // tapping the page) — it opens for whichever spread ZineJS is currently
 // showing, at that same existing size and position (no zoom).
 function pdEnterEditMode(allowCover){
+  if(pdIsMobile()){
+    const idx=pdMobileCurrentPage;
+    if(idx===0 && !allowCover) return; // the cover: no sticker editing (title/subtitle is a separate, allowed path)
+    pdEditingSpread={left:idx, right:null};
+    if(!pdBook.pages[idx]) pdBook.pages[idx]={stickers:[]};
+    pdEditingPage=idx;
+    const overlay=document.getElementById('pdEditOverlay');
+    if(overlay) overlay.style.display='block';
+    const doneBtn=document.getElementById('pdEditDoneBtn');
+    if(doneBtn) doneBtn.style.display='flex';
+    pdRenderEditPage();
+    pdMobilePositionEditOverlay();
+    pdMobileSyncUI();
+    return;
+  }
   if(!pdZineBook) return;
   const spreads=pdZineBook.getSpreads();
   const spread=spreads[pdZineBook.getSpreadIndex()];
@@ -4879,6 +5135,28 @@ function pdEnterEditMode(allowCover){
   if(doneBtn) doneBtn.style.display='flex';
   pdRenderEditPage();
   pdSyncBookLayout();
+}
+
+// Sizes/positions the edit overlay against the mobile current slide's own
+// bounds — a single slot always, matching the mobile model's one-page-at-
+// a-time editing (no left/right spread concept here).
+function pdMobilePositionEditOverlay(){
+  const overlay=document.getElementById('pdEditOverlay');
+  const leftEl=document.getElementById('pdEditPageLeft');
+  const rightEl=document.getElementById('pdEditPageRight');
+  const view=document.getElementById('pdMobilePageView');
+  if(!overlay||!leftEl||!rightEl||!view) return;
+  const mainW=pdMobileMainSlideWidth();
+  const mainH=view.clientHeight;
+  overlay.style.left='0px'; overlay.style.top='0px';
+  overlay.style.width=mainW+'px'; overlay.style.height=mainH+'px';
+  rightEl.style.display='none';
+  leftEl.style.display='block';
+  leftEl.style.left='0'; leftEl.style.top='0';
+  leftEl.style.width='100%'; leftEl.style.height='100%';
+  leftEl.style.borderRight='none';
+  const dotSize=Math.round((mainW/600)*22*10)/10;
+  leftEl.style.backgroundSize=dotSize+'px '+dotSize+'px';
 }
 
 // Entry point for the 🎨 button on the cover: opens the "add text" tool
@@ -4933,11 +5211,20 @@ function pdAddCoverTextBox(){
   const stickers=pdBook.pages[0].stickers;
   const count=stickers.filter(function(s){return s.kind==='text';}).length;
   const id='pd-text-'+Date.now()+'-'+Math.floor(Math.random()*1000);
-  stickers.push({id:id, kind:'text', text:'Text', font:'sans', x:50, y:Math.min(85,28+count*12), rot:0, scale:1});
+  // Mobile: centered both ways, matching the spec ("centro de la página")
+  // — deliberately not computing anything fancier while the keyboard may
+  // be about to open and resize the viewport. Desktop keeps its existing
+  // slight vertical stacking offset for adding several in a row.
+  const y = pdIsMobile() ? 50 : Math.min(85,28+count*12);
+  stickers.push({id:id, kind:'text', text:'Text', font:'sans', x:50, y:y, rot:0, scale:1});
   pdSaveBook();
   pdRenderEditPage();
   const el=document.querySelector('[data-sticker-id="'+id+'"]');
-  if(el) pdSelectSticker(el);
+  if(el){
+    pdSelectSticker(el);
+    const inner=el.querySelector('.pd-sticker-chip');
+    if(inner) inner.focus();
+  }
 }
 
 // Applies a font to whichever text box is currently selected.
@@ -5003,6 +5290,11 @@ function pdExitEditMode(){
   const doneBtn=document.getElementById('pdEditDoneBtn');
   if(doneBtn) doneBtn.style.display='none';
   pdSaveBook();
+  if(pdIsMobile()){
+    pdBuildZine(pdMobileCurrentPage);
+    pdMobileRenderPageView();
+    return;
+  }
   const targetPage=pdZineBook?pdZineBook.getPage():0;
   pdBuildZine(targetPage);
 }
@@ -5061,7 +5353,17 @@ function pdBuildPlacedSticker(st, pageIndex){
     inner.style.color=st.color||'#000000';
     inner.spellcheck=false;
     inner.addEventListener('input', function(){ st.text=inner.textContent; });
-    inner.addEventListener('blur', function(){ pdSaveBook(); });
+    inner.addEventListener('blur', function(){
+      if(!inner.textContent || !inner.textContent.trim()){
+        const page=pdBook.pages[pageIndex];
+        page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
+        pdDeselectSticker();
+        pdSaveBook();
+        pdRenderEditPage();
+        return;
+      }
+      pdSaveBook();
+    });
     // Enter should insert a real line break the same way the canvas will
     // bake it — a plain \n text node (not a <br> element), so .textContent
     // and the stored string always agree and white-space:pre-wrap renders
@@ -5205,7 +5507,12 @@ function pdMakeResizeRotatable(el, handle, st, pageIndex){
     function move(ev){
       const d1=Math.hypot(ev.clientX-cx, ev.clientY-cy);
       const angle1=Math.atan2(ev.clientY-cy, ev.clientX-cx)*180/Math.PI;
-      st.rot=Math.round((rot0+(angle1-angle0))*10)/10;
+      let rot=rot0+(angle1-angle0);
+      // A few degrees of drift is very likely finger imprecision while
+      // the intent was purely to resize — snap back rather than apply a
+      // tiny accidental tilt.
+      if(Math.abs(rot-rot0)<4) rot=rot0;
+      st.rot=Math.round(rot*10)/10;
 
       // A simple, generous fixed range — no page-bounds capping. That
       // calculation has been the source of resize bugs more than once;
@@ -5432,6 +5739,15 @@ function pdBookTurn(delta){
   }, 700);
 }
 function pdAddPage(){
+  if(pdIsMobile()){
+    const newIndex=pdBook.pages.length;
+    pdBook.pages.push({stickers:[]});
+    pdSaveBook();
+    pdBuildZine(pdMobileCurrentPage);
+    pdMobileCurrentPage=newIndex;
+    pdMobileRenderPageView();
+    return;
+  }
   if(!pdZineBook) return;
   const currentPage=pdZineBook.getPage();
   pdBook.pages.push({stickers:[]});
@@ -5770,6 +6086,12 @@ window.addEventListener('DOMContentLoaded',()=>{
            edge-flip zones) enters edit mode for that specific page. -->
       <div class="pd-zine-shell" id="pdZineShell">
         <div class="pd-zine-container" id="pdZineContainer"></div>
+        <div class="pd-mobile-page-view" id="pdMobilePageView">
+          <div class="pd-mobile-track" id="pdMobileTrack">
+            <div class="pd-mobile-slide" id="pdMobileSlideCurrent"></div>
+            <div class="pd-mobile-slide" id="pdMobileSlideNext"></div>
+          </div>
+        </div>
 
         <!-- Edit mode: two live, interactive page slots matching whatever
              ZineJS's current spread actually shows (one centered slot for
