@@ -1546,7 +1546,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-zine-container{position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
 .pd-mobile-page-view{display:none;}
 .pd-mobile-track{position:relative;height:100%;display:flex;}
-.pd-mobile-slide{flex-shrink:0;height:100%;background-size:cover;background-position:center;background-repeat:no-repeat;background-color:#fff;}
+.pd-mobile-slide{flex-shrink:0;height:100%;background-repeat:no-repeat;}
 @media(max-width:640px){
   #pdZineContainer{display:none;}
   .pd-mobile-page-view{display:block;position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
@@ -1571,6 +1571,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    its own — it's meant to sit flush and plain, not add visual weight. */
 .pd-edit-overlay{position:absolute;z-index:5;pointer-events:none;border:2px solid #000;border-radius:var(--r1);box-sizing:border-box;overflow:hidden;}
 .pd-edit-page{position:absolute;display:none;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;box-sizing:border-box;overflow:hidden;pointer-events:auto;}
+.pd-edit-page.pd-dots-suppressed{background-image:none;}
 .pd-edit-page.pd-flip-page-cover{background-image:none;}
 
 .pd-edit-done-btn{position:absolute;top:8px;right:48px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 13px;cursor:pointer;box-shadow:var(--s-sm);z-index:9;transition:transform .12s,box-shadow .12s,right .4s ease;}
@@ -1614,8 +1615,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 @media(max-width:640px){
   .pd-sticker-panel{left:0;right:0;bottom:0;top:auto;transform:none;width:100%;max-width:100%;border-radius:16px 16px 0 0;border-bottom:none;max-height:70vh;animation:pdSheetSlideIn .25s cubic-bezier(.22,.75,.32,1) forwards;}
   .pd-sticker-panel.pd-panel-closing{animation:pdSheetSlideOut .2s ease forwards;}
-  .pd-sticker-panel-drag{cursor:default;}
-  .pd-sticker-panel-drag .pd-diary-drag-grip{display:none;}
+  .pd-sticker-panel-drag{cursor:ns-resize;}
 }
 @keyframes pdSheetSlideIn{from{opacity:0;transform:translateY(100%);}to{opacity:1;transform:translateY(0);}}
 @keyframes pdSheetSlideOut{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(100%);}}
@@ -1698,8 +1698,14 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
      corner/edge offsets recalculated so they stay centered at the new
      size instead of drifting off the sticker's actual corner. */
   .pd-sticker-handle{width:30px;height:30px;font-size:14px;}
-  .pd-sticker-resize{bottom:-14px;right:-14px;}
-  .pd-sticker-width{right:-14px;}
+  /* Removed on mobile specifically — at this size it was covering the
+     "Text" placeholder word, making a freshly-created box's end nearly
+     impossible to tap into. Its function isn't lost: resize+rotate is
+     still available via the two-finger pinch gesture, a more natural
+     mobile interaction anyway. */
+  .pd-placed-sticker:hover .pd-sticker-resize,
+  .pd-placed-sticker.pd-selected .pd-sticker-resize{display:none;}
+  .pd-sticker-width{width:20px;height:20px;font-size:10px;right:-9px;}
   .pd-placed-sticker .pd-sticker-remove{width:26px;height:26px;font-size:13px;top:-12px;right:-12px;}
   /* Non-functional on mobile now (pdMakeDiaryResizable no-ops below this
      width) — hidden rather than left as a dead control. */
@@ -1899,7 +1905,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
         <div class="news-critter news-critter-dougie"><img src="dougie.webp" alt="Dougie" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-dougie">Dougie</span>
         <div class="news-critter news-critter-kirara"><img src="kirara.webp" alt="Kirara" onerror="this.style.display='none'"></div>
-        <span class="news-tag news-tag-kirara">Kiara</span>
+        <span class="news-tag news-tag-kirara">Kirara</span>
         <div class="news-critter news-critter-deerek"><img src="deerek.webp" alt="Deerek" onerror="this.style.display='none'"></div>
         <span class="news-tag news-tag-deerek">Deerek</span>
         <div class="news-critter news-critter-meemaw"><img src="meemaw.webp" alt="Meemaw" onerror="this.style.display='none'"></div>
@@ -4316,10 +4322,13 @@ function pdToggleStickerPicker(){
 // Dragging the sticker panel by its own strip — an independent floating
 // window, not tied to the diary's position, movable anywhere on screen.
 function pdMakeStickerPanelDraggable(){
-  if(pdIsMobile()) return;
   const handle=document.getElementById('pdStickerPanelDrag');
   const panel=document.getElementById('pdStickerPanel');
   if(!handle||!panel) return;
+  if(pdIsMobile()){
+    pdMakeSheetHeightAdjustable(handle, panel);
+    return;
+  }
   handle.addEventListener('pointerdown', function(e){
     if(e.target.closest('.pd-sticker-panel-close')) return;
     e.preventDefault();
@@ -4332,6 +4341,32 @@ function pdMakeStickerPanelDraggable(){
     function move(ev){
       panel.style.left=(startLeft + ev.clientX - startX)+'px';
       panel.style.top=(startTop + ev.clientY - startY)+'px';
+    }
+    function up(){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
+}
+
+// True bottom-sheet drag: the top strip only adjusts the sheet's own
+// height (vertical-only), not its position — dragging up reveals more of
+// the sheet, dragging down reveals more of the flipbook behind it.
+// Clamped between a small minimum and a comfortable maximum.
+function pdMakeSheetHeightAdjustable(handle, panel){
+  const MIN_VH=18, MAX_VH=78;
+  handle.addEventListener('pointerdown', function(e){
+    if(e.target.closest('.pd-sticker-panel-close')) return;
+    e.preventDefault();
+    const startY=e.clientY;
+    const startVh=(panel.getBoundingClientRect().height/window.innerHeight)*100;
+    function move(ev){
+      const dy=startY-ev.clientY; // dragging up increases height
+      const newVh=Math.max(MIN_VH, Math.min(MAX_VH, startVh+(dy/window.innerHeight)*100));
+      panel.style.maxHeight=newVh+'vh';
+      panel.style.height=newVh+'vh';
     }
     function up(){
       document.removeEventListener('pointermove', move);
@@ -4358,16 +4393,21 @@ function pdMakeStickerPanelDraggable(){
 function pdIsMobile(){ return window.innerWidth<=640; }
 
 // ── Mobile page view: an independent, single-page-at-a-time renderer with
-// a peeking sliver of the next page — deliberately separate from ZineJS's
-// own spread/cover model, which is built around full page-curl spreads,
-// not a "peek and slide" interaction. ZineJS still mounts underneath
-// (hidden via CSS) so all of its existing desktop logic keeps working
-// completely unmodified; this reads the very same pdBook data and the
-// very same pdBakePageImage() output, just displays it differently. ──
+// a peeking sliver of the paired page — deliberately separate from
+// ZineJS's own spread/cover model. ZineJS still mounts underneath (hidden
+// via CSS) so all of its existing desktop logic keeps working completely
+// unmodified; this reads the very same pdBook data and the very same
+// pdBakePageImage() output, just displays it differently. Pairing reuses
+// pdPageSide() — the exact same left/right logic the desktop border-
+// unification code already relies on — so a page's peek always reflects
+// its real book-pairing, not just "whatever comes next": the cover never
+// pairs with anything (it's its own single sheet), a left page peeks its
+// right partner, a right page peeks its left partner, and an unpaired
+// last page (odd-length book) shows no peek at all. ──
 let pdMobileCurrentPage=0;
 let pdMobileAnimating=false;
 let pdBakedPageUrlsCache=null;
-const PD_MOBILE_PEEK=0.15; // the next page peeks in at 15% of the main page's own width
+const PD_MOBILE_PEEK=0.15; // the paired page peeks in at 15% of the main page's own width
 
 function pdMobilePageUrl(idx){
   if(pdBakedPageUrlsCache && pdBakedPageUrlsCache[idx]!==undefined) return pdBakedPageUrlsCache[idx];
@@ -4380,87 +4420,138 @@ function pdMobileMainSlideWidth(){
   return view.clientWidth/(1+PD_MOBILE_PEEK);
 }
 
-// Repaints both slides at the current page and syncs the 🎨/Done buttons
-// to the current slide's own edge — called after every navigation, edit,
-// or rebuild. Resets the track's transform instantly (no visible jump,
-// since the freshly-painted content matches the reset position).
+// Where (if anywhere) the current page's true pair partner is shown.
+function pdMobilePeekInfo(){
+  const total=pdBook?pdBook.pages.length:0;
+  const idx=pdMobileCurrentPage;
+  if(idx===0) return {side:null}; // the cover: a standalone single sheet, never paired
+  const side=pdPageSide(idx); // 'left' or 'right', identical to desktop's own pairing
+  if(side==='left'){
+    if(idx+1<total) return {side:'right', peekIndex:idx+1};
+    return {side:null}; // odd-length book's unpaired last page
+  }
+  return {side:'left', peekIndex:idx-1}; // a 'right' page's partner (idx-1) always exists
+}
+
+// Repaints both slides at the current page and its (possibly absent, or
+// possibly left- or right-hand) peek, and syncs the 🎨/Done buttons to
+// the main slide's own edge. Resets the track's transform instantly (no
+// visible jump, since the freshly-painted content matches the reset
+// position). Flexbox `order` places the peek on the correct physical
+// side without needing separate left/right DOM structures.
 function pdMobileRenderPageView(){
   if(!pdIsMobile()) return;
   const view=document.getElementById('pdMobilePageView');
   const track=document.getElementById('pdMobileTrack');
   const curSlide=document.getElementById('pdMobileSlideCurrent');
-  const nextSlide=document.getElementById('pdMobileSlideNext');
-  if(!view||!track||!curSlide||!nextSlide||!pdBook) return;
+  const peekSlide=document.getElementById('pdMobileSlideNext');
+  if(!view||!track||!curSlide||!peekSlide||!pdBook) return;
   const total=pdBook.pages.length;
   pdMobileCurrentPage=Math.max(0,Math.min(total-1,pdMobileCurrentPage));
   const mainW=pdMobileMainSlideWidth();
   track.style.transition='none';
   track.style.transform='translateX(0)';
+  curSlide.style.order='1';
   curSlide.style.width=mainW+'px';
-  nextSlide.style.width=mainW+'px';
+  curSlide.style.backgroundSize='cover';
+  curSlide.style.backgroundPosition='center';
   curSlide.style.backgroundImage="url('"+pdMobilePageUrl(pdMobileCurrentPage)+"')";
-  if(pdMobileCurrentPage<total-1){
-    nextSlide.style.backgroundImage="url('"+pdMobilePageUrl(pdMobileCurrentPage+1)+"')";
+  const peek=pdMobilePeekInfo();
+  if(peek.side){
+    peekSlide.style.display='block';
+    peekSlide.style.width=(view.clientWidth-mainW)+'px';
+    // Explicit width matching the main slide (not "cover"), so this
+    // shows an un-scaled sliver of the real page rather than a zoomed
+    // crop — background-position then picks which edge is visible: the
+    // side nearest the gutter, matching how a real book pair meets.
+    peekSlide.style.backgroundSize=mainW+'px 100%';
+    peekSlide.style.backgroundPosition = peek.side==='right' ? 'left center' : 'right center';
+    peekSlide.style.order = peek.side==='right' ? '2' : '0';
+    peekSlide.style.backgroundImage="url('"+pdMobilePageUrl(peek.peekIndex)+"')";
   }else{
-    nextSlide.style.backgroundImage='none';
+    // No pair to show — fully hidden rather than showing a blank white
+    // slide that looked like a phantom "next page" placeholder.
+    peekSlide.style.display='none';
+    peekSlide.style.backgroundImage='none';
   }
   void track.offsetWidth; // force reflow before re-enabling transition, so a later animated move doesn't pick up this reset
   track.style.transition='';
   pdMobileSyncUI();
 }
 
-// Advance: the classic "peek becomes the new current" slide — animates by
-// repositioning the track exactly one main-slide-width to the left, not
-// by recalculating any size, matching the spec directly.
-function pdMobileGoNext(){
+// Tapping the peek always goes to whatever it's showing — a slide
+// animation, since that page's image is already painted in place, just
+// needs repositioning (never a resize), matching the spec directly.
+function pdMobileGoToPeek(){
   if(pdMobileAnimating||pdEditingPage!==null) return;
-  if(!pdBook||pdMobileCurrentPage>=pdBook.pages.length-1) return;
+  const peek=pdMobilePeekInfo();
+  if(!peek.side) return;
   pdMobileAnimating=true;
   const track=document.getElementById('pdMobileTrack');
   const mainW=pdMobileMainSlideWidth();
+  const dir = peek.side==='right' ? -1 : 1; // right peek: slide left to reveal it; left peek: slide right
   track.style.transition='transform .38s cubic-bezier(.22,.75,.32,1)';
-  track.style.transform='translateX(-'+mainW+'px)';
+  track.style.transform='translateX('+(dir*mainW)+'px)';
   setTimeout(function(){
-    pdMobileCurrentPage++;
+    pdMobileCurrentPage=peek.peekIndex;
     pdMobileAnimating=false;
     pdMobileRenderPageView();
   }, 380);
 }
 
-// Back: no mirrored peek is kept on the left (the spec only describes one
-// on the right), so this is a quick cross-fade rather than a slide — still
-// a deliberate transition, not an instant cut, matching "una pequeña
-// animación" from the spec.
-function pdMobileGoPrev(){
+// Tapping the main page goes the opposite direction from whatever the
+// peek represents — or simply advances if there's no peek at all (the
+// cover, or an unpaired last page). The target isn't pre-rendered here,
+// so this is a cross-fade rather than a slide — still a deliberate
+// transition, matching "una pequeña animación" from the spec.
+function pdMobileTapMain(){
   if(pdMobileAnimating||pdEditingPage!==null) return;
-  if(pdMobileCurrentPage<=0) return;
+  const peek=pdMobilePeekInfo();
+  let target=null;
+  if(peek.side==='right') target=pdMobileCurrentPage-1; // peek is forward; main goes back
+  else if(peek.side==='left') target=pdMobileCurrentPage+1; // peek is backward; main goes forward
+  else if(pdBook && pdMobileCurrentPage<pdBook.pages.length-1) target=pdMobileCurrentPage+1; // no peek: just advance
+  if(target===null || target<0 || !pdBook || target>pdBook.pages.length-1) return;
   pdMobileAnimating=true;
   const view=document.getElementById('pdMobilePageView');
   if(view) view.style.transition='opacity .18s ease';
   if(view) view.style.opacity='0';
   setTimeout(function(){
-    pdMobileCurrentPage--;
+    pdMobileCurrentPage=target;
     pdMobileRenderPageView();
     if(view) view.style.opacity='1';
     pdMobileAnimating=false;
   }, 180);
 }
 
-// The two tap zones from the spec: the fully-visible current page goes
-// back, the partially-visible peek advances. Wired once — the slides
-// themselves are repainted in place, never recreated, so this listener
-// stays valid across every render.
+// The two tap zones from the spec: the fully-visible current page and
+// the partially-visible peek. Wired once — the slides themselves are
+// repainted in place, never recreated, so this listener stays valid
+// across every render.
+// Simple direct sequential step (used by the Q/E keyboard shortcuts) —
+// independent of the pair-aware tap-zone semantics used for touch, since
+// keyboard navigation doesn't need to match a specific slide direction.
+function pdMobileStepPage(delta){
+  if(pdMobileAnimating||pdEditingPage!==null||!pdBook) return;
+  const target=pdMobileCurrentPage+delta;
+  if(target<0||target>pdBook.pages.length-1) return;
+  pdMobileAnimating=true;
+  const view=document.getElementById('pdMobilePageView');
+  if(view) view.style.transition='opacity .18s ease';
+  if(view) view.style.opacity='0';
+  setTimeout(function(){
+    pdMobileCurrentPage=target;
+    pdMobileRenderPageView();
+    if(view) view.style.opacity='1';
+    pdMobileAnimating=false;
+  }, 180);
+}
+
 function pdMobileWireTaps(){
   const curSlide=document.getElementById('pdMobileSlideCurrent');
-  const nextSlide=document.getElementById('pdMobileSlideNext');
-  if(curSlide) curSlide.addEventListener('click', function(){
-    if(pdEditingPage!==null) return;
-    pdMobileGoPrev();
-  });
-  if(nextSlide) nextSlide.addEventListener('click', function(){
-    if(pdEditingPage!==null) return;
-    pdMobileGoNext();
-  });
+  const peekSlide=document.getElementById('pdMobileSlideNext');
+  if(curSlide) curSlide.addEventListener('click', function(){ pdMobileTapMain(); });
+  if(peekSlide) peekSlide.addEventListener('click', function(){ pdMobileGoToPeek(); });
   let resizeT;
   window.addEventListener('resize', function(){
     clearTimeout(resizeT);
@@ -4472,15 +4563,19 @@ function pdMobileWireTaps(){
   }, {passive:true});
 }
 
-// Positions the 🎨/Done buttons against the current slide's own right
+// Positions the 🎨/Done buttons against the main slide's own right
 // edge instead of the full shell — the spec's point that these should
 // visually belong to the active page, not a fixed shell-relative spot.
+// Accounts for the peek possibly sitting on the LEFT (which shifts where
+// the main slide's own right edge actually falls).
 function pdMobileSyncUI(){
   if(!pdIsMobile()) return;
   const view=document.getElementById('pdMobilePageView');
   if(!view) return;
   const mainW=pdMobileMainSlideWidth();
-  const rightGap=view.clientWidth-mainW;
+  const peek=pdMobilePeekInfo();
+  const gapBefore = peek.side==='left' ? (view.clientWidth-mainW) : 0; // room the left-side peek takes up before the main slide
+  const rightGap=view.clientWidth-mainW-gapBefore;
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const doneBtn=document.getElementById('pdEditDoneBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
@@ -4497,7 +4592,7 @@ function pdMobileSyncUI(){
     const isLast = pdBook && pdMobileCurrentPage>=pdBook.pages.length-1;
     newPageBtn.style.display = (pdEditingPage===null && isLast) ? 'flex' : 'none';
   }
-  if(closeBtn) closeBtn.style.left='0px';
+  if(closeBtn) closeBtn.style.left=gapBefore+'px';
 }
 
 function pdMakeDiaryDraggable(){
@@ -4631,8 +4726,8 @@ document.addEventListener('keydown', function(e){
   if(pdEditingPage!==null) return;
   const key=e.key.toLowerCase();
   if(pdIsMobile()){
-    if(key==='q') pdMobileGoPrev();
-    else if(key==='e') pdMobileGoNext();
+    if(key==='q') pdMobileStepPage(-1);
+    else if(key==='e') pdMobileStepPage(1);
     return;
   }
   if(key==='q') pdBookTurn(-1);
@@ -5216,7 +5311,7 @@ function pdAddCoverTextBox(){
   // be about to open and resize the viewport. Desktop keeps its existing
   // slight vertical stacking offset for adding several in a row.
   const y = pdIsMobile() ? 50 : Math.min(85,28+count*12);
-  stickers.push({id:id, kind:'text', text:'Text', font:'sans', x:50, y:y, rot:0, scale:1});
+  stickers.push({id:id, kind:'text', text:'Text', font:'sans', x:50, y:y, rot:0, scale:1, _justCreated:true});
   pdSaveBook();
   pdRenderEditPage();
   const el=document.querySelector('[data-sticker-id="'+id+'"]');
@@ -5345,13 +5440,28 @@ function pdBuildPlacedSticker(st, pageIndex){
   const refWidth = editPageW || 300;
   const scaleFactor = refWidth/600;
   if(st.kind==='text'){
-    inner.contentEditable='true';
+    const mobileNeedsDoubleTap = pdIsMobile() && !st._justCreated;
+    inner.contentEditable = mobileNeedsDoubleTap ? 'false' : 'true';
+    if(st._justCreated) delete st._justCreated;
     inner.textContent=st.text;
     inner.style.fontSize=(28*scaleFactor)+'px';
     inner.style.fontWeight=st.weight||800;
     inner.style.lineHeight=st.lineHeight||1.25;
     inner.style.color=st.color||'#000000';
     inner.spellcheck=false;
+    if(mobileNeedsDoubleTap){
+      // First tap only selects/reveals the box (handled by el's own
+      // pointerdown, which runs first and sets el._pdWasSelected before
+      // reassigning selection) — a second tap, while it's already the
+      // selected box, is what actually opens it for editing.
+      inner.addEventListener('pointerdown', function(e){
+        if(el._pdWasSelected){
+          e.stopPropagation();
+          inner.contentEditable='true';
+          inner.focus();
+        }
+      });
+    }
     inner.addEventListener('input', function(){ st.text=inner.textContent; });
     inner.addEventListener('blur', function(){
       if(!inner.textContent || !inner.textContent.trim()){
@@ -5362,6 +5472,7 @@ function pdBuildPlacedSticker(st, pageIndex){
         pdRenderEditPage();
         return;
       }
+      if(mobileNeedsDoubleTap) inner.contentEditable='false'; // back to "select only" for next time
       pdSaveBook();
     });
     // Enter should insert a real line break the same way the canvas will
@@ -5428,7 +5539,7 @@ function pdBuildPlacedSticker(st, pageIndex){
   }
   el.appendChild(resizeHandle);
   if(widthHandle) el.appendChild(widthHandle);
-  el.addEventListener('pointerdown', function(){ pdSelectSticker(el); }, {capture:true});
+  el.addEventListener('pointerdown', function(){ el._pdWasSelected=(pdSelectedStickerEl===el); pdSelectSticker(el); }, {capture:true});
   if(isCoverText) pdMakeCoverTextDraggable(el, st, pageIndex);
   else pdMakePlacedDraggable(el, st, pageIndex);
   pdMakeResizeRotatable(el, resizeHandle, st, pageIndex);
@@ -5472,9 +5583,19 @@ function pdDeselectSticker(){
 // a text box — deliberately separate from the resize/rotate handle, so
 // scaling a text box bigger or smaller never triggers wrapping by itself.
 // Wrapping only ever happens once the user drags this handle.
+// Mitigates a visible artifact (thin blue lines) some mobile GPUs show
+// when the dot-grid's repeating radial-gradient repaints continuously
+// under rapid pointermove-driven style changes — hidden for the duration
+// of an active drag/resize/width-adjust, restored on release.
+function pdSuppressDotGrid(el, active){
+  const page=el&&el.parentNode;
+  if(page && page.classList) page.classList.toggle('pd-dots-suppressed', active);
+}
+
 function pdMakeTextWidthAdjustable(el, handle, st, inner, scaleFactor){
   handle.addEventListener('pointerdown', function(e){
     e.preventDefault(); e.stopPropagation();
+    pdSuppressDotGrid(el, true);
     const startX=e.clientX;
     const startWidth = typeof st.maxWidth==='number' ? st.maxWidth : (inner.offsetWidth/scaleFactor);
     function move(ev){
@@ -5487,6 +5608,7 @@ function pdMakeTextWidthAdjustable(el, handle, st, inner, scaleFactor){
     function up(){
       document.removeEventListener('pointermove', move);
       document.removeEventListener('pointerup', up);
+      pdSuppressDotGrid(el, false);
       pdSaveBook();
     }
     document.addEventListener('pointermove', move);
@@ -5619,6 +5741,7 @@ function pdMakeCoverTextDraggable(el, st, pageIndex){
         if(Math.hypot(dx,dy)<DRAG_THRESHOLD) return;
         dragging=true;
         el.classList.add('pd-dragging');
+        pdSuppressDotGrid(el, true);
         if(document.activeElement && el.contains(document.activeElement)) document.activeElement.blur();
       }
       const pageEl=el.parentNode;
@@ -5631,7 +5754,7 @@ function pdMakeCoverTextDraggable(el, st, pageIndex){
     function up(){
       document.removeEventListener('pointermove', move);
       document.removeEventListener('pointerup', up);
-      if(dragging){ el.classList.remove('pd-dragging'); pdSaveBook(); }
+      if(dragging){ el.classList.remove('pd-dragging'); pdSuppressDotGrid(el, false); pdSaveBook(); }
     }
     document.addEventListener('pointermove', move);
     document.addEventListener('pointerup', up);
@@ -5654,9 +5777,11 @@ function pdMakePlacedDraggable(el, st, pageIndex){
     if(ids.length===1){
       mode='drag';
       el.classList.add('pd-dragging');
+      pdSuppressDotGrid(el, true);
       dragStart={clientX:e.clientX, clientY:e.clientY, x:st.x, y:st.y};
     }else if(ids.length===2){
       mode='pinch';
+      pdSuppressDotGrid(el, true);
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
       const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
@@ -5694,6 +5819,7 @@ function pdMakePlacedDraggable(el, st, pageIndex){
     const ids=Object.keys(pointers);
     if(ids.length===0){
       el.classList.remove('pd-dragging');
+      pdSuppressDotGrid(el, false);
       mode=null; dragStart=null; pinchStart=null;
       pdSaveBook();
     }else if(ids.length===1){
