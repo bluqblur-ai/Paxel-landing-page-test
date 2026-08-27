@@ -1569,8 +1569,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    for the cover, two side by side for a spread. Baked back into images
    (via pdBakePageImage) on exit, which ZineJS then displays. No border of
    its own — it's meant to sit flush and plain, not add visual weight. */
-.pd-edit-overlay{position:absolute;z-index:5;pointer-events:none;border:2px solid #000;border-radius:var(--r1);box-sizing:border-box;overflow:hidden;}
-.pd-edit-page{position:absolute;display:none;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;box-sizing:border-box;overflow:hidden;pointer-events:auto;}
+.pd-edit-overlay{position:absolute;z-index:5;pointer-events:none;border:2px solid #000;border-radius:var(--r1);box-sizing:border-box;overflow:hidden;touch-action:pinch-zoom;}
+.pd-edit-page{position:absolute;display:none;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;box-sizing:border-box;overflow:hidden;pointer-events:auto;touch-action:pinch-zoom;}
 .pd-edit-page.pd-dots-suppressed{background-image:none;}
 .pd-edit-page.pd-flip-page-cover{background-image:none;}
 
@@ -1658,7 +1658,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-sticker-chip.pd-word{display:inline-flex;font-family:var(--font);font-weight:700;font-size:12.5px;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 11px;box-shadow:var(--s-sm);}
 .pd-sticker-chip.pd-text{cursor:text;user-select:text;touch-action:auto;white-space:pre;outline:none;min-width:1ch;text-align:center;padding:4px 8px;border-radius:var(--r0);border:1px dashed transparent;transition:border-color .12s,background .12s;}
 .pd-sticker-chip.pd-text.pd-text-wrapped{white-space:pre-wrap;}
-.pd-sticker-chip.pd-text:focus{border-color:var(--blue);background:rgba(71,190,238,.08);}
+.pd-sticker-chip.pd-text:focus,
+.pd-placed-sticker.pd-selected .pd-sticker-chip.pd-text{border-color:var(--blue);background:rgba(71,190,238,.08);}
 .pd-sticker-chip.pd-text.pd-font-sans{font-family:var(--font);}
 .pd-sticker-chip.pd-text.pd-font-serif{font-family:'Playfair Display',Georgia,serif;}
 .pd-sticker-chip.pd-text.pd-font-script{font-family:'Dancing Script',cursive;font-weight:700;}
@@ -4411,6 +4412,8 @@ function pdIsMobile(){ return window.innerWidth<=640; }
 let pdMobileCurrentPage=0;
 let pdMobileAnimating=false;
 let pdBakedPageUrlsCache=null;
+let pdLastTextTapTime=0;
+let pdLastTextTapEl=null;
 const PD_MOBILE_PEEK=0.15; // the paired page peeks in at 15% of the main page's own width
 
 function pdMobilePageUrl(idx){
@@ -5282,7 +5285,10 @@ function pdMobilePositionEditOverlay(){
   if(!overlay||!leftEl||!rightEl||!view) return;
   const mainW=pdMobileMainSlideWidth();
   const mainH=view.clientHeight;
-  overlay.style.left='0px'; overlay.style.top='0px';
+  const peekVisibleW=view.clientWidth-mainW;
+  const peek=pdMobilePeekInfo();
+  const overlayLeft = peek.side==='left' ? peekVisibleW : (peek.side===null ? peekVisibleW/2 : 0);
+  overlay.style.left=overlayLeft+'px'; overlay.style.top='0px';
   overlay.style.width=mainW+'px'; overlay.style.height=mainH+'px';
   rightEl.style.display='none';
   leftEl.style.display='block';
@@ -5357,7 +5363,10 @@ function pdAddCoverTextBox(){
   if(el){
     pdSelectSticker(el);
     const inner=el.querySelector('.pd-sticker-chip');
-    if(inner) inner.focus({preventScroll:true});
+    if(inner){
+      if(pdIsMobile() && parseFloat(inner.style.fontSize)<16) inner.style.fontSize='16px';
+      inner.focus({preventScroll:true});
+    }
   }
 }
 
@@ -5489,35 +5498,40 @@ function pdBuildPlacedSticker(st, pageIndex){
     inner.style.color=st.color||'#000000';
     inner.spellcheck=false;
     if(mobileNeedsDoubleTap){
-      // First tap only selects/reveals the box (handled by el's own
-      // pointerdown, which runs first and sets el._pdWasSelected before
-      // reassigning selection) — a second tap, while it's already the
-      // selected box, is what actually opens it for editing.
+      // Genuine double-tap detection by elapsed time between two taps on
+      // THIS SAME element — not "was already selected", which stays true
+      // across many separate taps and incorrectly treated every one of
+      // them as a second tap (and its stopPropagation blocked drag
+      // detection from ever seeing the event on any of those taps).
       inner.addEventListener('pointerdown', function(e){
-        if(el._pdWasSelected){
-          e.stopPropagation();
-          inner.contentEditable='true';
-          // Instagram Stories style: temporarily centers the box (clear
-          // of where a keyboard would sit) for comfortable typing, then
-          // animates back to its real position once editing ends. Also
-          // temporarily bumps font-size to iOS's 16px auto-zoom threshold
-          // — the scaled-down live size can fall well below that on a
-          // narrow screen, which would otherwise force the whole page to
-          // zoom in on focus.
-          const origLeft=el.style.left, origTop=el.style.top;
-          const origFontSize=inner.style.fontSize;
-          el.style.transition='left .28s cubic-bezier(.22,.75,.32,1), top .28s cubic-bezier(.22,.75,.32,1)';
-          el.style.left='50%';
-          el.style.top='30%';
-          if(parseFloat(origFontSize)<16) inner.style.fontSize='16px';
-          inner.focus({preventScroll:true});
-          inner._pdRestorePos=function(){
-            el.style.left=origLeft;
-            el.style.top=origTop;
-            inner.style.fontSize=origFontSize;
-            setTimeout(function(){ el.style.transition=''; }, 300);
-          };
-        }
+        const now=Date.now();
+        const isDoubleTap = pdLastTextTapEl===inner && (now-pdLastTextTapTime)<400;
+        pdLastTextTapTime=now;
+        pdLastTextTapEl=isDoubleTap ? null : inner; // consume it — a third quick tap shouldn't immediately re-trigger
+        if(!isDoubleTap) return; // a normal tap: let selection + potential drag proceed as usual
+        e.stopPropagation();
+        e.preventDefault();
+        inner.contentEditable='true';
+        // Instagram Stories style: temporarily centers the box (clear
+        // of where a keyboard would sit) for comfortable typing, then
+        // animates back to its real position once editing ends. Also
+        // temporarily bumps font-size to iOS's 16px auto-zoom threshold
+        // — the scaled-down live size can fall well below that on a
+        // narrow screen, which would otherwise force the whole page to
+        // zoom in on focus.
+        const origLeft=el.style.left, origTop=el.style.top;
+        const origFontSize=inner.style.fontSize;
+        el.style.transition='left .28s cubic-bezier(.22,.75,.32,1), top .28s cubic-bezier(.22,.75,.32,1)';
+        el.style.left='50%';
+        el.style.top='30%';
+        if(parseFloat(origFontSize)<16) inner.style.fontSize='16px';
+        inner.focus({preventScroll:true});
+        inner._pdRestorePos=function(){
+          el.style.left=origLeft;
+          el.style.top=origTop;
+          inner.style.fontSize=origFontSize;
+          setTimeout(function(){ el.style.transition=''; }, 300);
+        };
       });
     }
     inner.addEventListener('input', function(){ st.text=inner.textContent; });
@@ -5600,7 +5614,7 @@ function pdBuildPlacedSticker(st, pageIndex){
   }
   el.appendChild(resizeHandle);
   if(widthHandle) el.appendChild(widthHandle);
-  el.addEventListener('pointerdown', function(){ el._pdWasSelected=(pdSelectedStickerEl===el); pdSelectSticker(el); }, {capture:true});
+  el.addEventListener('pointerdown', function(){ pdSelectSticker(el); }, {capture:true});
   if(isCoverText) pdMakeCoverTextDraggable(el, st, pageIndex);
   else pdMakePlacedDraggable(el, st, pageIndex);
   pdMakeResizeRotatable(el, resizeHandle, st, pageIndex);
@@ -5620,22 +5634,16 @@ function pdSelectSticker(el){
   const id=el.getAttribute('data-sticker-id');
   const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
-  const styleControls=document.getElementById('pdTextStyleControls');
   if(st && st.kind==='text'){
     const slider=document.getElementById('pdLineHeightSlider');
     if(slider) slider.value=st.lineHeight||1.25;
     const colorInput=document.getElementById('pdColorCustom');
     if(colorInput) colorInput.value=st.color||'#000000';
-    if(styleControls) styleControls.style.display='block';
-  }else if(styleControls){
-    styleControls.style.display='none';
   }
 }
 function pdDeselectSticker(){
   if(pdSelectedStickerEl) pdSelectedStickerEl.classList.remove('pd-selected');
   pdSelectedStickerEl=null;
-  const styleControls=document.getElementById('pdTextStyleControls');
-  if(styleControls) styleControls.style.display='none';
 }
 
 // One handle does both: how far the drag moves from the sticker's own
@@ -5816,6 +5824,7 @@ function pdMakeEditAreaPinchable(){
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
     const ids=Object.keys(pointers);
     if(ids.length===2){
+      e.stopPropagation();
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
       const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
@@ -6386,7 +6395,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   <div class="pd-picker-list pd-view-words" id="pdPickerList"></div>
   <div class="pd-cover-text-panel" id="pdCoverTextPanel" style="display:none;">
     <button class="pd-add-text-btn" onclick="pdAddCoverTextBox()">&#43; Add text box</button>
-    <div id="pdTextStyleControls" style="display:none;">
+    <div id="pdTextStyleControls">
       <div class="pd-cover-text-hint">Style the selected text box:</div>
       <div class="pd-font-row">
         <button class="pd-font-choice pd-font-sans" onclick="pdSetSelectedTextFont('sans')">Sans</button>
