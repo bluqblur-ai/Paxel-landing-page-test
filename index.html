@@ -4655,29 +4655,47 @@ function pdMobileGoToPeek(){
 // in, so it uses the same slide animation as tapping a peek; only going
 // backward (when the peek is on the right, meaning there's no pre-
 // rendered "previous" content) falls back to a cross-fade.
+// Shared fade-backward step — used whenever the target page isn't
+// pre-rendered as a peek (so a slide animation isn't possible).
+function pdMobileFadeToPage(target){
+  if(target<0 || !pdBook || target>pdBook.pages.length-1) return;
+  pdMobileAnimating=true;
+  const view=document.getElementById('pdMobilePageView');
+  if(view) view.style.transition='opacity .18s ease';
+  if(view) view.style.opacity='0';
+  setTimeout(function(){
+    pdMobileCurrentPage=target;
+    pdMobileRenderPageView();
+    if(view) view.style.opacity='1';
+    pdMobileAnimating=false;
+  }, 180);
+}
+
 function pdMobileTapMain(){
   if(pdMobileAnimating||pdEditingPage!==null||!pdBook) return;
   const peek=pdMobilePeekInfo();
   if(peek.side==='right'){
-    const target=pdMobileCurrentPage-1;
-    if(target<0) return;
-    pdMobileAnimating=true;
-    const view=document.getElementById('pdMobilePageView');
-    if(view) view.style.transition='opacity .18s ease';
-    if(view) view.style.opacity='0';
-    setTimeout(function(){
-      pdMobileCurrentPage=target;
-      pdMobileRenderPageView();
-      if(view) view.style.opacity='1';
-      pdMobileAnimating=false;
-    }, 180);
+    // peek is forward; main goes back
+    pdMobileFadeToPage(pdMobileCurrentPage-1);
     return;
   }
-  // peek is 'left' (a right page advancing to the next left page) or
-  // null (the cover advancing to page 1) — both slide in from the right.
-  const target=pdMobileCurrentPage+1;
-  if(target>pdBook.pages.length-1) return;
-  pdMobileSlideToPage(target, 'right');
+  if(peek.side==='left'){
+    // peek is backward; main goes forward — pre-rendered as the peek on
+    // the OTHER side conceptually, but here it's a fresh page, so slide.
+    const target=pdMobileCurrentPage+1;
+    if(target>pdBook.pages.length-1) return;
+    pdMobileSlideToPage(target, 'right');
+    return;
+  }
+  // peek.side === null: either the cover (nothing before it — advance),
+  // or a lone unpaired last "left" page (nothing after it — go back).
+  if(pdMobileCurrentPage===0){
+    const target=1;
+    if(target>pdBook.pages.length-1) return;
+    pdMobileSlideToPage(target, 'right');
+  }else{
+    pdMobileFadeToPage(pdMobileCurrentPage-1);
+  }
 }
 
 // The two tap zones from the spec: the fully-visible current page and
