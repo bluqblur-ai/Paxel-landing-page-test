@@ -4221,6 +4221,15 @@ function pdLockBodyScroll(){
   document.body.style.top=(-pdScrollLockY)+'px';
   document.body.style.left='0';
   document.body.style.right='0';
+  document.body.style.width='100%';
+  // 100vh first as a fallback, then 100dvh (dynamic viewport height)
+  // where supported — the purpose-built fix for iOS Safari's own
+  // dynamic address-bar chrome, which otherwise leaves a gap at the
+  // bottom the size of whatever toolbar is currently showing, since
+  // plain 100vh there can represent the toolbar-hidden size even while
+  // the toolbar is visible.
+  document.body.style.height='100vh';
+  document.body.style.height='100dvh';
   document.body.classList.add('pd-diary-active');
 }
 function pdUnlockBodyScroll(){
@@ -4229,6 +4238,8 @@ function pdUnlockBodyScroll(){
   document.body.style.top='';
   document.body.style.left='';
   document.body.style.right='';
+  document.body.style.width='';
+  document.body.style.height='';
   window.scrollTo(0, pdScrollLockY);
 }
 
