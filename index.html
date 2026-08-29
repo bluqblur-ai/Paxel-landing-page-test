@@ -1629,6 +1629,10 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
 .pd-picker-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:7px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
 .pd-picker-tab.active{background:var(--blue);color:var(--ink);}
+.pd-panel-main-tabs{display:flex;gap:8px;margin-bottom:12px;flex-shrink:0;}
+.pd-panel-main-tab{flex:1;font-family:var(--font);font-size:13px;font-weight:800;padding:10px 8px;border:var(--bw2) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;box-shadow:var(--s-sm);transition:background .15s,color .15s,transform .12s;}
+.pd-panel-main-tab:hover{transform:translate(-1px,-1px);}
+.pd-panel-main-tab.active{background:var(--blue);color:var(--ink);}
 .pd-add-text-btn{width:100%;font-family:var(--font);font-weight:700;font-size:13px;padding:10px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
 .pd-add-text-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 .pd-mobile-text-edit-box{width:100%;min-height:110px;padding:10px 12px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;font-family:var(--font);font-size:16px;line-height:1.35;color:var(--ink);resize:none;box-sizing:border-box;box-shadow:var(--s-sm);word-wrap:break-word;overflow-wrap:break-word;}
@@ -4330,7 +4334,9 @@ function pdToggleStickerPicker(){
   if(!panel) return;
   const isOpen = panel.style.display==='flex';
   if(!isOpen){
-    if(pdEditingPage===null) pdEnterEditMode();
+    if(pdEditingPage===null) pdEnterEditMode(true);
+    const mainTabs=document.getElementById('pdPanelMainTabs');
+    if(mainTabs) mainTabs.style.display='flex';
     pdShowWordsPhrasesPanelBody();
     pdRenderPicker();
     panel.classList.remove('pd-panel-closing');
@@ -4463,6 +4469,15 @@ let pdBakedPageUrlsCache=null;
 // the mobile sheet textarea's blur. Returns true if it removed the
 // sticker, so callers know not to proceed with any further per-sticker
 // logic (like a redundant extra save).
+// The text tool (font/weight/align/color/line-height, add-text-box, and
+// the mobile synced textarea) used to be cover-only, hardcoded to page 0.
+// Now it works on whichever page is currently being edited — this
+// resolves that page safely, falling back to 0 only as a defensive
+// measure if somehow called outside an active edit session.
+function pdTextToolPageIndex(){
+  return pdEditingPage!==null ? pdEditingPage : 0;
+}
+
 function pdRemoveTextIfEmpty(st, pageIndex){
   if(st.text && st.text.trim()) return false;
   const page=pdBook.pages[pageIndex];
@@ -5379,18 +5394,13 @@ function pdToggleCoverText(){
   if(!pdZineBook) return;
   if(pdEditingPage===null){
     pdEnterEditMode(true);
+    const mainTabs=document.getElementById('pdPanelMainTabs');
+    if(mainTabs) mainTabs.style.display='none';
     pdShowCoverTextPanelBody();
     const panel=document.getElementById('pdStickerPanel');
     if(panel){
       panel.classList.remove('pd-panel-closing');
       panel.style.display='flex';
-      if(pdIsMobile()){
-        // Collapsed by default — just enough for the drag strip + the
-        // add-text button. The style controls stay in the DOM, reachable
-        // only by the user dragging the sheet taller themselves.
-        panel.style.height='18vh';
-        panel.style.maxHeight='18vh';
-      }
       if(!pdStickerPanelInitialized){
         pdMakeStickerPanelDraggable();
         pdStickerPanelInitialized=true;
@@ -5402,8 +5412,8 @@ function pdToggleCoverText(){
 }
 
 // Swaps the shared floating panel's body between the words/phrases picker
-// and the cover text tool, so the same window is reused for both rather
-// than building a second, separate popup.
+// and the text tool, so the same window is reused for both rather than
+// building a second, separate popup.
 function pdShowWordsPhrasesPanelBody(){
   const toggle=document.querySelector('.pd-picker-toggle');
   const list=document.getElementById('pdPickerList');
@@ -5411,6 +5421,15 @@ function pdShowWordsPhrasesPanelBody(){
   if(toggle) toggle.style.display='flex';
   if(list) list.style.display='';
   if(textPanel) textPanel.style.display='none';
+  const tabStickers=document.getElementById('pdMainTabStickers');
+  const tabText=document.getElementById('pdMainTabText');
+  if(tabStickers) tabStickers.classList.add('active');
+  if(tabText) tabText.classList.remove('active');
+  pdDeselectSticker();
+  if(pdIsMobile()){
+    const panel=document.getElementById('pdStickerPanel');
+    if(panel){ panel.style.height='45vh'; panel.style.maxHeight='45vh'; }
+  }
 }
 function pdShowCoverTextPanelBody(){
   const toggle=document.querySelector('.pd-picker-toggle');
@@ -5419,6 +5438,18 @@ function pdShowCoverTextPanelBody(){
   if(toggle) toggle.style.display='none';
   if(list) list.style.display='none';
   if(textPanel) textPanel.style.display='block';
+  const tabStickers=document.getElementById('pdMainTabStickers');
+  const tabText=document.getElementById('pdMainTabText');
+  if(tabStickers) tabStickers.classList.remove('active');
+  if(tabText) tabText.classList.add('active');
+  pdDeselectSticker();
+  if(pdIsMobile()){
+    // Collapsed by default — just enough for the drag strip + the
+    // add-text button. The style controls stay in the DOM, reachable
+    // only by the user dragging the sheet taller themselves.
+    const panel=document.getElementById('pdStickerPanel');
+    if(panel){ panel.style.height='18vh'; panel.style.maxHeight='18vh'; }
+  }
 }
 
 // Adds a new, freely-placed text box to the cover — offset a little from
@@ -5426,8 +5457,8 @@ function pdShowCoverTextPanelBody(){
 // and selects it immediately so the font buttons and resize handle are
 // ready to use right away.
 function pdAddCoverTextBox(){
-  if(!pdBook.pages[0]) pdBook.pages[0]={stickers:[]};
-  const stickers=pdBook.pages[0].stickers;
+  if(!pdBook.pages[pdTextToolPageIndex()]) pdBook.pages[pdTextToolPageIndex()]={stickers:[]};
+  const stickers=pdBook.pages[pdTextToolPageIndex()].stickers;
   const count=stickers.filter(function(s){return s.kind==='text';}).length;
   const id='pd-text-'+Date.now()+'-'+Math.floor(Math.random()*1000);
   // Mobile: centered both ways, matching the spec ("centro de la página")
@@ -5456,7 +5487,7 @@ function pdAddCoverTextBox(){
 function pdSetSelectedTextFont(font){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.font=font;
@@ -5472,7 +5503,7 @@ function pdSetSelectedTextFont(font){
 function pdSetSelectedTextWeight(weight){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.weight=weight;
@@ -5483,7 +5514,7 @@ function pdSetSelectedTextWeight(weight){
 function pdSetSelectedTextAlign(align){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.textAlign=align;
@@ -5497,7 +5528,7 @@ function pdSetSelectedTextAlign(align){
 function pdSetSelectedTextLineHeight(value){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.lineHeight=parseFloat(value);
@@ -5508,7 +5539,7 @@ function pdSetSelectedTextLineHeight(value){
 function pdSetSelectedTextColor(color){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.color=color;
@@ -5685,7 +5716,7 @@ function pdSelectSticker(el){
   // Keep the line-height slider and custom color swatch showing this
   // box's own current values, not whatever the last-selected box had.
   const id=el.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(st && st.kind==='text'){
     const slider=document.getElementById('pdLineHeightSlider');
@@ -5733,7 +5764,7 @@ function pdMobileHideTextEditBox(){
 function pdMobileSyncTextEditBox(value){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.text=value;
@@ -5744,10 +5775,10 @@ function pdMobileSyncTextEditBox(value){
 function pdMobileTextEditBoxBlur(){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
-  pdRemoveTextIfEmpty(st, 0);
+  pdRemoveTextIfEmpty(st, pdTextToolPageIndex());
 }
 
 // One handle does both: how far the drag moves from the sticker's own
@@ -5922,7 +5953,7 @@ function pdMakeEditAreaPinchable(){
   overlay.addEventListener('pointerdown', function(e){
     if(!pdSelectedStickerEl) return;
     const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-    const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+    const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
     const st=stickers.find(function(s){ return s.id===id; });
     if(!st || st.kind!=='text') return;
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
@@ -6491,6 +6522,10 @@ window.addEventListener('DOMContentLoaded',()=>{
   <div class="pd-sticker-panel-drag" id="pdStickerPanelDrag">
     <span class="pd-diary-drag-grip">&#8942;&#8942;</span>
     <button class="pd-sticker-panel-close" onclick="pdToggleStickerOrText()">&#10005;</button>
+  </div>
+  <div class="pd-panel-main-tabs" id="pdPanelMainTabs" style="display:none;">
+    <button class="pd-panel-main-tab active" id="pdMainTabStickers" onclick="pdShowWordsPhrasesPanelBody()">&#127912; Stickers</button>
+    <button class="pd-panel-main-tab" id="pdMainTabText" onclick="pdShowCoverTextPanelBody()">Aa Text</button>
   </div>
   <div class="pd-picker-toggle">
     <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
