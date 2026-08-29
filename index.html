@@ -4202,11 +4202,33 @@ function pdToggleInventory(){
   if(floatEl && floatEl.classList.contains('pd-diary-open')) pdCloseInventory();
   else pdOpenInventory();
 }
+let pdScrollLockY=0;
+// iOS Safari handles plain overflow:hidden on body unreliably, especially
+// combined with its own dynamic address-bar collapsing — position:fixed
+// with the scroll offset preserved (and restored on unlock) is the
+// well-established, more robust technique.
+function pdLockBodyScroll(){
+  pdScrollLockY=window.scrollY||window.pageYOffset||0;
+  document.body.style.position='fixed';
+  document.body.style.top=(-pdScrollLockY)+'px';
+  document.body.style.left='0';
+  document.body.style.right='0';
+  document.body.classList.add('pd-diary-active');
+}
+function pdUnlockBodyScroll(){
+  document.body.classList.remove('pd-diary-active');
+  document.body.style.position='';
+  document.body.style.top='';
+  document.body.style.left='';
+  document.body.style.right='';
+  window.scrollTo(0, pdScrollLockY);
+}
+
 function pdOpenInventory(){
   if(!pdBook) pdBook=pdLoadBook();
   const floatEl=document.getElementById('pdDiaryFloat');
   if(!floatEl) return;
-  document.body.classList.add('pd-diary-active');
+  pdLockBodyScroll();
   floatEl.classList.add('pd-diary-open');
   pdAnimateDiaryIn(floatEl);
   pdRenderPicker();
@@ -4238,7 +4260,7 @@ function pdAnimateDiaryIn(floatEl){
     // over the controls column," a desktop-only concept that doesn't
     // apply once the diary isn't a draggable floating object anymore.
     targetLeft=window.innerWidth/2-fRect.width/2;
-    targetTop=window.innerHeight*0.04;
+    targetTop=window.innerHeight*0.09;
   }else{
     const controlsCol=document.getElementById('pdControlsCol');
     if(controlsCol){
@@ -4268,7 +4290,7 @@ function pdAnimateDiaryIn(floatEl){
 }
 
 function pdCloseInventory(){
-  document.body.classList.remove('pd-diary-active');
+  pdUnlockBodyScroll();
   const floatEl=document.getElementById('pdDiaryFloat');
   if(floatEl && floatEl.classList.contains('pd-diary-open')){
     // Slide + fade back down to the bottom of the viewport, same path in
@@ -5312,6 +5334,13 @@ function pdToggleCoverText(){
     if(panel){
       panel.classList.remove('pd-panel-closing');
       panel.style.display='flex';
+      if(pdIsMobile()){
+        // Collapsed by default — just enough for the drag strip + the
+        // add-text button. The style controls stay in the DOM, reachable
+        // only by the user dragging the sheet taller themselves.
+        panel.style.height='18vh';
+        panel.style.maxHeight='18vh';
+      }
       if(!pdStickerPanelInitialized){
         pdMakeStickerPanelDraggable();
         pdStickerPanelInitialized=true;
