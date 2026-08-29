@@ -1595,6 +1595,18 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-flip-nav-btn:active{transform:translate(50%,-50%) scale(.86);}
 .pd-zine-shell.pd-book-cover .pd-flip-nav-btn{right:25%;}
 .pd-flip-nav-addpage{background:var(--blue);font-size:16px;font-weight:800;}
+.pd-flip-nav-deletepage{top:calc(50% - 54px);background:#fff;font-size:14px;}
+
+.pd-confirm-overlay{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:20px;}
+.pd-confirm-box{background:#fff;border:var(--bw2) solid var(--ink);border-radius:var(--r1);box-shadow:var(--s-md);padding:20px;max-width:320px;width:100%;font-family:var(--font);}
+.pd-confirm-text{margin:0 0 14px;font-size:14px;line-height:1.4;color:var(--ink);}
+.pd-confirm-checkbox-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft);margin-bottom:16px;cursor:pointer;}
+.pd-confirm-checkbox-row input{width:16px;height:16px;cursor:pointer;}
+.pd-confirm-actions{display:flex;gap:8px;}
+.pd-confirm-cancel,.pd-confirm-delete{flex:1;font-family:var(--font);font-weight:700;font-size:13px;padding:10px;border:var(--bw) solid var(--ink);border-radius:var(--r1);cursor:pointer;transition:transform .12s,box-shadow .12s;}
+.pd-confirm-cancel{background:#fff;color:var(--ink);}
+.pd-confirm-delete{background:#DC2626;color:#fff;}
+.pd-confirm-cancel:hover,.pd-confirm-delete:hover{transform:translate(-1px,-1px);box-shadow:var(--s-sm);}
 
 /* Words/Phrases picker: an independent floating panel, not tied to the
    book's own position — draggable anywhere on screen. */
@@ -4724,6 +4736,7 @@ function pdMobileSyncUI(){
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const doneBtn=document.getElementById('pdEditDoneBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
+  const deleteBtn=document.getElementById('pdDeletePageBtn');
   const closeBtn=document.getElementById('pdDiaryCloseBtn');
   const isCover = pdMobileCurrentPage===0;
   if(stickerBtn){
@@ -4732,10 +4745,14 @@ function pdMobileSyncUI(){
     stickerBtn.title = isCover ? 'Edit title/subtitle' : 'Add stickers';
   }
   if(doneBtn) doneBtn.style.right=(rightGap+48)+'px';
+  const isLast = pdBook && pdMobileCurrentPage>=pdBook.pages.length-1;
   if(newPageBtn){
     newPageBtn.style.right=(rightGap+8)+'px';
-    const isLast = pdBook && pdMobileCurrentPage>=pdBook.pages.length-1;
     newPageBtn.style.display = (pdEditingPage===null && isLast) ? 'flex' : 'none';
+  }
+  if(deleteBtn){
+    deleteBtn.style.right=(rightGap+8)+'px';
+    deleteBtn.style.display = (pdEditingPage===null && isLast && pdBook && pdBook.pages.length>1) ? 'flex' : 'none';
   }
   if(closeBtn) closeBtn.style.left=gapBefore+'px';
 }
@@ -5286,6 +5303,7 @@ function pdSyncBookLayout(){
   const shell=document.getElementById('pdZineShell');
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
+  const deleteBtn=document.getElementById('pdDeletePageBtn');
 
   const spreads=pdZineBook.getSpreads();
   const spread=spreads[pdZineBook.getSpreadIndex()]||{left:null,right:null};
@@ -5312,7 +5330,11 @@ function pdSyncBookLayout(){
   // New page: only appears once there's nowhere left to flip forward to —
   // disappears again the moment there are more pages ahead. Not shown
   // while editing (Done takes that spot instead).
-  if(newPageBtn) newPageBtn.style.display = (pdEditingPage===null && !pdZineBook.canFlipNext()) ? 'flex' : 'none';
+  const canAddOrDelete = pdEditingPage===null && !pdZineBook.canFlipNext();
+  if(newPageBtn) newPageBtn.style.display = canAddOrDelete ? 'flex' : 'none';
+  // Delete: same visibility as add-page, but only once there's an actual
+  // interior page to remove — never lets the cover itself be deleted.
+  if(deleteBtn) deleteBtn.style.display = (canAddOrDelete && pdBook.pages.length>1) ? 'flex' : 'none';
 
   if(pdEditingPage!==null){
     pdPositionEditPages();
@@ -6182,6 +6204,47 @@ function pdBookTurn(delta){
     }
   }, 700);
 }
+// ── Delete last page (mirrors pdAddPage's own mobile/desktop rebuild
+// pattern) — never removes the cover itself, and asks for confirmation
+// unless the user has previously opted out via the checkbox. ──
+const PD_SKIP_DELETE_CONFIRM_KEY='paxel_pd_skip_delete_confirm';
+
+function pdConfirmDeleteLastPage(){
+  if(!pdBook || pdBook.pages.length<=1) return; // nothing beyond the cover to delete
+  let skip=false;
+  try{ skip=localStorage.getItem(PD_SKIP_DELETE_CONFIRM_KEY)==='true'; }catch(e){}
+  if(skip){ pdDeleteLastPage(); return; }
+  const overlay=document.getElementById('pdConfirmDeleteOverlay');
+  const checkbox=document.getElementById('pdConfirmDeleteSkipNext');
+  if(checkbox) checkbox.checked=false;
+  if(overlay) overlay.style.display='flex';
+}
+function pdCancelDeletePage(){
+  const overlay=document.getElementById('pdConfirmDeleteOverlay');
+  if(overlay) overlay.style.display='none';
+}
+function pdDeleteLastPageConfirmed(){
+  const checkbox=document.getElementById('pdConfirmDeleteSkipNext');
+  if(checkbox && checkbox.checked){
+    try{ localStorage.setItem(PD_SKIP_DELETE_CONFIRM_KEY, 'true'); }catch(e){}
+  }
+  pdCancelDeletePage();
+  pdDeleteLastPage();
+}
+function pdDeleteLastPage(){
+  if(!pdBook || pdBook.pages.length<=1) return; // never delete the cover
+  pdBook.pages.pop();
+  pdSaveBook();
+  const newLast=pdBook.pages.length-1;
+  if(pdIsMobile()){
+    pdBuildZine(newLast);
+    pdMobileCurrentPage=newLast;
+    pdMobileRenderPageView();
+    return;
+  }
+  pdBuildZine(newLast);
+}
+
 function pdAddPage(){
   if(pdIsMobile()){
     const newIndex=pdBook.pages.length;
@@ -6561,6 +6624,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerOrText()">&#127912;</button>
         <button class="pd-edit-done-btn" id="pdEditDoneBtn" onclick="event.stopPropagation();pdExitEditMode()" style="display:none;">Done &#10003;</button>
         <button class="pd-flip-nav-btn pd-flip-nav-addpage" id="pdNewPageBtn" onclick="event.stopPropagation();pdAddPage()" title="New page" style="display:none;">&#43;</button>
+        <button class="pd-flip-nav-btn pd-flip-nav-deletepage" id="pdDeletePageBtn" onclick="event.stopPropagation();pdConfirmDeleteLastPage()" title="Delete last page" style="display:none;">&#128465;</button>
       </div>
     </div>
   </div>
@@ -6616,6 +6680,23 @@ window.addEventListener('DOMContentLoaded',()=>{
         <button class="pd-color-swatch" style="background:#15803D;" onclick="pdSetSelectedTextColor('#15803D')" title="Green"></button>
         <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" title="Custom color">
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation modal for deleting the last page — shared by mobile and
+     desktop. Skipped entirely (deletion happens immediately) if the
+     user has previously checked "don't show this again". -->
+<div class="pd-confirm-overlay" id="pdConfirmDeleteOverlay" style="display:none;">
+  <div class="pd-confirm-box">
+    <p class="pd-confirm-text">Delete the last page? This can't be undone.</p>
+    <label class="pd-confirm-checkbox-row">
+      <input type="checkbox" id="pdConfirmDeleteSkipNext">
+      <span>Don't show this again</span>
+    </label>
+    <div class="pd-confirm-actions">
+      <button class="pd-confirm-cancel" onclick="pdCancelDeletePage()">Cancel</button>
+      <button class="pd-confirm-delete" onclick="pdDeleteLastPageConfirmed()">Delete page</button>
     </div>
   </div>
 </div>
