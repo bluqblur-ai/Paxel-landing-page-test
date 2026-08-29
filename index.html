@@ -5980,6 +5980,13 @@ let pdEditAreaPinchWired=false;
 // anywhere within the edit area — not just with both fingers landing
 // exactly on the (often small) box itself, which is an awkward target on
 // a phone. Only acts on a selected text-kind sticker.
+// Lets the currently selected sticker — any kind, not just text — be
+// resized/rotated by pinching anywhere within the edit area, not just
+// with both fingers landing exactly on the sticker itself (an especially
+// awkward target for a short word/phrase chip on a phone). Also
+// explicitly blocks the browser's own native pinch-zoom (allowed on the
+// surrounding page for manual zooming) from winning the gesture the
+// moment a finger lands outside the sticker's own small bounding box.
 function pdMakeEditAreaPinchable(){
   if(pdEditAreaPinchWired) return;
   pdEditAreaPinchWired=true;
@@ -5992,10 +5999,11 @@ function pdMakeEditAreaPinchable(){
     const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
     const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
     const st=stickers.find(function(s){ return s.id===id; });
-    if(!st || st.kind!=='text') return;
+    if(!st) return;
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
     const ids=Object.keys(pointers);
     if(ids.length===2){
+      e.preventDefault();
       e.stopPropagation();
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
@@ -6008,6 +6016,7 @@ function pdMakeEditAreaPinchable(){
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
     const ids=Object.keys(pointers);
     if(ids.length===2 && pinchStart){
+      e.preventDefault();
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
       const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
