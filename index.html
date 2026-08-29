@@ -1537,20 +1537,10 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    needs no runtime measurement of ZineJS's internals at all — just the
    same fixed geometry ZineJS itself is built to produce. */
 .pd-zine-shell{position:relative;width:100%;aspect-ratio:420/297;overflow:visible;background:transparent;touch-action:pinch-zoom;}
-@media(max-width:640px){
-  /* 210 (one page) * 1.15 (adding the 15% peek) : 297 — matches
-     PD_MOBILE_PEEK exactly, so the shell's own shape fits the mobile
-     page-view's actual content instead of the desktop double-spread ratio. */
-  .pd-zine-shell{aspect-ratio:241.5/297;}
-}
 .pd-zine-container{position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
 .pd-mobile-page-view{display:none;}
 .pd-mobile-track{position:relative;height:100%;}
 .pd-mobile-slide{position:absolute;top:0;height:100%;background-size:cover;background-position:center;background-repeat:no-repeat;}
-@media(max-width:640px){
-  #pdZineContainer{display:none;}
-  .pd-mobile-page-view{display:block;position:absolute;inset:0;overflow:hidden;border-radius:var(--r1);}
-}
 .pd-zine-container,.pd-zine-container *{outline:none;}
 
 /* Close + resize: stuck to the visible content's own corners — animating
@@ -4236,7 +4226,6 @@ function pdOpenInventory(){
   if(!pdDiaryInitialized){
     pdMakeDiaryDraggable();
     pdMakeDiaryResizable();
-    pdMobileWireTaps();
     pdDiaryInitialized=true;
   }
   // Safety net: keeps the floating buttons correctly positioned even if a
@@ -4612,7 +4601,21 @@ function pdMobileStepPage(delta){
 function pdMobileWireTaps(){
   const curSlide=document.getElementById('pdMobileSlideCurrent');
   const peekSlide=document.getElementById('pdMobileSlideNext');
-  if(curSlide) curSlide.addEventListener('click', function(){ pdMobileTapMain(); });
+  const EDGE_ZONE=55; // px — matches roughly the same scale as ZineJS's own clickZoneSize on desktop
+  if(curSlide) curSlide.addEventListener('click', function(e){
+    const rect=curSlide.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    const peek=pdMobilePeekInfo();
+    // peek==='right': tapping main goes back — only from the LEFT edge.
+    // peek==='left' or null (cover): tapping main advances — only from
+    // the RIGHT edge.
+    if(peek.side==='right'){
+      if(x>EDGE_ZONE) return;
+    }else{
+      if(x<rect.width-EDGE_ZONE) return;
+    }
+    pdMobileTapMain();
+  });
   if(peekSlide) peekSlide.addEventListener('click', function(){ pdMobileGoToPeek(); });
   let resizeT;
   window.addEventListener('resize', function(){
@@ -4788,11 +4791,6 @@ document.addEventListener('keydown', function(e){
   if(e.target && e.target.isContentEditable) return;
   if(pdEditingPage!==null) return;
   const key=e.key.toLowerCase();
-  if(pdIsMobile()){
-    if(key==='q') pdMobileStepPage(-1);
-    else if(key==='e') pdMobileStepPage(1);
-    return;
-  }
   if(key==='q') pdBookTurn(-1);
   else if(key==='e') pdBookTurn(1);
 });
@@ -5145,10 +5143,6 @@ function pdBuildZine(startPage){
   // waiting for the next periodic safety-net tick.
   pdZineBook.on('spreadChanged', function(){ pdSyncBookLayout(); });
   pdZineBook.ready.then(function(){ pdSyncBookLayoutRetrying(8); }).catch(function(){});
-  if(pdIsMobile()){
-    pdMobileCurrentPage=Math.max(0,Math.min((urls.length||1)-1,startPage||0));
-    pdMobileRenderPageView();
-  }
 }
 
 // getPageBox() can still report null right when `ready` resolves — the
@@ -5169,11 +5163,6 @@ function pdSyncBookLayoutRetrying(framesLeft){
 // current page geometry. Re-run after every build, flip, and resize.
 function pdSyncBookLayout(){
   if(!pdZineBook) return;
-  if(pdIsMobile()){
-    pdMobileSyncUI();
-    if(pdEditingPage!==null) pdMobilePositionEditOverlay();
-    return;
-  }
   const shell=document.getElementById('pdZineShell');
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
@@ -5263,22 +5252,6 @@ function pdPositionEditPages(){
 // tapping the page) — it opens for whichever spread ZineJS is currently
 // showing, at that same existing size and position (no zoom).
 function pdEnterEditMode(allowCover){
-  if(pdIsMobile()){
-    const idx=pdMobileCurrentPage;
-    if(idx===0 && !allowCover) return; // the cover: no sticker editing (title/subtitle is a separate, allowed path)
-    pdEditingSpread={left:idx, right:null};
-    if(!pdBook.pages[idx]) pdBook.pages[idx]={stickers:[]};
-    pdEditingPage=idx;
-    const overlay=document.getElementById('pdEditOverlay');
-    if(overlay) overlay.style.display='block';
-    const doneBtn=document.getElementById('pdEditDoneBtn');
-    if(doneBtn) doneBtn.style.display='flex';
-    pdRenderEditPage();
-    pdMobilePositionEditOverlay();
-    pdMobileSyncUI();
-    pdMakeEditAreaPinchable();
-    return;
-  }
   if(!pdZineBook) return;
   const spreads=pdZineBook.getSpreads();
   const spread=spreads[pdZineBook.getSpreadIndex()];
@@ -5294,6 +5267,7 @@ function pdEnterEditMode(allowCover){
   if(doneBtn) doneBtn.style.display='flex';
   pdRenderEditPage();
   pdSyncBookLayout();
+  pdMakeEditAreaPinchable();
 }
 
 // Sizes/positions the edit overlay against the mobile current slide's own
@@ -5462,11 +5436,6 @@ function pdExitEditMode(){
   const doneBtn=document.getElementById('pdEditDoneBtn');
   if(doneBtn) doneBtn.style.display='none';
   pdSaveBook();
-  if(pdIsMobile()){
-    pdBuildZine(pdMobileCurrentPage);
-    pdMobileRenderPageView();
-    return;
-  }
   const targetPage=pdZineBook?pdZineBook.getPage():0;
   pdBuildZine(targetPage);
 }
@@ -6026,15 +5995,6 @@ function pdBookTurn(delta){
   }, 700);
 }
 function pdAddPage(){
-  if(pdIsMobile()){
-    const newIndex=pdBook.pages.length;
-    pdBook.pages.push({stickers:[]});
-    pdSaveBook();
-    pdBuildZine(pdMobileCurrentPage);
-    pdMobileCurrentPage=newIndex;
-    pdMobileRenderPageView();
-    return;
-  }
   if(!pdZineBook) return;
   const currentPage=pdZineBook.getPage();
   pdBook.pages.push({stickers:[]});
