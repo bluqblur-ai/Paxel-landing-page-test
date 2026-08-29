@@ -2550,6 +2550,48 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 
 
 <script>
+// ============================================================
+// ARCHITECTURE MAP — read this first
+// ============================================================
+// This file holds four independent creative tools, each wrapped in its
+// own self-executing function (IIFE) below. Wrapping means everything
+// inside a tool — its helpers, its state — is private by default; each
+// tool ends with an explicit "Public API" list of the only names it
+// exposes on `window`. That list IS the tool's contract with the rest
+// of the page. If you need to know what a tool can be asked to do from
+// the outside, read its exposure list — you don't need to read its
+// internals.
+//
+// The four tools, in the order they appear below, each named by a
+// two-letter prefix used on every one of their functions/variables:
+//   pt — Pixel Tool      (the original pixel-art reveal tool)
+//   wt — Pixel Waterer   (the "water your art" reveal variant)
+//   pp — Pixel Phrases   (collects words/phrases into a reward system)
+//   pd — Pixel Diary     (the flipbook "My diary" feature — by far the
+//                         largest and most complex module, having grown
+//                         feature-by-feature over many iterations; see
+//                         its own internal sub-section banners for a
+//                         map of ITS structure)
+//
+// Shared layer (deliberately tiny, declared before any tool below):
+//   paxelWallet          — the shared coin/currency balance
+//   setUploadLoading/
+//   setUploadLoaded      — generic upload-zone UI state, parameterized
+//                          by prefix so every tool can reuse it
+//   showPage(id)         — the page router; lazily calls each tool's
+//                          own ptInitP5/wtInitP5/ppInitP5 the first
+//                          time its page is shown
+// This is the ONLY code any tool depends on besides itself. Search for
+// "pdDownloadCanvas" if you want to see the one deliberate exception:
+// the diary's download reuses the waterer's certificate-hash utilities
+// rather than duplicating them.
+//
+// A few small, separate (function(){...})() blocks appear after all
+// four tools — each is an isolated, additive UI behavior (e.g. the
+// scroll-based nav-compacting, or moving a button on mobile) that
+// intentionally doesn't belong inside any one tool's module.
+// ============================================================
+
 // Upload zone status helpers
 // ── Shared coin wallet (Pixel Waterer + Pixel Phrases) ──
 const paxelWallet={monedas:0};
@@ -2594,6 +2636,12 @@ function showPage(id){
 // ============================================================
 // PIXEL TOOL
 // ============================================================
+// Self-contained module: everything below is private to this tool
+// unless explicitly exposed at the bottom. Nothing here reads or writes
+// another tool's state — the only thing shared across tools is
+// paxelWallet, setUploadLoading/setUploadLoaded, and showPage (all
+// declared above, outside any tool's module).
+(function(){
 let ptP5Instance=null,ptPxSketch=null;
 let pt={img:null,bloquesADibujar:[],indiceActual:0,diaActual:0,construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,canvasW:600,canvasH:600};
 let ptIntervalSpeed=30,ptBloquesPorCiclo=1,ptCurrentInterval=null;
@@ -2677,9 +2725,25 @@ function ptSetFmt(tipo,w,h,btn){
 
 function ptOnResChange(){const v=document.getElementById('ptResSelect').value;if(!v)return;const p=v.split('x');pt.COLS=parseInt(p[0]);pt.ROWS=parseInt(p[1]);if(pt.img)ptProcesarImagen();}
 
+// Public API — everything else above stays private to this module.
+window.ptInitP5=ptInitP5;
+window.ptHandleFileInput=ptHandleFileInput;
+window.ptProcesarImagen=ptProcesarImagen;
+window.ptIniciarConstruccionDia=ptIniciarConstruccionDia;
+window.ptUpdateDayStatus=ptUpdateDayStatus;
+window.ptDownloadCanvas=ptDownloadCanvas;
+window.ptSetFmt=ptSetFmt;
+window.ptOnResChange=ptOnResChange;
+Object.defineProperty(window,'ptP5Instance',{get:()=>ptP5Instance});
+})();
+
 // ============================================================
 // PIXEL WATERER — toggle
 // ============================================================
+// Self-contained module: only the identifiers listed at the bottom
+// are reachable from outside — everything else is private to this
+// tool, matching the Pixel Tool module above.
+(function(){
 let wtCtrlHidden=false;
 
 function wtToggleControls(){
@@ -3107,9 +3171,30 @@ window.addEventListener('resize',()=>{wtRecalcCanvasHeight();});
 
 
 
+// Public API — everything else above stays private to this module.
+window.wtDownloadCanvas=wtDownloadCanvas;
+window.wtGenerateHash=wtGenerateHash;
+window.wtHandleFileInput=wtHandleFileInput;
+window.wtIniciarConstruccionDia=wtIniciarConstruccionDia;
+window.wtInitP5=wtInitP5;
+window.wtNextCertSerial=wtNextCertSerial;
+window.wtOnResChange=wtOnResChange;
+Object.defineProperty(window,'wtP5Instance',{get:()=>wtP5Instance});
+window.wtProcesarImagen=wtProcesarImagen;
+window.wtResetCoins=wtResetCoins;
+window.wtRevelarColorActual=wtRevelarColorActual;
+window.wtSetFmt=wtSetFmt;
+window.wtToggleControls=wtToggleControls;
+window.wtUpdateUI=wtUpdateUI;
+window.wtUsarHolyWater=wtUsarHolyWater;
+})();
 // ============================================================
 // PIXEL PHRASES — full rewrite with toggle + fixed popup + PDF
 // ============================================================
+// Self-contained module: only the identifiers listed at the bottom
+// are reachable from outside — everything else is private to this
+// tool, matching the Pixel Tool / Pixel Waterer modules above.
+(function(){
 
 let ppP5Instance=null,ppPxSketch=null;
 let ppCtrlHidden=false;
@@ -3743,8 +3828,35 @@ window.addEventListener('DOMContentLoaded',()=>{
 
 
 
+// Public API — everything else above stays private to this module.
+window.ppDownloadCanvas=ppDownloadCanvas;
+window.ppExtraPhrase=ppExtraPhrase;
+window.ppHandleFile=ppHandleFile;
+window.ppIniciarConstruccionDia=ppIniciarConstruccionDia;
+window.ppInitP5=ppInitP5;
+window.ppOnResChange=ppOnResChange;
+window.ppOpenInventory=ppOpenInventory;
+Object.defineProperty(window,'ppP5Instance',{get:()=>ppP5Instance});
+window.ppRevelarColorActual=ppRevelarColorActual;
+window.ppSetFmt=ppSetFmt;
+window.ppToggleControls=ppToggleControls;
+window.ppUpdateUI=ppUpdateUI;
+window.ppUsarHolyWater=ppUsarHolyWater;
+})();
 // ============================================================
-
+// PIXEL DIARY
+// ============================================================
+// Self-contained module: only the identifiers listed at the very
+// bottom are reachable from outside — everything else (over 90
+// helpers) is private to this tool, matching the other three
+// modules above. This is by far the largest and most complex of
+// the four, having grown feature-by-feature over many iterations —
+// see the sub-section banners below for its own internal map:
+// data model & persistence, panel open/close, mobile page-view
+// rendering & navigation, desktop drag/resize, sticker picker,
+// canvas baking, ZineJS build & sync, edit mode & text tool,
+// sticker interaction, and page management.
+(function(){
 let pdP5Instance=null,pdPxSketch=null;
 let pdCtrlHidden=false;
 
@@ -4519,6 +4631,24 @@ let pdLastTextTapEl=null;
 
 function pdTextToolPageIndex(){
   return pdEditingPage!==null ? pdEditingPage : 0;
+}
+
+// Base lookup shared by everything that needs "whatever sticker is
+// currently selected" — any kind. Returns null if nothing is selected
+// or it can't be found on the current page.
+function pdGetSelectedSticker(){
+  if(!pdSelectedStickerEl) return null;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
+  return stickers.find(function(s){ return s.id===id; }) || null;
+}
+// Same, but only returns it if it's specifically a text-kind sticker —
+// used by the text-style setters (font, weight, align, line-height,
+// color) and the mobile synced textarea, none of which apply to
+// words/phrases.
+function pdGetSelectedTextSticker(){
+  const st=pdGetSelectedSticker();
+  return (st && st.kind==='text') ? st : null;
 }
 
 function pdRemoveTextIfEmpty(st, pageIndex){
@@ -5570,15 +5700,12 @@ function pdAddCoverTextBox(){
 
 // Applies a font to whichever text box is currently selected.
 function pdSetSelectedTextFont(font){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   st.font=font;
   pdSaveBook();
   pdRenderEditPage();
-  const el=document.querySelector('[data-sticker-id="'+id+'"]');
+  const el=document.querySelector('[data-sticker-id="'+st.id+'"]');
   if(el) pdSelectSticker(el);
 }
 
@@ -5586,22 +5713,16 @@ function pdSetSelectedTextFont(font){
 // re-render) so dragging the slider or native color picker feels instant
 // instead of rebuilding every sticker on the page each tick.
 function pdSetSelectedTextWeight(weight){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   st.weight=weight;
   const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
   if(inner) inner.style.fontWeight=weight;
   pdSaveBook();
 }
 function pdSetSelectedTextAlign(align){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   st.textAlign=align;
   const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
   if(inner) inner.style.textAlign=align;
@@ -5611,22 +5732,16 @@ function pdSetSelectedTextAlign(align){
   pdSaveBook();
 }
 function pdSetSelectedTextLineHeight(value){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   st.lineHeight=parseFloat(value);
   const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
   if(inner) inner.style.lineHeight=st.lineHeight;
   pdSaveBook();
 }
 function pdSetSelectedTextColor(color){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   st.color=color;
   const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
   if(inner) inner.style.color=color;
@@ -5814,9 +5929,7 @@ function pdSelectSticker(el){
   el.classList.add('pd-selected');
   // Keep the line-height slider and custom color swatch showing this
   // box's own current values, not whatever the last-selected box had.
-  const id=el.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
+  const st=pdGetSelectedSticker();
   if(st && st.kind==='text'){
     const slider=document.getElementById('pdLineHeightSlider');
     if(slider) slider.value=st.lineHeight||1.25;
@@ -5861,22 +5974,16 @@ function pdMobileHideTextEditBox(){
 // Keeps the cover's own live element in sync as the user types in the
 // sheet's textarea instead.
 function pdMobileSyncTextEditBox(value){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   st.text=value;
   const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
   if(inner) inner.textContent=value;
   pdSaveBook();
 }
 function pdMobileTextEditBoxBlur(){
-  if(!pdSelectedStickerEl) return;
-  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-  const st=stickers.find(function(s){ return s.id===id; });
-  if(!st || st.kind!=='text') return;
+  const st=pdGetSelectedTextSticker();
+  if(!st) return;
   pdRemoveTextIfEmpty(st, pdTextToolPageIndex());
 }
 
@@ -6046,10 +6153,7 @@ function pdMakeEditAreaPinchable(){
   const pointers={};
   let pinchStart=null;
   overlay.addEventListener('pointerdown', function(e){
-    if(!pdSelectedStickerEl) return;
-    const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-    const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
-    const st=stickers.find(function(s){ return s.id===id; });
+    const st=pdGetSelectedSticker();
     if(!st) return;
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
     const ids=Object.keys(pointers);
@@ -6381,11 +6485,11 @@ async function pdDownloadCanvas(){
 
   // ZIP
   const zip=new JSZip();
-  zip.file('paxel_phrases_'+hash+'.png',pngB64,{base64:true});
-  zip.file('paxel_phrases_certificate_'+hash+'.pdf',pdfB64,{base64:true});
+  zip.file('paxel_diary_'+hash+'.png',pngB64,{base64:true});
+  zip.file('paxel_diary_certificate_'+hash+'.pdf',pdfB64,{base64:true});
   const zipBlob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}});
   const url=URL.createObjectURL(zipBlob);
-  const a=document.createElement('a');a.href=url;a.download='paxel_phrases_'+hash+'.zip';
+  const a=document.createElement('a');a.href=url;a.download='paxel_diary_'+hash+'.zip';
   document.body.appendChild(a);a.click();document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
@@ -6406,7 +6510,42 @@ window.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
-</script>
+
+// Public API — everything else above (over 90 helpers) stays private
+// to this module. This list IS the diary's contract with the rest of
+// the page: HTML event handlers and the shared page router only ever
+// reach in through these names.
+window.pdAddCoverTextBox=pdAddCoverTextBox;
+window.pdAddPage=pdAddPage;
+window.pdCancelDeletePage=pdCancelDeletePage;
+window.pdCloseInventory=pdCloseInventory;
+window.pdConfirmDeleteLastPage=pdConfirmDeleteLastPage;
+window.pdDeleteLastPageConfirmed=pdDeleteLastPageConfirmed;
+window.pdDownloadCanvas=pdDownloadCanvas;
+window.pdExitEditMode=pdExitEditMode;
+window.pdExtraPhrase=pdExtraPhrase;
+window.pdHandleFile=pdHandleFile;
+window.pdIniciarConstruccionDia=pdIniciarConstruccionDia;
+window.pdMobileSyncTextEditBox=pdMobileSyncTextEditBox;
+window.pdMobileTextEditBoxBlur=pdMobileTextEditBoxBlur;
+window.pdOnResChange=pdOnResChange;
+window.pdOpenInventory=pdOpenInventory;
+window.pdPageBackgroundClick=pdPageBackgroundClick;
+window.pdRevelarColorActual=pdRevelarColorActual;
+window.pdSetFmt=pdSetFmt;
+window.pdSetPickerView=pdSetPickerView;
+window.pdSetSelectedTextAlign=pdSetSelectedTextAlign;
+window.pdSetSelectedTextColor=pdSetSelectedTextColor;
+window.pdSetSelectedTextFont=pdSetSelectedTextFont;
+window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
+window.pdSetSelectedTextWeight=pdSetSelectedTextWeight;
+window.pdShowCoverTextPanelBody=pdShowCoverTextPanelBody;
+window.pdShowWordsPhrasesPanelBody=pdShowWordsPhrasesPanelBody;
+window.pdToggleControls=pdToggleControls;
+window.pdToggleInventory=pdToggleInventory;
+window.pdToggleStickerOrText=pdToggleStickerOrText;
+window.pdUsarHolyWater=pdUsarHolyWater;
+})();</script>
 <script>
 /* Isolated, additive behavior only — does not touch any tool logic above.
    Toggles body classes on scroll so the nav + ticker react to scroll position. */
