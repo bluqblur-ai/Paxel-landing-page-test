@@ -1595,6 +1595,18 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-flip-nav-btn:active{transform:translate(50%,-50%) scale(.86);}
 .pd-zine-shell.pd-book-cover .pd-flip-nav-btn{right:25%;}
 .pd-flip-nav-addpage{background:var(--blue);font-size:16px;font-weight:800;}
+.pd-flip-nav-deletepage{top:calc(50% - 54px);background:#fff;font-size:14px;}
+
+.pd-confirm-overlay{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:20px;}
+.pd-confirm-box{background:#fff;border:var(--bw2) solid var(--ink);border-radius:var(--r1);box-shadow:var(--s-md);padding:20px;max-width:320px;width:100%;font-family:var(--font);}
+.pd-confirm-text{margin:0 0 14px;font-size:14px;line-height:1.4;color:var(--ink);}
+.pd-confirm-checkbox-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-soft);margin-bottom:16px;cursor:pointer;}
+.pd-confirm-checkbox-row input{width:16px;height:16px;cursor:pointer;}
+.pd-confirm-actions{display:flex;gap:8px;}
+.pd-confirm-cancel,.pd-confirm-delete{flex:1;font-family:var(--font);font-weight:700;font-size:13px;padding:10px;border:var(--bw) solid var(--ink);border-radius:var(--r1);cursor:pointer;transition:transform .12s,box-shadow .12s;}
+.pd-confirm-cancel{background:#fff;color:var(--ink);}
+.pd-confirm-delete{background:#DC2626;color:#fff;}
+.pd-confirm-cancel:hover,.pd-confirm-delete:hover{transform:translate(-1px,-1px);box-shadow:var(--s-sm);}
 
 /* Words/Phrases picker: an independent floating panel, not tied to the
    book's own position — draggable anywhere on screen. */
@@ -1629,8 +1641,13 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
 .pd-picker-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:7px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
 .pd-picker-tab.active{background:var(--blue);color:var(--ink);}
+.pd-panel-main-tabs{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0;}
+.pd-panel-main-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.02em;padding:6px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
+.pd-panel-main-tab.active{background:var(--blue);color:var(--ink);}
 .pd-add-text-btn{width:100%;font-family:var(--font);font-weight:700;font-size:13px;padding:10px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
 .pd-add-text-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
+.pd-mobile-text-edit-box{width:100%;min-height:110px;padding:10px 12px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;font-family:var(--font);font-size:16px;line-height:1.35;color:var(--ink);resize:none;box-sizing:border-box;box-shadow:var(--s-sm);word-wrap:break-word;overflow-wrap:break-word;}
+.pd-mobile-text-edit-box:focus{outline:none;border-color:var(--blue);box-shadow:var(--s-md);}
 .pd-sheet-resizing button{transform:none !important;}
 .pd-cover-text-hint{font-family:var(--font);font-size:11px;color:var(--ink-soft);margin:12px 0 8px;text-align:center;}
 .pd-font-row{display:flex;gap:6px;}
@@ -1642,6 +1659,9 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-text-ctrl-label{font-family:var(--font);font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin:12px 0 6px;}
 .pd-weight-choice{flex:1;padding:9px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-family:var(--font);font-size:12px;transition:background .15s;}
 .pd-weight-choice:hover{background:var(--paper-alt);}
+.pd-align-choice{flex:1;padding:9px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-family:var(--font);font-size:12px;transition:background .15s,color .15s;}
+.pd-align-choice:hover{background:var(--paper-alt);}
+.pd-align-choice.pd-align-active{background:var(--blue);color:#fff;}
 .pd-line-height-slider{width:100%;accent-color:var(--blue);cursor:pointer;}
 .pd-color-row{display:flex;gap:6px;align-items:center;}
 .pd-color-swatch{width:26px;height:26px;border-radius:50%;border:var(--bw) solid var(--ink);cursor:pointer;padding:0;flex-shrink:0;transition:transform .12s;}
@@ -4213,6 +4233,15 @@ function pdLockBodyScroll(){
   document.body.style.top=(-pdScrollLockY)+'px';
   document.body.style.left='0';
   document.body.style.right='0';
+  document.body.style.width='100%';
+  // 100vh first as a fallback, then 100dvh (dynamic viewport height)
+  // where supported — the purpose-built fix for iOS Safari's own
+  // dynamic address-bar chrome, which otherwise leaves a gap at the
+  // bottom the size of whatever toolbar is currently showing, since
+  // plain 100vh there can represent the toolbar-hidden size even while
+  // the toolbar is visible.
+  document.body.style.height='100vh';
+  document.body.style.height='100dvh';
   document.body.classList.add('pd-diary-active');
 }
 function pdUnlockBodyScroll(){
@@ -4221,6 +4250,8 @@ function pdUnlockBodyScroll(){
   document.body.style.top='';
   document.body.style.left='';
   document.body.style.right='';
+  document.body.style.width='';
+  document.body.style.height='';
   window.scrollTo(0, pdScrollLockY);
 }
 
@@ -4303,7 +4334,7 @@ function pdCloseInventory(){
     setTimeout(function(){ floatEl.classList.remove('pd-diary-open'); }, 400);
   }
   const panel=document.getElementById('pdStickerPanel');
-  if(panel) panel.style.display='none';
+  if(panel){ panel.style.display='none'; panel.style.bottom=''; }
   if(pdEditingPage!==null) pdExitEditMode();
   if(pdBookLayoutInterval){ clearInterval(pdBookLayoutInterval); pdBookLayoutInterval=null; }
 }
@@ -4313,9 +4344,17 @@ let pdStickerPanelInitialized=false;
 // on interior pages it opens the word/phrase picker.
 function pdToggleStickerOrText(){
   if(!pdZineBook) return;
-  const spreads=pdZineBook.getSpreads();
-  const spread=spreads[pdZineBook.getSpreadIndex()]||{left:null,right:null};
-  const isCover = spread.left===null && spread.right===0;
+  let isCover;
+  if(pdIsMobile()){
+    // ZineJS's own internal spread state doesn't track pdMobileCurrentPage
+    // in real time (only a rebuild syncs them) — checking it directly
+    // here avoids acting on a stale "still on the cover" reading.
+    isCover = pdMobileCurrentPage===0;
+  }else{
+    const spreads=pdZineBook.getSpreads();
+    const spread=spreads[pdZineBook.getSpreadIndex()]||{left:null,right:null};
+    isCover = spread.left===null && spread.right===0;
+  }
   if(isCover) pdToggleCoverText();
   else pdToggleStickerPicker();
 }
@@ -4325,7 +4364,9 @@ function pdToggleStickerPicker(){
   if(!panel) return;
   const isOpen = panel.style.display==='flex';
   if(!isOpen){
-    if(pdEditingPage===null) pdEnterEditMode();
+    if(pdEditingPage===null) pdEnterEditMode(true);
+    const mainTabs=document.getElementById('pdPanelMainTabs');
+    if(mainTabs) mainTabs.style.display='flex';
     pdShowWordsPhrasesPanelBody();
     pdRenderPicker();
     panel.classList.remove('pd-panel-closing');
@@ -4338,6 +4379,7 @@ function pdToggleStickerPicker(){
     panel.classList.add('pd-panel-closing');
     setTimeout(function(){
       panel.style.display='none';
+      panel.style.bottom='';
       panel.classList.remove('pd-panel-closing');
     }, 200);
   }
@@ -4379,6 +4421,30 @@ function pdMakeStickerPanelDraggable(){
 // height (vertical-only), not its position — dragging up reveals more of
 // the sheet, dragging down reveals more of the flipbook behind it.
 // Clamped between a small minimum and a comfortable maximum.
+// Keeps the sheet docked just above the on-screen keyboard — a plain
+// position:fixed;bottom:0 element doesn't reliably track the visual
+// viewport shrinking when the keyboard opens on some mobile browsers
+// (notably iOS Safari), so this measures the actual gap and nudges the
+// sheet up to sit right above it instead of risking being covered.
+function pdMobileHandleViewportResize(){
+  if(!window.visualViewport) return;
+  const panel=document.getElementById('pdStickerPanel');
+  if(!panel || panel.style.display==='none' || !pdIsMobile()) return;
+  const vv=window.visualViewport;
+  const keyboardGap=Math.max(0, window.innerHeight-vv.height-vv.offsetTop);
+  panel.style.bottom=keyboardGap+'px';
+}
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize', pdMobileHandleViewportResize);
+  window.visualViewport.addEventListener('scroll', pdMobileHandleViewportResize);
+}
+
+// Shared default height for both panel tabs on mobile — small, just
+// enough to fit either tab's essentials (main tabs + sub-tabs + a
+// couple picker rows, or main tabs + the add-text button), and kept
+// identical between tabs so switching doesn't visibly resize the sheet.
+const PD_SHEET_DEFAULT_VH=26;
+
 function pdMakeSheetHeightAdjustable(handle, panel){
   const MIN_VH=18, MAX_VH=78;
   handle.addEventListener('pointerdown', function(e){
@@ -4434,8 +4500,36 @@ function pdIsMobile(){ return window.innerWidth<=640; }
 let pdMobileCurrentPage=0;
 let pdMobileAnimating=false;
 let pdBakedPageUrlsCache=null;
+// Removes a text sticker if its content was cleared entirely, and
+// re-renders — shared by both the desktop cover element's own blur and
+// the mobile sheet textarea's blur. Returns true if it removed the
+// sticker, so callers know not to proceed with any further per-sticker
+// logic (like a redundant extra save).
+// The text tool (font/weight/align/color/line-height, add-text-box, and
+// the mobile synced textarea) used to be cover-only, hardcoded to page 0.
+// Now it works on whichever page is currently being edited — this
+// resolves that page safely, falling back to 0 only as a defensive
+// measure if somehow called outside an active edit session.
+// Timestamp-based double-tap tracking for text stickers — a genuine
+// double-tap (two taps on the SAME element within a short window) jumps
+// straight to the Text tab, ready to edit; a single tap just selects
+// normally, same as any other sticker.
 let pdLastTextTapTime=0;
 let pdLastTextTapEl=null;
+
+function pdTextToolPageIndex(){
+  return pdEditingPage!==null ? pdEditingPage : 0;
+}
+
+function pdRemoveTextIfEmpty(st, pageIndex){
+  if(st.text && st.text.trim()) return false;
+  const page=pdBook.pages[pageIndex];
+  page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
+  pdDeselectSticker();
+  pdSaveBook();
+  pdRenderEditPage();
+  return true;
+}
 const PD_MOBILE_PEEK=0.15; // the paired page peeks in at 15% of the main page's own width
 
 function pdMobilePageUrl(idx){
@@ -4561,29 +4655,47 @@ function pdMobileGoToPeek(){
 // in, so it uses the same slide animation as tapping a peek; only going
 // backward (when the peek is on the right, meaning there's no pre-
 // rendered "previous" content) falls back to a cross-fade.
+// Shared fade-backward step — used whenever the target page isn't
+// pre-rendered as a peek (so a slide animation isn't possible).
+function pdMobileFadeToPage(target){
+  if(target<0 || !pdBook || target>pdBook.pages.length-1) return;
+  pdMobileAnimating=true;
+  const view=document.getElementById('pdMobilePageView');
+  if(view) view.style.transition='opacity .18s ease';
+  if(view) view.style.opacity='0';
+  setTimeout(function(){
+    pdMobileCurrentPage=target;
+    pdMobileRenderPageView();
+    if(view) view.style.opacity='1';
+    pdMobileAnimating=false;
+  }, 180);
+}
+
 function pdMobileTapMain(){
   if(pdMobileAnimating||pdEditingPage!==null||!pdBook) return;
   const peek=pdMobilePeekInfo();
   if(peek.side==='right'){
-    const target=pdMobileCurrentPage-1;
-    if(target<0) return;
-    pdMobileAnimating=true;
-    const view=document.getElementById('pdMobilePageView');
-    if(view) view.style.transition='opacity .18s ease';
-    if(view) view.style.opacity='0';
-    setTimeout(function(){
-      pdMobileCurrentPage=target;
-      pdMobileRenderPageView();
-      if(view) view.style.opacity='1';
-      pdMobileAnimating=false;
-    }, 180);
+    // peek is forward; main goes back
+    pdMobileFadeToPage(pdMobileCurrentPage-1);
     return;
   }
-  // peek is 'left' (a right page advancing to the next left page) or
-  // null (the cover advancing to page 1) — both slide in from the right.
-  const target=pdMobileCurrentPage+1;
-  if(target>pdBook.pages.length-1) return;
-  pdMobileSlideToPage(target, 'right');
+  if(peek.side==='left'){
+    // peek is backward; main goes forward — pre-rendered as the peek on
+    // the OTHER side conceptually, but here it's a fresh page, so slide.
+    const target=pdMobileCurrentPage+1;
+    if(target>pdBook.pages.length-1) return;
+    pdMobileSlideToPage(target, 'right');
+    return;
+  }
+  // peek.side === null: either the cover (nothing before it — advance),
+  // or a lone unpaired last "left" page (nothing after it — go back).
+  if(pdMobileCurrentPage===0){
+    const target=1;
+    if(target>pdBook.pages.length-1) return;
+    pdMobileSlideToPage(target, 'right');
+  }else{
+    pdMobileFadeToPage(pdMobileCurrentPage-1);
+  }
 }
 
 // The two tap zones from the spec: the fully-visible current page and
@@ -4642,6 +4754,7 @@ function pdMobileSyncUI(){
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const doneBtn=document.getElementById('pdEditDoneBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
+  const deleteBtn=document.getElementById('pdDeletePageBtn');
   const closeBtn=document.getElementById('pdDiaryCloseBtn');
   const isCover = pdMobileCurrentPage===0;
   if(stickerBtn){
@@ -4650,10 +4763,14 @@ function pdMobileSyncUI(){
     stickerBtn.title = isCover ? 'Edit title/subtitle' : 'Add stickers';
   }
   if(doneBtn) doneBtn.style.right=(rightGap+48)+'px';
+  const isLast = pdBook && pdMobileCurrentPage>=pdBook.pages.length-1;
   if(newPageBtn){
     newPageBtn.style.right=(rightGap+8)+'px';
-    const isLast = pdBook && pdMobileCurrentPage>=pdBook.pages.length-1;
     newPageBtn.style.display = (pdEditingPage===null && isLast) ? 'flex' : 'none';
+  }
+  if(deleteBtn){
+    deleteBtn.style.right=(rightGap+8)+'px';
+    deleteBtn.style.display = (pdEditingPage===null && isLast && pdBook && pdBook.pages.length>1) ? 'flex' : 'none';
   }
   if(closeBtn) closeBtn.style.left=gapBefore+'px';
 }
@@ -4945,6 +5062,19 @@ function pdBakePageImage(pageIndex){
     }
     ctx.restore();
   }
+  // Page numbering — interior pages only (the cover isn't counted),
+  // drawn before any stickers so user content always shows on top of it
+  // rather than the other way around.
+  if(pageIndex!==0){
+    const interiorTotal=Math.max(0, totalPages-1);
+    ctx.save();
+    ctx.font='700 13px Cairo, sans-serif';
+    ctx.fillStyle='#000000';
+    ctx.textAlign='center';
+    ctx.textBaseline='alphabetic';
+    ctx.fillText('Page '+pageIndex+' of '+interiorTotal, W/2, H-18);
+    ctx.restore();
+  }
   const page=(pdBook.pages&&pdBook.pages[pageIndex])||{stickers:[]};
   (page.stickers||[]).forEach(function(st){
     ctx.save();
@@ -4961,7 +5091,6 @@ function pdBakePageImage(pageIndex){
       const fontSize=28;
       ctx.font=weight+' '+fontSize+'px '+fam;
       ctx.fillStyle=st.color||'#000000';
-      ctx.textAlign='center';
       ctx.textBaseline='middle';
       // First split on explicit \n (Enter presses) — then, only if the
       // user set an explicit wrap width via the dedicated width handle,
@@ -4985,8 +5114,23 @@ function pdBakePageImage(pageIndex){
       }
       const lineH=fontSize*(st.lineHeight||1.25);
       const totalH=lines.length*lineH;
+      // The width to align within: matches maxWidth if the user set one,
+      // otherwise the widest line's own natural width — mirroring how the
+      // live CSS box sizes itself to its content when unconstrained.
+      let boxW;
+      if(typeof st.maxWidth==='number'){
+        boxW=st.maxWidth-16;
+      }else{
+        boxW=0;
+        lines.forEach(function(ln){ boxW=Math.max(boxW, ctx.measureText(ln).width); });
+      }
+      const align=st.textAlign||'left';
+      let alignX=0;
+      if(align==='left'){ ctx.textAlign='left'; alignX=-boxW/2; }
+      else if(align==='right'){ ctx.textAlign='right'; alignX=boxW/2; }
+      else{ ctx.textAlign='center'; alignX=0; }
       lines.forEach(function(ln,i){
-        ctx.fillText(ln, 0, -totalH/2+lineH/2+i*lineH+1);
+        ctx.fillText(ln, alignX, -totalH/2+lineH/2+i*lineH+1);
       });
     }else if(st.kind==='word'){
       const textW=ctx.measureText(st.text).width;
@@ -5177,6 +5321,7 @@ function pdSyncBookLayout(){
   const shell=document.getElementById('pdZineShell');
   const stickerBtn=document.getElementById('pdStickerPickerBtn');
   const newPageBtn=document.getElementById('pdNewPageBtn');
+  const deleteBtn=document.getElementById('pdDeletePageBtn');
 
   const spreads=pdZineBook.getSpreads();
   const spread=spreads[pdZineBook.getSpreadIndex()]||{left:null,right:null};
@@ -5203,7 +5348,11 @@ function pdSyncBookLayout(){
   // New page: only appears once there's nowhere left to flip forward to —
   // disappears again the moment there are more pages ahead. Not shown
   // while editing (Done takes that spot instead).
-  if(newPageBtn) newPageBtn.style.display = (pdEditingPage===null && !pdZineBook.canFlipNext()) ? 'flex' : 'none';
+  const canAddOrDelete = pdEditingPage===null && !pdZineBook.canFlipNext();
+  if(newPageBtn) newPageBtn.style.display = canAddOrDelete ? 'flex' : 'none';
+  // Delete: same visibility as add-page, but only once there's an actual
+  // interior page to remove — never lets the cover itself be deleted.
+  if(deleteBtn) deleteBtn.style.display = (canAddOrDelete && pdBook.pages.length>1) ? 'flex' : 'none';
 
   if(pdEditingPage!==null){
     pdPositionEditPages();
@@ -5329,18 +5478,13 @@ function pdToggleCoverText(){
   if(!pdZineBook) return;
   if(pdEditingPage===null){
     pdEnterEditMode(true);
+    const mainTabs=document.getElementById('pdPanelMainTabs');
+    if(mainTabs) mainTabs.style.display='none';
     pdShowCoverTextPanelBody();
     const panel=document.getElementById('pdStickerPanel');
     if(panel){
       panel.classList.remove('pd-panel-closing');
       panel.style.display='flex';
-      if(pdIsMobile()){
-        // Collapsed by default — just enough for the drag strip + the
-        // add-text button. The style controls stay in the DOM, reachable
-        // only by the user dragging the sheet taller themselves.
-        panel.style.height='18vh';
-        panel.style.maxHeight='18vh';
-      }
       if(!pdStickerPanelInitialized){
         pdMakeStickerPanelDraggable();
         pdStickerPanelInitialized=true;
@@ -5352,8 +5496,8 @@ function pdToggleCoverText(){
 }
 
 // Swaps the shared floating panel's body between the words/phrases picker
-// and the cover text tool, so the same window is reused for both rather
-// than building a second, separate popup.
+// and the text tool, so the same window is reused for both rather than
+// building a second, separate popup.
 function pdShowWordsPhrasesPanelBody(){
   const toggle=document.querySelector('.pd-picker-toggle');
   const list=document.getElementById('pdPickerList');
@@ -5361,6 +5505,15 @@ function pdShowWordsPhrasesPanelBody(){
   if(toggle) toggle.style.display='flex';
   if(list) list.style.display='';
   if(textPanel) textPanel.style.display='none';
+  const tabStickers=document.getElementById('pdMainTabStickers');
+  const tabText=document.getElementById('pdMainTabText');
+  if(tabStickers) tabStickers.classList.add('active');
+  if(tabText) tabText.classList.remove('active');
+  pdDeselectSticker();
+  if(pdIsMobile()){
+    const panel=document.getElementById('pdStickerPanel');
+    if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
+  }
 }
 function pdShowCoverTextPanelBody(){
   const toggle=document.querySelector('.pd-picker-toggle');
@@ -5369,6 +5522,19 @@ function pdShowCoverTextPanelBody(){
   if(toggle) toggle.style.display='none';
   if(list) list.style.display='none';
   if(textPanel) textPanel.style.display='block';
+  const tabStickers=document.getElementById('pdMainTabStickers');
+  const tabText=document.getElementById('pdMainTabText');
+  if(tabStickers) tabStickers.classList.remove('active');
+  if(tabText) tabText.classList.add('active');
+  pdDeselectSticker();
+  if(pdIsMobile()){
+    // Same height as the Stickers tab — switching tabs shouldn't visibly
+    // resize the sheet. Sized to comfortably fit the main tabs + the
+    // add-text button (or the special textarea once a box is selected),
+    // reachable-taller only if the user drags the sheet up themselves.
+    const panel=document.getElementById('pdStickerPanel');
+    if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
+  }
 }
 
 // Adds a new, freely-placed text box to the cover — offset a little from
@@ -5376,8 +5542,8 @@ function pdShowCoverTextPanelBody(){
 // and selects it immediately so the font buttons and resize handle are
 // ready to use right away.
 function pdAddCoverTextBox(){
-  if(!pdBook.pages[0]) pdBook.pages[0]={stickers:[]};
-  const stickers=pdBook.pages[0].stickers;
+  if(!pdBook.pages[pdTextToolPageIndex()]) pdBook.pages[pdTextToolPageIndex()]={stickers:[]};
+  const stickers=pdBook.pages[pdTextToolPageIndex()].stickers;
   const count=stickers.filter(function(s){return s.kind==='text';}).length;
   const id='pd-text-'+Date.now()+'-'+Math.floor(Math.random()*1000);
   // Mobile: centered both ways, matching the spec ("centro de la página")
@@ -5389,13 +5555,16 @@ function pdAddCoverTextBox(){
   pdSaveBook();
   pdRenderEditPage();
   const el=document.querySelector('[data-sticker-id="'+id+'"]');
-  if(el){
-    pdSelectSticker(el);
+  if(!el) return;
+  pdSelectSticker(el);
+  if(pdIsMobile()){
+    // Typing happens in the sheet's synced textarea instead — focus that,
+    // not the cover element (no longer directly editable there).
+    const editBox=document.getElementById('pdMobileTextEditBox');
+    if(editBox) editBox.focus({preventScroll:true});
+  }else{
     const inner=el.querySelector('.pd-sticker-chip');
-    if(inner){
-      if(pdIsMobile() && parseFloat(inner.style.fontSize)<16) inner.style.fontSize='16px';
-      inner.focus({preventScroll:true});
-    }
+    if(inner) inner.focus({preventScroll:true});
   }
 }
 
@@ -5403,7 +5572,7 @@ function pdAddCoverTextBox(){
 function pdSetSelectedTextFont(font){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.font=font;
@@ -5419,7 +5588,7 @@ function pdSetSelectedTextFont(font){
 function pdSetSelectedTextWeight(weight){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.weight=weight;
@@ -5427,10 +5596,24 @@ function pdSetSelectedTextWeight(weight){
   if(inner) inner.style.fontWeight=weight;
   pdSaveBook();
 }
+function pdSetSelectedTextAlign(align){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  st.textAlign=align;
+  const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
+  if(inner) inner.style.textAlign=align;
+  document.querySelectorAll('.pd-align-choice').forEach(function(btn){
+    btn.classList.toggle('pd-align-active', btn.getAttribute('data-align')===align);
+  });
+  pdSaveBook();
+}
 function pdSetSelectedTextLineHeight(value){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.lineHeight=parseFloat(value);
@@ -5441,7 +5624,7 @@ function pdSetSelectedTextLineHeight(value){
 function pdSetSelectedTextColor(color){
   if(!pdSelectedStickerEl) return;
   const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(!st || st.kind!=='text') return;
   st.color=color;
@@ -5453,7 +5636,7 @@ function pdSetSelectedTextColor(color){
 function pdExitEditMode(){
   if(pdEditingPage===null) return;
   const panel=document.getElementById('pdStickerPanel');
-  if(panel) panel.style.display='none';
+  if(panel){ panel.style.display='none'; panel.style.bottom=''; }
   pdDeselectSticker();
   pdEditingPage=null;
   pdEditingSpread=null;
@@ -5517,66 +5700,37 @@ function pdBuildPlacedSticker(st, pageIndex){
   const refWidth = editPageW || 300;
   const scaleFactor = refWidth/600;
   if(st.kind==='text'){
-    const mobileNeedsDoubleTap = pdIsMobile() && !st._justCreated;
-    inner.contentEditable = mobileNeedsDoubleTap ? 'false' : 'true';
+    // On mobile, text is edited via the synced textarea in the bottom
+    // sheet instead — selecting the box (a single tap) is enough to open
+    // that, so the cover's own element never needs direct keyboard focus
+    // and the double-tap/temporary-centering system this used to need is
+    // no longer necessary. Desktop is unchanged.
+    inner.contentEditable = pdIsMobile() ? 'false' : 'true';
     if(st._justCreated) delete st._justCreated;
     inner.textContent=st.text;
     inner.style.fontSize=(28*scaleFactor)+'px';
     inner.style.fontWeight=st.weight||800;
     inner.style.lineHeight=st.lineHeight||1.25;
     inner.style.color=st.color||'#000000';
+    inner.style.textAlign=st.textAlign||'left';
     inner.spellcheck=false;
-    if(mobileNeedsDoubleTap){
-      // Genuine double-tap detection by elapsed time between two taps on
-      // THIS SAME element — not "was already selected", which stays true
-      // across many separate taps and incorrectly treated every one of
-      // them as a second tap (and its stopPropagation blocked drag
-      // detection from ever seeing the event on any of those taps).
+    if(pdIsMobile()){
       inner.addEventListener('pointerdown', function(e){
         const now=Date.now();
         const isDoubleTap = pdLastTextTapEl===inner && (now-pdLastTextTapTime)<400;
         pdLastTextTapTime=now;
         pdLastTextTapEl=isDoubleTap ? null : inner; // consume it — a third quick tap shouldn't immediately re-trigger
-        if(!isDoubleTap) return; // a normal tap: let selection + potential drag proceed as usual
+        if(!isDoubleTap) return; // a single tap: let normal selection/drag proceed as usual
         e.stopPropagation();
-        e.preventDefault();
-        inner.contentEditable='true';
-        // Instagram Stories style: temporarily centers the box (clear
-        // of where a keyboard would sit) for comfortable typing, then
-        // animates back to its real position once editing ends. Also
-        // temporarily bumps font-size to iOS's 16px auto-zoom threshold
-        // — the scaled-down live size can fall well below that on a
-        // narrow screen, which would otherwise force the whole page to
-        // zoom in on focus.
-        const origLeft=el.style.left, origTop=el.style.top;
-        const origFontSize=inner.style.fontSize;
-        el.style.transition='left .28s cubic-bezier(.22,.75,.32,1), top .28s cubic-bezier(.22,.75,.32,1)';
-        el.style.left='50%';
-        el.style.top='30%';
-        if(parseFloat(origFontSize)<16) inner.style.fontSize='16px';
-        inner.focus({preventScroll:true});
-        inner._pdRestorePos=function(){
-          el.style.left=origLeft;
-          el.style.top=origTop;
-          inner.style.fontSize=origFontSize;
-          setTimeout(function(){ el.style.transition=''; }, 300);
-        };
+        pdShowCoverTextPanelBody(); // jumps to the Text tab (this also deselects, restored right below)
+        pdSelectSticker(el); // re-select this box so the textarea shows its own content
+        const editBox=document.getElementById('pdMobileTextEditBox');
+        if(editBox) editBox.focus({preventScroll:true});
       });
     }
     inner.addEventListener('input', function(){ st.text=inner.textContent; });
     inner.addEventListener('blur', function(){
-      if(!inner.textContent || !inner.textContent.trim()){
-        const page=pdBook.pages[pageIndex];
-        page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
-        pdDeselectSticker();
-        pdSaveBook();
-        pdRenderEditPage();
-        return;
-      }
-      if(mobileNeedsDoubleTap){
-        inner.contentEditable='false'; // back to "select only" for next time
-        if(inner._pdRestorePos){ inner._pdRestorePos(); inner._pdRestorePos=null; }
-      }
+      if(pdRemoveTextIfEmpty(st, pageIndex)) return;
       pdSaveBook();
     });
     // Enter should insert a real line break the same way the canvas will
@@ -5661,18 +5815,69 @@ function pdSelectSticker(el){
   // Keep the line-height slider and custom color swatch showing this
   // box's own current values, not whatever the last-selected box had.
   const id=el.getAttribute('data-sticker-id');
-  const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
   const st=stickers.find(function(s){ return s.id===id; });
   if(st && st.kind==='text'){
     const slider=document.getElementById('pdLineHeightSlider');
     if(slider) slider.value=st.lineHeight||1.25;
     const colorInput=document.getElementById('pdColorCustom');
     if(colorInput) colorInput.value=st.color||'#000000';
+    const align=st.textAlign||'left';
+    document.querySelectorAll('.pd-align-choice').forEach(function(btn){
+      btn.classList.toggle('pd-align-active', btn.getAttribute('data-align')===align);
+    });
+    if(pdIsMobile()) pdMobileShowTextEditBox(st.text||'');
+  }else if(pdIsMobile()){
+    pdMobileHideTextEditBox();
   }
 }
 function pdDeselectSticker(){
   if(pdSelectedStickerEl) pdSelectedStickerEl.classList.remove('pd-selected');
   pdSelectedStickerEl=null;
+  if(pdIsMobile()) pdMobileHideTextEditBox();
+}
+
+// Swaps the "+Add text box" button for the special synced textarea —
+// selecting a text box (a single tap) is enough to start editing its
+// content this way, so the cover element itself never needs direct
+// keyboard focus.
+function pdMobileShowTextEditBox(text){
+  const addBtn=document.getElementById('pdAddTextBtn');
+  const editBox=document.getElementById('pdMobileTextEditBox');
+  if(addBtn) addBtn.style.display='none';
+  if(editBox){
+    editBox.style.display='block';
+    editBox.value=text;
+  }
+  pdMobileHandleViewportResize();
+}
+function pdMobileHideTextEditBox(){
+  const addBtn=document.getElementById('pdAddTextBtn');
+  const editBox=document.getElementById('pdMobileTextEditBox');
+  if(addBtn) addBtn.style.display='';
+  if(editBox) editBox.style.display='none';
+}
+
+// Keeps the cover's own live element in sync as the user types in the
+// sheet's textarea instead.
+function pdMobileSyncTextEditBox(value){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  st.text=value;
+  const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
+  if(inner) inner.textContent=value;
+  pdSaveBook();
+}
+function pdMobileTextEditBoxBlur(){
+  if(!pdSelectedStickerEl) return;
+  const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
+  const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
+  const st=stickers.find(function(s){ return s.id===id; });
+  if(!st || st.kind!=='text') return;
+  pdRemoveTextIfEmpty(st, pdTextToolPageIndex());
 }
 
 // One handle does both: how far the drag moves from the sticker's own
@@ -5687,19 +5892,9 @@ function pdDeselectSticker(){
 // a text box — deliberately separate from the resize/rotate handle, so
 // scaling a text box bigger or smaller never triggers wrapping by itself.
 // Wrapping only ever happens once the user drags this handle.
-// Mitigates a visible artifact (thin blue lines) some mobile GPUs show
-// when the dot-grid's repeating radial-gradient repaints continuously
-// under rapid pointermove-driven style changes — hidden for the duration
-// of an active drag/resize/width-adjust, restored on release.
-function pdSuppressDotGrid(el, active){
-  const page=el&&el.parentNode;
-  if(page && page.classList) page.classList.toggle('pd-dots-suppressed', active);
-}
-
 function pdMakeTextWidthAdjustable(el, handle, st, inner, scaleFactor){
   handle.addEventListener('pointerdown', function(e){
     e.preventDefault(); e.stopPropagation();
-    pdSuppressDotGrid(el, true);
     const startX=e.clientX;
     const startWidth = typeof st.maxWidth==='number' ? st.maxWidth : (inner.offsetWidth/scaleFactor);
     function move(ev){
@@ -5712,7 +5907,6 @@ function pdMakeTextWidthAdjustable(el, handle, st, inner, scaleFactor){
     function up(){
       document.removeEventListener('pointermove', move);
       document.removeEventListener('pointerup', up);
-      pdSuppressDotGrid(el, false);
       pdSaveBook();
     }
     document.addEventListener('pointermove', move);
@@ -5837,6 +6031,13 @@ let pdEditAreaPinchWired=false;
 // anywhere within the edit area — not just with both fingers landing
 // exactly on the (often small) box itself, which is an awkward target on
 // a phone. Only acts on a selected text-kind sticker.
+// Lets the currently selected sticker — any kind, not just text — be
+// resized/rotated by pinching anywhere within the edit area, not just
+// with both fingers landing exactly on the sticker itself (an especially
+// awkward target for a short word/phrase chip on a phone). Also
+// explicitly blocks the browser's own native pinch-zoom (allowed on the
+// surrounding page for manual zooming) from winning the gesture the
+// moment a finger lands outside the sticker's own small bounding box.
 function pdMakeEditAreaPinchable(){
   if(pdEditAreaPinchWired) return;
   pdEditAreaPinchWired=true;
@@ -5847,18 +6048,18 @@ function pdMakeEditAreaPinchable(){
   overlay.addEventListener('pointerdown', function(e){
     if(!pdSelectedStickerEl) return;
     const id=pdSelectedStickerEl.getAttribute('data-sticker-id');
-    const stickers=(pdBook.pages[0]||{stickers:[]}).stickers||[];
+    const stickers=(pdBook.pages[pdTextToolPageIndex()]||{stickers:[]}).stickers||[];
     const st=stickers.find(function(s){ return s.id===id; });
-    if(!st || st.kind!=='text') return;
+    if(!st) return;
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
     const ids=Object.keys(pointers);
     if(ids.length===2){
+      e.preventDefault();
       e.stopPropagation();
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
       const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
       pinchStart={dist:dist, angle:angle, scale:st.scale||1, rot:st.rot||0, st:st, el:pdSelectedStickerEl};
-      pdSuppressDotGrid(pdSelectedStickerEl, true);
     }
   }, true);
   overlay.addEventListener('pointermove', function(e){
@@ -5866,6 +6067,7 @@ function pdMakeEditAreaPinchable(){
     pointers[e.pointerId]={x:e.clientX, y:e.clientY};
     const ids=Object.keys(pointers);
     if(ids.length===2 && pinchStart){
+      e.preventDefault();
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
       const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
@@ -5880,7 +6082,6 @@ function pdMakeEditAreaPinchable(){
   function endPinch(e){
     delete pointers[e.pointerId];
     if(Object.keys(pointers).length<2 && pinchStart){
-      pdSuppressDotGrid(pinchStart.el, false);
       pdSaveBook();
       pinchStart=null;
     }
@@ -5902,7 +6103,6 @@ function pdMakeCoverTextDraggable(el, st, pageIndex){
         if(Math.hypot(dx,dy)<DRAG_THRESHOLD) return;
         dragging=true;
         el.classList.add('pd-dragging');
-        pdSuppressDotGrid(el, true);
         if(document.activeElement && el.contains(document.activeElement)) document.activeElement.blur();
       }
       const pageEl=el.parentNode;
@@ -5915,7 +6115,7 @@ function pdMakeCoverTextDraggable(el, st, pageIndex){
     function up(){
       document.removeEventListener('pointermove', move);
       document.removeEventListener('pointerup', up);
-      if(dragging){ el.classList.remove('pd-dragging'); pdSuppressDotGrid(el, false); pdSaveBook(); }
+      if(dragging){ el.classList.remove('pd-dragging'); pdSaveBook(); }
     }
     document.addEventListener('pointermove', move);
     document.addEventListener('pointerup', up);
@@ -5938,11 +6138,9 @@ function pdMakePlacedDraggable(el, st, pageIndex){
     if(ids.length===1){
       mode='drag';
       el.classList.add('pd-dragging');
-      pdSuppressDotGrid(el, true);
       dragStart={clientX:e.clientX, clientY:e.clientY, x:st.x, y:st.y};
     }else if(ids.length===2){
       mode='pinch';
-      pdSuppressDotGrid(el, true);
       const pts=ids.map(function(id){ return pointers[id]; });
       const dist=Math.hypot(pts[1].x-pts[0].x, pts[1].y-pts[0].y);
       const angle=Math.atan2(pts[1].y-pts[0].y, pts[1].x-pts[0].x)*180/Math.PI;
@@ -5980,7 +6178,6 @@ function pdMakePlacedDraggable(el, st, pageIndex){
     const ids=Object.keys(pointers);
     if(ids.length===0){
       el.classList.remove('pd-dragging');
-      pdSuppressDotGrid(el, false);
       mode=null; dragStart=null; pinchStart=null;
       pdSaveBook();
     }else if(ids.length===1){
@@ -6025,6 +6222,47 @@ function pdBookTurn(delta){
     }
   }, 700);
 }
+// ── Delete last page (mirrors pdAddPage's own mobile/desktop rebuild
+// pattern) — never removes the cover itself, and asks for confirmation
+// unless the user has previously opted out via the checkbox. ──
+const PD_SKIP_DELETE_CONFIRM_KEY='paxel_pd_skip_delete_confirm';
+
+function pdConfirmDeleteLastPage(){
+  if(!pdBook || pdBook.pages.length<=1) return; // nothing beyond the cover to delete
+  let skip=false;
+  try{ skip=localStorage.getItem(PD_SKIP_DELETE_CONFIRM_KEY)==='true'; }catch(e){}
+  if(skip){ pdDeleteLastPage(); return; }
+  const overlay=document.getElementById('pdConfirmDeleteOverlay');
+  const checkbox=document.getElementById('pdConfirmDeleteSkipNext');
+  if(checkbox) checkbox.checked=false;
+  if(overlay) overlay.style.display='flex';
+}
+function pdCancelDeletePage(){
+  const overlay=document.getElementById('pdConfirmDeleteOverlay');
+  if(overlay) overlay.style.display='none';
+}
+function pdDeleteLastPageConfirmed(){
+  const checkbox=document.getElementById('pdConfirmDeleteSkipNext');
+  if(checkbox && checkbox.checked){
+    try{ localStorage.setItem(PD_SKIP_DELETE_CONFIRM_KEY, 'true'); }catch(e){}
+  }
+  pdCancelDeletePage();
+  pdDeleteLastPage();
+}
+function pdDeleteLastPage(){
+  if(!pdBook || pdBook.pages.length<=1) return; // never delete the cover
+  pdBook.pages.pop();
+  pdSaveBook();
+  const newLast=pdBook.pages.length-1;
+  if(pdIsMobile()){
+    pdBuildZine(newLast);
+    pdMobileCurrentPage=newLast;
+    pdMobileRenderPageView();
+    return;
+  }
+  pdBuildZine(newLast);
+}
+
 function pdAddPage(){
   if(pdIsMobile()){
     const newIndex=pdBook.pages.length;
@@ -6404,6 +6642,7 @@ window.addEventListener('DOMContentLoaded',()=>{
         <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerOrText()">&#127912;</button>
         <button class="pd-edit-done-btn" id="pdEditDoneBtn" onclick="event.stopPropagation();pdExitEditMode()" style="display:none;">Done &#10003;</button>
         <button class="pd-flip-nav-btn pd-flip-nav-addpage" id="pdNewPageBtn" onclick="event.stopPropagation();pdAddPage()" title="New page" style="display:none;">&#43;</button>
+        <button class="pd-flip-nav-btn pd-flip-nav-deletepage" id="pdDeletePageBtn" onclick="event.stopPropagation();pdConfirmDeleteLastPage()" title="Delete last page" style="display:none;">&#128465;</button>
       </div>
     </div>
   </div>
@@ -6417,13 +6656,18 @@ window.addEventListener('DOMContentLoaded',()=>{
     <span class="pd-diary-drag-grip">&#8942;&#8942;</span>
     <button class="pd-sticker-panel-close" onclick="pdToggleStickerOrText()">&#10005;</button>
   </div>
+  <div class="pd-panel-main-tabs" id="pdPanelMainTabs" style="display:none;">
+    <button class="pd-panel-main-tab active" id="pdMainTabStickers" onclick="pdShowWordsPhrasesPanelBody()">&#127912; Stickers</button>
+    <button class="pd-panel-main-tab" id="pdMainTabText" onclick="pdShowCoverTextPanelBody()">Aa Text</button>
+  </div>
   <div class="pd-picker-toggle">
     <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
     <button class="pd-picker-tab" id="pdPickerTabPhrases" onclick="pdSetPickerView('phrases')">Phrases</button>
   </div>
   <div class="pd-picker-list pd-view-words" id="pdPickerList"></div>
   <div class="pd-cover-text-panel" id="pdCoverTextPanel" style="display:none;">
-    <button class="pd-add-text-btn" onclick="pdAddCoverTextBox()">&#43; Add text box</button>
+    <button class="pd-add-text-btn" id="pdAddTextBtn" onclick="pdAddCoverTextBox()">&#43; Add text box</button>
+    <textarea class="pd-mobile-text-edit-box" id="pdMobileTextEditBox" style="display:none;" placeholder="Type your text…" oninput="pdMobileSyncTextEditBox(this.value)" onblur="pdMobileTextEditBoxBlur()"></textarea>
     <div id="pdTextStyleControls">
       <div class="pd-cover-text-hint">Style the selected text box:</div>
       <div class="pd-font-row">
@@ -6437,6 +6681,12 @@ window.addEventListener('DOMContentLoaded',()=>{
         <button class="pd-weight-choice" style="font-weight:700;" onclick="pdSetSelectedTextWeight(700)">Bold</button>
         <button class="pd-weight-choice" style="font-weight:900;" onclick="pdSetSelectedTextWeight(900)">Black</button>
       </div>
+      <div class="pd-text-ctrl-label">Align</div>
+      <div class="pd-font-row">
+        <button class="pd-align-choice" data-align="left" onclick="pdSetSelectedTextAlign('left')">&#8676; Left</button>
+        <button class="pd-align-choice" data-align="center" onclick="pdSetSelectedTextAlign('center')">Center</button>
+        <button class="pd-align-choice" data-align="right" onclick="pdSetSelectedTextAlign('right')">Right &#8677;</button>
+      </div>
       <div class="pd-text-ctrl-label">Line spacing</div>
       <input type="range" class="pd-line-height-slider" id="pdLineHeightSlider" min="0.9" max="2.2" step="0.05" value="1.25" oninput="pdSetSelectedTextLineHeight(this.value)">
       <div class="pd-text-ctrl-label">Color</div>
@@ -6448,6 +6698,23 @@ window.addEventListener('DOMContentLoaded',()=>{
         <button class="pd-color-swatch" style="background:#15803D;" onclick="pdSetSelectedTextColor('#15803D')" title="Green"></button>
         <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" title="Custom color">
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation modal for deleting the last page — shared by mobile and
+     desktop. Skipped entirely (deletion happens immediately) if the
+     user has previously checked "don't show this again". -->
+<div class="pd-confirm-overlay" id="pdConfirmDeleteOverlay" style="display:none;">
+  <div class="pd-confirm-box">
+    <p class="pd-confirm-text">Delete the last page? This can't be undone.</p>
+    <label class="pd-confirm-checkbox-row">
+      <input type="checkbox" id="pdConfirmDeleteSkipNext">
+      <span>Don't show this again</span>
+    </label>
+    <div class="pd-confirm-actions">
+      <button class="pd-confirm-cancel" onclick="pdCancelDeletePage()">Cancel</button>
+      <button class="pd-confirm-delete" onclick="pdDeleteLastPageConfirmed()">Delete page</button>
     </div>
   </div>
 </div>
