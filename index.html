@@ -1576,8 +1576,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    (via pdBakePageImage) on exit, which ZineJS then displays. No border of
    its own — it's meant to sit flush and plain, not add visual weight. */
 .pd-edit-overlay{position:absolute;z-index:5;pointer-events:none;border:2px solid #000;border-radius:var(--r1);box-sizing:border-box;overflow:hidden;touch-action:pinch-zoom;}
-.pd-edit-page{position:absolute;display:none;background:#fff;background-image:radial-gradient(circle,rgba(71,190,238,.3) 1.5px,transparent 1.5px);background-size:22px 22px;box-sizing:border-box;overflow:hidden;pointer-events:auto;touch-action:pinch-zoom;}
-.pd-edit-page.pd-dots-suppressed{background-image:none;}
+.pd-edit-page{position:absolute;display:none;background:#fff;box-sizing:border-box;overflow:hidden;pointer-events:auto;touch-action:pinch-zoom;}
 .pd-edit-page.pd-flip-page-cover{background-image:none;}
 
 .pd-edit-done-btn{position:absolute;top:8px;right:48px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 13px;cursor:pointer;box-shadow:var(--s-sm);z-index:9;transition:transform .12s,box-shadow .12s,right .4s ease;}
@@ -1601,7 +1600,11 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-flip-nav-btn:active{transform:translate(50%,-50%) scale(.86);}
 .pd-zine-shell.pd-book-cover .pd-flip-nav-btn{right:25%;}
 .pd-flip-nav-addpage{background:var(--blue);font-size:16px;font-weight:800;}
-.pd-flip-nav-deletepage{top:calc(50% - 54px);background:#fff;font-size:14px;}
+.pd-flip-nav-deletepage{top:calc(50% - 54px);background:#fff;font-size:14px;white-space:nowrap;transition:box-shadow .12s,right .4s ease,width .15s ease,border-radius .15s ease,padding .15s ease;}
+.pd-delete-hover-label{display:none;font-size:12px;font-weight:700;font-family:var(--font);margin-left:6px;}
+.pd-flip-nav-deletepage.pd-delete-expanded{width:auto;border-radius:20px;padding:0 14px;}
+.pd-flip-nav-deletepage.pd-delete-expanded .pd-delete-hover-label{display:inline;}
+@media(hover:none){.pd-delete-hover-label{display:none!important;}}
 
 .pd-confirm-overlay{position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:20px;}
 .pd-confirm-box{background:#fff;border:var(--bw2) solid var(--ink);border-radius:var(--r1);box-shadow:var(--s-md);padding:20px;max-width:320px;width:100%;font-family:var(--font);}
@@ -1613,6 +1616,18 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-confirm-cancel{background:#fff;color:var(--ink);}
 .pd-confirm-delete{background:#DC2626;color:#fff;}
 .pd-confirm-cancel:hover,.pd-confirm-delete:hover{transform:translate(-1px,-1px);box-shadow:var(--s-sm);}
+
+/* Small popover from long-pressing (mobile) / hover-holding (desktop)
+   the delete-page button — lets you type a count instead of just
+   removing one page at a time. */
+.pd-delete-more-popover{position:fixed;z-index:20001;background:#fff;border:var(--bw2) solid var(--ink);border-radius:var(--r1);box-shadow:var(--s-md);padding:12px;width:220px;font-family:var(--font);flex-direction:column;gap:8px;}
+.pd-delete-more-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pd-delete-more-title{font-weight:800;font-size:13px;color:var(--ink);}
+.pd-delete-more-close{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);font-size:10px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.pd-delete-more-info{font-size:11px;color:var(--ink-soft);line-height:1.4;}
+.pd-delete-more-row{display:flex;gap:8px;}
+.pd-delete-more-row input{width:60px;font-family:var(--font);font-size:13px;padding:7px;border:var(--bw) solid var(--ink);border-radius:4px;text-align:center;}
+.pd-delete-more-row .pd-confirm-delete{flex:1;padding:7px;font-size:12px;}
 
 /* Words/Phrases picker: an independent floating panel, not tied to the
    book's own position — draggable anywhere on screen. */
@@ -1647,7 +1662,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
 .pd-picker-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:7px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
 .pd-picker-tab.active{background:var(--blue);color:var(--ink);}
-.pd-panel-coins{display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--blue-deep);margin-bottom:8px;flex-shrink:0;}
+.pd-panel-drag-right{display:flex;align-items:center;gap:8px;}
+.pd-panel-coins{display:flex;align-items:center;gap:4px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--blue-deep);flex-shrink:0;user-select:none;-webkit-user-select:none;}
 .pd-panel-main-tabs{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0;}
 .pd-panel-main-tab{flex:1;font-family:var(--font);font-size:9.5px;font-weight:700;letter-spacing:.01em;padding:6px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pd-panel-main-tab.active{background:var(--blue);color:var(--ink);}
@@ -1657,7 +1673,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-mobile-text-edit-box:focus{outline:none;border-color:var(--blue);box-shadow:var(--s-md);}
 .pd-sheet-resizing button{transform:none !important;}
 .pd-cover-text-hint{font-family:var(--font);font-size:11px;color:var(--ink-soft);margin:12px 0 8px;text-align:center;}
-.pd-canvases-panel{display:flex;flex-direction:column;overflow-y:auto;padding:4px;}
+.pd-canvases-panel{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;padding:4px;}
+.pd-cover-text-panel{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;}
 .pd-canvas-section-header{font-family:var(--font);font-weight:700;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);border-bottom:var(--bw) solid var(--ink);padding-bottom:4px;margin:12px 0 8px;}
 .pd-canvas-section-header:first-child{margin-top:4px;}
 .pd-canvas-picker-chip{width:56px;height:56px;flex-shrink:0;border:var(--bw2) solid var(--ink);border-radius:4px;box-shadow:var(--s-sm);cursor:grab;background-size:cover;position:relative;}
@@ -1682,7 +1699,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-color-custom{width:26px;height:26px;border-radius:50%;border:var(--bw) solid var(--ink);cursor:pointer;padding:0;flex-shrink:0;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);}
 .pd-color-custom::-webkit-color-swatch-wrapper{padding:2px;}
 .pd-color-custom::-webkit-color-swatch{border:none;border-radius:50%;}
-.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:7px;padding:4px;min-height:100px;max-height:50vh;align-content:flex-start;}
+.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:7px;padding:4px;min-height:0;align-content:flex-start;}
 .pd-picker-list.pd-view-words{flex-direction:row;flex-wrap:wrap;}
 .pd-picker-list.pd-view-phrases{flex-direction:column;}
 .pd-picker-empty{font-size:13px;color:var(--ink-soft);font-weight:600;text-align:center;padding:20px 8px;margin:auto;}
@@ -1698,6 +1715,10 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-sticker-chip.pd-text.pd-font-serif{font-family:'Playfair Display',Georgia,serif;}
 .pd-sticker-chip.pd-text.pd-font-script{font-family:'Dancing Script',cursive;font-weight:700;}
 .pd-sticker-chip.pd-phrase{background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:8px 10px;box-shadow:var(--s-sm);font-size:12px;line-height:1.4;color:var(--ink);font-weight:600;}
+.pd-sticker-chip.pd-chip-locked{background:var(--paper-alt)!important;border:var(--bw2) dashed var(--dormant-2)!important;color:var(--dormant-2)!important;box-shadow:none!important;cursor:default;}
+.pd-sticker-chip.pd-chip-locked span{color:var(--dormant-2)!important;}
+.pd-sticker-chip.pd-word.pd-chip-locked{justify-content:center;min-width:34px;}
+.pd-sticker-chip.pd-chip-depleted{opacity:.45;cursor:default;}
 .pd-picker-list .pd-sticker-chip.pd-phrase{width:100%;}
 .pd-sticker-chip:hover{transform:translate(-1px,-1px);}
 .pd-chip-count{font-size:0.85em;font-weight:800;color:var(--ink-soft);margin-left:0.4em;}
@@ -4486,6 +4507,7 @@ function pdOpenInventory(){
     pdMakeDiaryDraggable();
     pdMakeDiaryResizable();
     pdMobileWireTaps();
+    pdWireDeleteButtonHover();
     pdDiaryInitialized=true;
   }
   // Safety net: keeps the floating buttons correctly positioned even if a
@@ -4684,6 +4706,12 @@ if(window.visualViewport){
 // couple picker rows, or main tabs + the add-text button), and kept
 // identical between tabs so switching doesn't visibly resize the sheet.
 const PD_SHEET_DEFAULT_VH=26;
+// Whatever height the user has actually dragged the sheet to — null
+// until they do, meaning the default above still applies. Once set, this
+// is what every tab switch uses instead of the default, so the sheet's
+// height stays exactly where the user left it regardless of which tab
+// it gets dragged from.
+let pdSheetUserHeightVh=null;
 
 function pdMakeSheetHeightAdjustable(handle, panel){
   const MIN_VH=18, MAX_VH=78;
@@ -4697,6 +4725,7 @@ function pdMakeSheetHeightAdjustable(handle, panel){
       ev.preventDefault();
       const dy=startY-ev.clientY; // dragging up increases height
       const newVh=Math.max(MIN_VH, Math.min(MAX_VH, startVh+(dy/window.innerHeight)*100));
+      pdSheetUserHeightVh=newVh;
       panel.style.maxHeight=newVh+'vh';
       panel.style.height=newVh+'vh';
     }
@@ -5155,6 +5184,11 @@ function pdMakeDiaryResizable(){
 }
 
 // Keyboard shortcuts (matching the labels drawn on the book itself): Q = previous, E = next.
+// Holding "E" down fires keydown repeatedly via the OS's own key-repeat,
+// each one flagged e.repeat=true — only a genuine, fresh press
+// (e.repeat=false) is allowed to create a new page upon reaching the
+// end; a held repeat just does nothing there instead of flooding the
+// book with pages for as long as the key stays down.
 document.addEventListener('keydown', function(e){
   const floatEl=document.getElementById('pdDiaryFloat');
   if(!floatEl || !floatEl.classList.contains('pd-diary-open')) return;
@@ -5169,7 +5203,7 @@ document.addEventListener('keydown', function(e){
     return;
   }
   if(key==='q') pdBookTurn(-1);
-  else if(key==='e') pdBookTurn(1);
+  else if(key==='e') pdBookTurn(1, e.repeat);
 });
 
 function pdSetPickerView(view){
@@ -5205,28 +5239,32 @@ function pdRenderPicker(){
   const list=document.getElementById('pdPickerList');
   if(!list) return;
   list.innerHTML='';
+  const getPrio=function(p){if(pdCategorias.legendary.includes(p))return 3;if(pdCategorias.rare.includes(p))return 2;return 1;};
   if(pdPickerView==='words'){
-    const getPrio=function(p){if(pdCategorias.legendary.includes(p))return 3;if(pdCategorias.rare.includes(p))return 2;return 1;};
+    // Collected words always come first (sorted by rarity within that
+    // group), then every still-locked "?" word after (also sorted by
+    // rarity within its own group) — matching Pixel Phrases' original
+    // collection preview exactly, rather than mixing both groups
+    // together by rarity.
     const found=pdPalabrasClave.filter(function(p){return (pd.coleccion[p]||0)>0;}).sort(function(a,b){return getPrio(b)-getPrio(a);});
-    const available=found.filter(function(w){ return pdCountCollected('word',w)-pdCountPlaced('word',w) > 0; });
-    if(!available.length){
-      const empty=document.createElement('div');
-      empty.className='pd-picker-empty';
-      empty.textContent = found.length ? "You've placed all your collected words!" : "You haven't collected any words yet.";
-      list.appendChild(empty);
-      return;
-    }
-    available.forEach(function(word){
-      const remaining=pdCountCollected('word',word)-pdCountPlaced('word',word);
+    const missing=pdPalabrasClave.filter(function(p){return (pd.coleccion[p]||0)===0;}).sort(function(a,b){return getPrio(b)-getPrio(a);});
+    [].concat(found,missing).forEach(function(word){
+      const collected=(pd.coleccion[word]||0)>0;
+      const remaining=collected ? pdCountCollected('word',word)-pdCountPlaced('word',word) : 0;
       const chip=document.createElement('div');
-      chip.className='pd-sticker-chip pd-word';
-      chip.style.color=pdColorRareza(word);
+      chip.className='pd-sticker-chip pd-word'+(collected?'':' pd-chip-locked');
       chip.setAttribute('data-kind','word');
       chip.setAttribute('data-text',word);
       const label=document.createElement('span');
-      label.textContent=word;
+      if(collected){
+        chip.style.color=pdColorRareza(word);
+        label.textContent=word;
+        if(remaining<=0) chip.classList.add('pd-chip-depleted');
+      }else{
+        label.textContent='?';
+      }
       chip.appendChild(label);
-      if(remaining>1){
+      if(collected && remaining>1){
         const badge=document.createElement('span');
         badge.className='pd-chip-count';
         badge.textContent='\u00d7'+remaining;
@@ -5236,25 +5274,40 @@ function pdRenderPicker(){
       list.appendChild(chip);
     });
   }else{
-    const distinct=Array.from(new Set(pd.frasesUsadas||[]));
-    const available=distinct.filter(function(p){ return pdCountCollected('phrase',p)-pdCountPlaced('phrase',p) > 0; });
-    if(!available.length){
-      const empty=document.createElement('div');
-      empty.className='pd-picker-empty';
-      empty.textContent = distinct.length ? "You've placed all your collected phrases!" : "You haven't collected any phrases yet.";
-      list.appendChild(empty);
-      return;
-    }
-    available.forEach(function(phrase){
-      const remaining=pdCountCollected('phrase',phrase)-pdCountPlaced('phrase',phrase);
+    // A phrase has no category of its own — its rarity for sorting
+    // purposes is the highest-rarity collectible word found within its
+    // own text (matching the same highlighting pdHighlightCollectibleWords
+    // already does), defaulting to common if it doesn't contain one.
+    const getPhrasePrio=function(phrase){
+      let maxPrio=1;
+      pdPalabrasClave.forEach(function(w){
+        const re=new RegExp('\\b'+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b');
+        if(re.test(phrase)){
+          const p=getPrio(w);
+          if(p>maxPrio) maxPrio=p;
+        }
+      });
+      return maxPrio;
+    };
+    const seen=new Set(pd.frasesUsadas||[]);
+    const found=pdFrases.filter(function(p){return seen.has(p);}).sort(function(a,b){return getPhrasePrio(b)-getPhrasePrio(a);});
+    const missing=pdFrases.filter(function(p){return !seen.has(p);}).sort(function(a,b){return getPhrasePrio(b)-getPhrasePrio(a);});
+    [].concat(found,missing).forEach(function(phrase){
+      const collected=seen.has(phrase);
+      const remaining=collected ? pdCountCollected('phrase',phrase)-pdCountPlaced('phrase',phrase) : 0;
       const chip=document.createElement('div');
-      chip.className='pd-sticker-chip pd-phrase';
+      chip.className='pd-sticker-chip pd-phrase'+(collected?'':' pd-chip-locked');
       chip.setAttribute('data-kind','phrase');
       chip.setAttribute('data-text',phrase);
       const label=document.createElement('span');
-      label.innerHTML=pdHighlightCollectibleWords(phrase);
+      if(collected){
+        label.innerHTML=pdHighlightCollectibleWords(phrase);
+        if(remaining<=0) chip.classList.add('pd-chip-depleted');
+      }else{
+        label.textContent='?';
+      }
       chip.appendChild(label);
-      if(remaining>1){
+      if(collected && remaining>1){
         const badge=document.createElement('span');
         badge.className='pd-chip-count';
         badge.textContent='\u00d7'+remaining;
@@ -5506,18 +5559,9 @@ function pdBakePageImage(pageIndex){
   canvas.width=W*RES_SCALE; canvas.height=H*RES_SCALE;
   const ctx=canvas.getContext('2d');
   ctx.scale(RES_SCALE, RES_SCALE);
-  ctx.fillStyle='#ffffff';
+  const bgPage=(pdBook.pages&&pdBook.pages[pageIndex]);
+  ctx.fillStyle=(bgPage && bgPage.bgColor) || '#ffffff';
   ctx.fillRect(0,0,W,H);
-  if(pageIndex!==0){
-    ctx.fillStyle='rgba(71,190,238,.3)';
-    for(let y=11;y<H;y+=22){
-      for(let x=11;x<W;x+=22){
-        ctx.beginPath();
-        ctx.arc(x,y,1.5,0,Math.PI*2);
-        ctx.fill();
-      }
-    }
-  }
   // Page-stack effect: a few thin lines near the outer (fore-)edge, whose
   // count/spread scale with how many pages remain in that direction — a
   // rough visual cue for "how thick the rest of the diary is," on both the
@@ -5844,6 +5888,12 @@ function pdSyncBookLayoutRetrying(framesLeft){
 // offset only ever looked right for one of them. Desktop only — mobile
 // uses its own bottom-sheet layout, unrelated to this.
 const PD_PANEL_GAP=28;
+// The flipbook's own default (pre-resize) size — 760px is
+// .pd-diary-scale-wrap's base CSS width; the resize handle only scales
+// this visually via a CSS transform (see pdMakeDiaryResizable), so the
+// underlying value here never actually changes regardless of the book's
+// current scale. 420/297 matches .pd-zine-shell's own aspect-ratio.
+const PD_DEFAULT_FLIPBOOK_HEIGHT=760*(297/420);
 function pdPositionStickerPanel(){
   if(pdIsMobile()) return;
   const panel=document.getElementById('pdStickerPanel');
@@ -5858,6 +5908,11 @@ function pdPositionStickerPanel(){
   panel.style.transform='none';
   panel.style.left=(contentRight + PD_PANEL_GAP)+'px';
   panel.style.top=shellRect.top+'px';
+  // Matches the flipbook's default height, not its current (possibly
+  // user-resized) one — so resizing the book doesn't also grow/shrink
+  // the panel every time.
+  panel.style.height=PD_DEFAULT_FLIPBOOK_HEIGHT+'px';
+  panel.style.maxHeight=PD_DEFAULT_FLIPBOOK_HEIGHT+'px';
 }
 // Tracks the lone/spread state from the last sync so the panel only gets
 // repositioned when the flipbook's shape actually changes — repositioning
@@ -6000,8 +6055,8 @@ function pdEnterEditMode(allowCover){
   if(overlay) overlay.style.display='block';
   const doneBtn=document.getElementById('pdEditDoneBtn');
   if(doneBtn) doneBtn.style.display='flex';
-  pdRenderEditPage();
   pdSyncBookLayout();
+  pdRenderEditPage();
 }
 
 // Sizes/positions the edit overlay against the mobile current slide's own
@@ -6079,7 +6134,7 @@ function pdShowWordsPhrasesPanelBody(){
   pdDeselectSticker();
   if(pdIsMobile()){
     const panel=document.getElementById('pdStickerPanel');
-    if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
+    if(panel){ const vh=pdSheetUserHeightVh!==null?pdSheetUserHeightVh:PD_SHEET_DEFAULT_VH; panel.style.height=vh+'vh'; panel.style.maxHeight=vh+'vh'; }
   }
 }
 function pdShowCoverTextPanelBody(){
@@ -6089,7 +6144,7 @@ function pdShowCoverTextPanelBody(){
   const canvasesPanel=document.getElementById('pdCanvasesPanel');
   if(toggle) toggle.style.display='none';
   if(list) list.style.display='none';
-  if(textPanel) textPanel.style.display='block';
+  if(textPanel) textPanel.style.display='flex';
   if(canvasesPanel) canvasesPanel.style.display='none';
   const tabStickers=document.getElementById('pdMainTabStickers');
   const tabText=document.getElementById('pdMainTabText');
@@ -6098,13 +6153,18 @@ function pdShowCoverTextPanelBody(){
   if(tabText) tabText.classList.add('active');
   if(tabCanvases) tabCanvases.classList.remove('active');
   pdDeselectSticker();
+  const bgInput=document.getElementById('pdPageBgCustom');
+  if(bgInput){
+    const page=pdBook.pages[pdTextToolPageIndex()];
+    bgInput.value=(page && page.bgColor) || '#ffffff';
+  }
   if(pdIsMobile()){
     // Same height as the Stickers tab — switching tabs shouldn't visibly
     // resize the sheet. Sized to comfortably fit the main tabs + the
     // add-text button (or the special textarea once a box is selected),
     // reachable-taller only if the user drags the sheet up themselves.
     const panel=document.getElementById('pdStickerPanel');
-    if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
+    if(panel){ const vh=pdSheetUserHeightVh!==null?pdSheetUserHeightVh:PD_SHEET_DEFAULT_VH; panel.style.height=vh+'vh'; panel.style.maxHeight=vh+'vh'; }
   }
 }
 function pdShowCanvasesPanelBody(){
@@ -6126,7 +6186,7 @@ function pdShowCanvasesPanelBody(){
   pdRenderCanvasesList();
   if(pdIsMobile()){
     const panel=document.getElementById('pdStickerPanel');
-    if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
+    if(panel){ const vh=pdSheetUserHeightVh!==null?pdSheetUserHeightVh:PD_SHEET_DEFAULT_VH; panel.style.height=vh+'vh'; panel.style.maxHeight=vh+'vh'; }
   }
 }
 
@@ -6343,6 +6403,30 @@ function pdSetSelectedTextColor(color){
   pdSaveBook();
 }
 
+// Sets the background color of whichever page is currently being edited
+// (cover or interior page alike) — replaces the old fixed dot-grid,
+// which no longer suits a page that can now be any color.
+function pdSetPageBackground(color){
+  const pageIndex=pdTextToolPageIndex();
+  if(!pdBook.pages[pageIndex]) pdBook.pages[pageIndex]={stickers:[]};
+  pdBook.pages[pageIndex].bgColor=color;
+  const bgInput=document.getElementById('pdPageBgCustom');
+  if(bgInput) bgInput.value=color;
+  // Reflect it immediately on whichever live edit-page element currently
+  // shows this page (left or right slot of the spread).
+  if(pdEditingSpread){
+    if(pdEditingSpread.left===pageIndex){
+      const el=document.getElementById('pdEditPageLeft');
+      if(el) el.style.background=color;
+    }
+    if(pdEditingSpread.right===pageIndex){
+      const el=document.getElementById('pdEditPageRight');
+      if(el) el.style.background=color;
+    }
+  }
+  pdSaveBook();
+}
+
 function pdExitEditMode(){
   if(pdEditingPage===null) return;
   const panel=document.getElementById('pdStickerPanel');
@@ -6374,6 +6458,7 @@ function pdRenderEditPage(){
     if(idx===null || idx===undefined) return;
     el.classList.toggle('pd-flip-page-cover', idx===0);
     const page=pdBook.pages[idx]||{stickers:[]};
+    el.style.background=page.bgColor||'#ffffff';
     (page.stickers||[]).forEach(function(st){
       el.appendChild(pdBuildPlacedSticker(st, idx));
     });
@@ -6969,7 +7054,7 @@ function pdMakePlacedDraggable(el, st, pageIndex){
   el.addEventListener('pointercancel', endPointer);
 }
 
-function pdBookTurn(delta){
+function pdBookTurn(delta, isKeyRepeat){
   if(!pdZineBook) return;
   if(pdEditingPage!==null) pdExitEditMode();
   // Suppress the safety-net interval during the flip so it can't
@@ -6982,8 +7067,14 @@ function pdBookTurn(delta){
   if(delta<0){
     pdZineBook.flipPrev();
   }else{
-    if(pdZineBook.canFlipNext()) pdZineBook.flipNext();
-    else pdAddPage();
+    if(pdZineBook.canFlipNext()){
+      pdZineBook.flipNext();
+    }else if(!isKeyRepeat){
+      // A genuine single "E" press (or a click past the edge, where
+      // isKeyRepeat is simply undefined) still adds a page normally.
+      // Only an OS-generated repeat from holding the key down skips this.
+      pdAddPage();
+    }
   }
   // ZineJS can silently QUEUE a flip request instead of running it right
   // away, if its own internal state isn't idle yet (e.g. briefly during
@@ -7005,31 +7096,144 @@ function pdBookTurn(delta){
 // unless the user has previously opted out via the checkbox. ──
 const PD_SKIP_DELETE_CONFIRM_KEY='paxel_pd_skip_delete_confirm';
 
-function pdConfirmDeleteLastPage(){
-  if(!pdBook || pdBook.pages.length<=1) return; // nothing beyond the cover to delete
-  let skip=false;
-  try{ skip=localStorage.getItem(PD_SKIP_DELETE_CONFIRM_KEY)==='true'; }catch(e){}
-  if(skip){ pdDeleteLastPage(); return; }
+// How many pages the confirmation modal is currently about to delete —
+// read from whatever the "delete more" popover's input held when its
+// own Delete button was pressed. Set right before showing the modal.
+let pdPendingDeleteCount=1;
+
+function pdShowDeleteConfirmModal(){
   const overlay=document.getElementById('pdConfirmDeleteOverlay');
   const checkbox=document.getElementById('pdConfirmDeleteSkipNext');
+  const text=document.getElementById('pdConfirmDeleteText');
+  const skipRow=document.getElementById('pdConfirmDeleteSkipRow');
   if(checkbox) checkbox.checked=false;
+  if(text){
+    text.textContent = pdPendingDeleteCount<=1
+      ? "Delete the last page? This can't be undone."
+      : "Delete the last "+pdPendingDeleteCount+" pages? This can't be undone.";
+  }
+  // "Don't show again" only ever applies to deleting exactly one page —
+  // bulk deletion always confirms explicitly, every time.
+  if(skipRow) skipRow.style.display = pdPendingDeleteCount<=1 ? 'flex' : 'none';
   if(overlay) overlay.style.display='flex';
 }
+
+// The fast path: a click on the delete button before the hover delay
+// below has elapsed just deletes the last page, exactly like the
+// original single-purpose button always did.
+function pdQuickDeleteOnePage(){
+  if(!pdBook || pdBook.pages.length<=1) return;
+  pdPendingDeleteCount=1;
+  let skip=false;
+  try{ skip=localStorage.getItem(PD_SKIP_DELETE_CONFIRM_KEY)==='true'; }catch(e){}
+  if(skip){ pdDeleteMultiplePages(1); return; }
+  pdShowDeleteConfirmModal();
+}
+
+// Resting the mouse on the delete button for a moment (desktop only —
+// mouseenter/mouseleave never fire for touch) is what actually swaps it
+// to the "Delete more pages" expanded state; clicking before that delay
+// elapses stays the fast single-page path above instead.
+let pdDeleteBtnHoverTimer=null;
+let pdDeleteBtnExpanded=false;
+const PD_DELETE_HOVER_DELAY=550;
+function pdWireDeleteButtonHover(){
+  const btn=document.getElementById('pdDeletePageBtn');
+  if(!btn) return;
+  btn.addEventListener('mouseenter', function(){
+    pdDeleteBtnHoverTimer=setTimeout(function(){
+      pdDeleteBtnExpanded=true;
+      btn.classList.add('pd-delete-expanded');
+    }, PD_DELETE_HOVER_DELAY);
+  });
+  btn.addEventListener('mouseleave', function(){
+    if(pdDeleteBtnHoverTimer){ clearTimeout(pdDeleteBtnHoverTimer); pdDeleteBtnHoverTimer=null; }
+    pdDeleteBtnExpanded=false;
+    btn.classList.remove('pd-delete-expanded');
+  });
+}
+// The button's own click handler — routes to whichever path matches
+// what the button is currently showing. A touch tap (no hover possible)
+// always lands here with pdDeleteBtnExpanded still false, so it always
+// takes the popover path instead of a surprise instant deletion.
+function pdHandleDeleteButtonClick(){
+  if(pdDeleteBtnExpanded) pdShowDeleteMorePopover();
+  else if(pdIsMobile()) pdShowDeleteMorePopover();
+  else pdQuickDeleteOnePage();
+}
+
+// Hovering the delete button (desktop) reveals a "Delete more pages"
+// label via CSS alone (see .pd-delete-hover-label) — clicking it, on
+// either desktop or mobile, opens this popover to type how many
+// trailing pages to remove, rather than assuming just the last one.
+function pdShowDeleteMorePopover(){
+  if(!pdBook) return;
+  const deletable=Math.max(0, pdBook.pages.length-1);
+  if(deletable<=0) return;
+  const popover=document.getElementById('pdDeleteMorePopover');
+  const btn=document.getElementById('pdDeletePageBtn');
+  const info=document.getElementById('pdDeleteMoreInfo');
+  const input=document.getElementById('pdDeleteMoreInput');
+  if(!popover || !btn || !info || !input) return;
+  info.textContent=deletable+' page'+(deletable!==1?'s':'')+' can be deleted (all except the cover)';
+  input.max=String(deletable);
+  input.value='1';
+  popover.style.display='flex';
+  const rect=btn.getBoundingClientRect();
+  const pRect=popover.getBoundingClientRect();
+  let left=rect.left+rect.width/2-pRect.width/2;
+  left=Math.max(8, Math.min(left, window.innerWidth-pRect.width-8));
+  popover.style.left=left+'px';
+  popover.style.top=(rect.bottom+10)+'px';
+  setTimeout(function(){ document.addEventListener('pointerdown', pdMaybeCloseDeleteMorePopover); }, 0);
+}
+function pdMaybeCloseDeleteMorePopover(e){
+  const popover=document.getElementById('pdDeleteMorePopover');
+  const btn=document.getElementById('pdDeletePageBtn');
+  if(!popover) return;
+  if(popover.contains(e.target) || (btn && btn.contains(e.target))) return;
+  pdHideDeleteMorePopover();
+}
+function pdHideDeleteMorePopover(){
+  const popover=document.getElementById('pdDeleteMorePopover');
+  if(popover) popover.style.display='none';
+  document.removeEventListener('pointerdown', pdMaybeCloseDeleteMorePopover);
+}
+function pdConfirmDeleteMultiplePages(){
+  const input=document.getElementById('pdDeleteMoreInput');
+  if(!input || !pdBook) return;
+  const deletable=Math.max(0, pdBook.pages.length-1);
+  let count=parseInt(input.value)||0;
+  count=Math.max(1, Math.min(count, deletable));
+  pdHideDeleteMorePopover();
+  if(count<=0) return;
+  pdPendingDeleteCount=count;
+  if(count===1){
+    let skip=false;
+    try{ skip=localStorage.getItem(PD_SKIP_DELETE_CONFIRM_KEY)==='true'; }catch(e){}
+    if(skip){ pdDeleteMultiplePages(1); return; }
+  }
+  pdShowDeleteConfirmModal();
+}
+
 function pdCancelDeletePage(){
   const overlay=document.getElementById('pdConfirmDeleteOverlay');
   if(overlay) overlay.style.display='none';
 }
 function pdDeleteLastPageConfirmed(){
   const checkbox=document.getElementById('pdConfirmDeleteSkipNext');
-  if(checkbox && checkbox.checked){
+  if(pdPendingDeleteCount<=1 && checkbox && checkbox.checked){
     try{ localStorage.setItem(PD_SKIP_DELETE_CONFIRM_KEY, 'true'); }catch(e){}
   }
   pdCancelDeletePage();
-  pdDeleteLastPage();
+  pdDeleteMultiplePages(pdPendingDeleteCount);
 }
-function pdDeleteLastPage(){
-  if(!pdBook || pdBook.pages.length<=1) return; // never delete the cover
-  pdBook.pages.pop();
+function pdDeleteMultiplePages(count){
+  if(!pdBook) return;
+  const deletable=Math.max(0, pdBook.pages.length-1);
+  count=Math.max(1, Math.min(count||1, deletable));
+  if(count<=0) return; // never delete the cover
+  pdBook.pages.splice(pdBook.pages.length-count, count);
   pdSaveBook();
   const newLast=pdBook.pages.length-1;
   if(pdIsMobile()){
@@ -7218,7 +7422,10 @@ window.pdAddCoverTextBox=pdAddCoverTextBox;
 window.pdAddPage=pdAddPage;
 window.pdCancelDeletePage=pdCancelDeletePage;
 window.pdCloseInventory=pdCloseInventory;
-window.pdConfirmDeleteLastPage=pdConfirmDeleteLastPage;
+window.pdConfirmDeleteMultiplePages=pdConfirmDeleteMultiplePages;
+window.pdShowDeleteMorePopover=pdShowDeleteMorePopover;
+window.pdHandleDeleteButtonClick=pdHandleDeleteButtonClick;
+window.pdHideDeleteMorePopover=pdHideDeleteMorePopover;
 window.pdDeleteLastPageConfirmed=pdDeleteLastPageConfirmed;
 window.pdDownloadCanvas=pdDownloadCanvas;
 window.pdExitEditMode=pdExitEditMode;
@@ -7237,6 +7444,7 @@ window.pdSetFmt=pdSetFmt;
 window.pdSetPickerView=pdSetPickerView;
 window.pdSetSelectedTextAlign=pdSetSelectedTextAlign;
 window.pdSetSelectedTextColor=pdSetSelectedTextColor;
+window.pdSetPageBackground=pdSetPageBackground;
 window.pdSetSelectedTextFont=pdSetSelectedTextFont;
 window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
 window.pdSetSelectedTextWeight=pdSetSelectedTextWeight;
@@ -7484,7 +7692,7 @@ window.pdUsarHolyWater=pdUsarHolyWater;
         <button class="pd-sticker-picker-btn" id="pdStickerPickerBtn" onclick="event.stopPropagation();pdToggleStickerOrText()">&#127912;</button>
         <button class="pd-edit-done-btn" id="pdEditDoneBtn" onclick="event.stopPropagation();pdExitEditMode()" style="display:none;">Done &#10003;</button>
         <button class="pd-flip-nav-btn pd-flip-nav-addpage" id="pdNewPageBtn" onclick="event.stopPropagation();pdAddPage()" title="New page" style="display:none;">&#43;</button>
-        <button class="pd-flip-nav-btn pd-flip-nav-deletepage" id="pdDeletePageBtn" onclick="event.stopPropagation();pdConfirmDeleteLastPage()" title="Delete last page" style="display:none;">&#128465;</button>
+        <button class="pd-flip-nav-btn pd-flip-nav-deletepage" id="pdDeletePageBtn" onclick="event.stopPropagation();pdHandleDeleteButtonClick()" title="Delete pages" style="display:none;">&#128465;<span class="pd-delete-hover-label">Delete more pages</span></button>
       </div>
     </div>
   </div>
@@ -7496,12 +7704,14 @@ window.pdUsarHolyWater=pdUsarHolyWater;
 <div class="pd-sticker-panel" id="pdStickerPanel" style="display:none;">
   <div class="pd-sticker-panel-drag" id="pdStickerPanelDrag">
     <span class="pd-diary-drag-grip">&#8942;&#8942;</span>
-    <button class="pd-sticker-panel-close" onclick="pdToggleStickerOrText()">&#10005;</button>
+    <div class="pd-panel-drag-right">
+      <div class="pd-panel-coins" id="pdPanelCoins">&#129689; <span id="pdPanelCoinsCount">0</span> coins</div>
+      <button class="pd-sticker-panel-close" onclick="pdToggleStickerOrText()">&#10005;</button>
+    </div>
   </div>
-  <div class="pd-panel-coins" id="pdPanelCoins">&#129689; <span id="pdPanelCoinsCount">0</span> coins</div>
   <div class="pd-panel-main-tabs" id="pdPanelMainTabs" style="display:none;">
     <button class="pd-panel-main-tab active" id="pdMainTabStickers" onclick="pdShowWordsPhrasesPanelBody()">&#127912; Stickers</button>
-    <button class="pd-panel-main-tab" id="pdMainTabText" onclick="pdShowCoverTextPanelBody()">Aa Text</button>
+    <button class="pd-panel-main-tab" id="pdMainTabText" onclick="pdShowCoverTextPanelBody()">Edit page</button>
     <button class="pd-panel-main-tab" id="pdMainTabCanvases" onclick="pdShowCanvasesPanelBody()">&#128444; Canvases</button>
   </div>
   <div class="pd-picker-toggle">
@@ -7543,6 +7753,15 @@ window.pdUsarHolyWater=pdUsarHolyWater;
         <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" title="Custom color">
       </div>
     </div>
+    <div class="pd-text-ctrl-label">Background</div>
+    <div class="pd-color-row">
+      <button class="pd-color-swatch" style="background:#ffffff;" onclick="pdSetPageBackground('#ffffff')" title="White"></button>
+      <button class="pd-color-swatch" style="background:#F5FBFE;" onclick="pdSetPageBackground('#F5FBFE')" title="Pale blue"></button>
+      <button class="pd-color-swatch" style="background:#FFF8E7;" onclick="pdSetPageBackground('#FFF8E7')" title="Cream"></button>
+      <button class="pd-color-swatch" style="background:#F0FDF4;" onclick="pdSetPageBackground('#F0FDF4')" title="Pale green"></button>
+      <button class="pd-color-swatch" style="background:#1a1a1a;" onclick="pdSetPageBackground('#1a1a1a')" title="Black"></button>
+      <input type="color" class="pd-color-custom" id="pdPageBgCustom" value="#ffffff" oninput="pdSetPageBackground(this.value)" title="Custom color">
+    </div>
   </div>
   <div class="pd-canvases-panel" id="pdCanvasesPanel" style="display:none;">
     <div class="upload-zone upload-zone-sm" id="pdCanvasUploadZone">
@@ -7560,8 +7779,8 @@ window.pdUsarHolyWater=pdUsarHolyWater;
      user has previously checked "don't show this again". -->
 <div class="pd-confirm-overlay" id="pdConfirmDeleteOverlay" style="display:none;">
   <div class="pd-confirm-box">
-    <p class="pd-confirm-text">Delete the last page? This can't be undone.</p>
-    <label class="pd-confirm-checkbox-row">
+    <p class="pd-confirm-text" id="pdConfirmDeleteText">Delete the last page? This can't be undone.</p>
+    <label class="pd-confirm-checkbox-row" id="pdConfirmDeleteSkipRow">
       <input type="checkbox" id="pdConfirmDeleteSkipNext">
       <span>Don't show this again</span>
     </label>
@@ -7569,6 +7788,18 @@ window.pdUsarHolyWater=pdUsarHolyWater;
       <button class="pd-confirm-cancel" onclick="pdCancelDeletePage()">Cancel</button>
       <button class="pd-confirm-delete" onclick="pdDeleteLastPageConfirmed()">Delete page</button>
     </div>
+  </div>
+</div>
+
+<div class="pd-delete-more-popover" id="pdDeleteMorePopover" style="display:none;">
+  <div class="pd-delete-more-header">
+    <div class="pd-delete-more-title">&#128465; Delete more pages</div>
+    <button class="pd-delete-more-close" onclick="pdHideDeleteMorePopover()" title="Cancel">&#10005;</button>
+  </div>
+  <div class="pd-delete-more-info" id="pdDeleteMoreInfo">0 pages can be deleted (all except the cover)</div>
+  <div class="pd-delete-more-row">
+    <input type="number" id="pdDeleteMoreInput" min="1" value="1">
+    <button class="pd-confirm-delete" onclick="pdConfirmDeleteMultiplePages()">Delete</button>
   </div>
 </div>
 
