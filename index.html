@@ -4251,7 +4251,9 @@ function pdMostrarFraseAleatoria(){
 }
 
 function pdMostrarFraseExtra(){
-  // Stage 1: 60% new (uncollected), 40% old (already collected)
+  // Stage 1: 85% new (uncollected), 15% old (already collected) — a
+  // strong bias, not just a mild lean, so "Extra phrase" reliably feels
+  // like it's mostly surfacing phrases you don't have yet.
   // "Collected" = frase has already been shown (frasesUsadas)
   const nuevas=pdFrases.filter(f=>!pd.frasesUsadas.includes(f));
   const viejas=pdFrases.filter(f=>pd.frasesUsadas.includes(f));
@@ -4261,7 +4263,7 @@ function pdMostrarFraseExtra(){
   if(!nuevas.length && !viejas.length){ pool=pdFrases; }
   else if(!nuevas.length){ pool=viejas; }
   else if(!viejas.length){ pool=nuevas; }
-  else{ pool=Math.random()<0.6 ? nuevas : viejas; }
+  else{ pool=Math.random()<0.85 ? nuevas : viejas; }
 
   // Stage 2: apply rarity weighting INSIDE the chosen pool
   const chosen=pdSeleccionarConRareza(pool);
@@ -7445,6 +7447,7 @@ window.pdSetPickerView=pdSetPickerView;
 window.pdSetSelectedTextAlign=pdSetSelectedTextAlign;
 window.pdSetSelectedTextColor=pdSetSelectedTextColor;
 window.pdSetPageBackground=pdSetPageBackground;
+window.pdUpdateUI=pdUpdateUI;
 window.pdSetSelectedTextFont=pdSetSelectedTextFont;
 window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
 window.pdSetSelectedTextWeight=pdSetSelectedTextWeight;
