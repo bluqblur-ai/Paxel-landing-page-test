@@ -1191,6 +1191,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
 @keyframes spin-icon{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 .upload-zone p{font-size:14px;font-weight:700;color:var(--ink);transition:color .25s ease;}
 .upload-zone span{font-size:12px;color:var(--ink-soft);font-weight:500;}
+.upload-zone-sm{padding:8px 10px;margin-bottom:10px;display:flex;flex-direction:row;align-items:center;gap:8px;text-align:left;}
+.upload-zone-sm .upload-zone-icon{width:24px;height:24px;font-size:12px;margin-bottom:0;flex-shrink:0;}
+.upload-zone-sm p{font-size:12px;margin-right:auto;}
+.upload-zone-sm span{font-size:10px;}
+.upload-zone-sm.pd-upload-zone-disabled{opacity:.5;pointer-events:none;}
+.upload-zone .pd-upload-cost-badge{font-family:var(--font);font-weight:800;font-size:11px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:4px 9px;flex-shrink:0;white-space:nowrap;}
 
 .canvas-panel{display:flex;flex-direction:column;gap:14px;}
 .canvas-wrap{background:var(--blue);border:var(--bw2) solid var(--ink);border-radius:var(--r0);overflow:hidden;display:flex;align-items:stretch;justify-content:stretch;position:relative;width:100%;aspect-ratio:1/1;box-shadow:var(--s-md);transition:aspect-ratio .35s cubic-bezier(.4,0,.2,1);}
@@ -1641,8 +1647,9 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-picker-toggle{display:flex;gap:6px;margin-bottom:10px;flex-shrink:0;}
 .pd-picker-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:7px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
 .pd-picker-tab.active{background:var(--blue);color:var(--ink);}
+.pd-panel-coins{display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--blue-deep);margin-bottom:8px;flex-shrink:0;}
 .pd-panel-main-tabs{display:flex;gap:6px;margin-bottom:8px;flex-shrink:0;}
-.pd-panel-main-tab{flex:1;font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.02em;padding:6px 8px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;}
+.pd-panel-main-tab{flex:1;font-family:var(--font);font-size:9.5px;font-weight:700;letter-spacing:.01em;padding:6px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .pd-panel-main-tab.active{background:var(--blue);color:var(--ink);}
 .pd-add-text-btn{width:100%;font-family:var(--font);font-weight:700;font-size:13px;padding:10px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:var(--blue);color:var(--ink);cursor:pointer;box-shadow:var(--s-sm);transition:transform .12s,box-shadow .12s;}
 .pd-add-text-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
@@ -1650,8 +1657,12 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-mobile-text-edit-box:focus{outline:none;border-color:var(--blue);box-shadow:var(--s-md);}
 .pd-sheet-resizing button{transform:none !important;}
 .pd-cover-text-hint{font-family:var(--font);font-size:11px;color:var(--ink-soft);margin:12px 0 8px;text-align:center;}
-.pd-canvases-panel{display:flex;flex-direction:column;overflow-y:auto;}
-.pd-canvas-picker-chip{width:56px;height:56px;flex-shrink:0;border:var(--bw2) solid var(--ink);border-radius:4px;box-shadow:var(--s-sm);cursor:grab;background-size:cover;}
+.pd-canvases-panel{display:flex;flex-direction:column;overflow-y:auto;padding:4px;}
+.pd-canvas-section-header{font-family:var(--font);font-weight:700;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);border-bottom:var(--bw) solid var(--ink);padding-bottom:4px;margin:12px 0 8px;}
+.pd-canvas-section-header:first-child{margin-top:4px;}
+.pd-canvas-picker-chip{width:56px;height:56px;flex-shrink:0;border:var(--bw2) solid var(--ink);border-radius:4px;box-shadow:var(--s-sm);cursor:grab;background-size:cover;position:relative;}
+.pd-canvas-chip-remove{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.pd-canvas-picker-chip:hover .pd-canvas-chip-remove{display:flex;}
 .pd-font-row{display:flex;gap:6px;}
 .pd-font-choice{flex:1;padding:10px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-size:14px;transition:background .15s;}
 .pd-font-choice:hover{background:var(--paper-alt);}
@@ -1671,7 +1682,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-color-custom{width:26px;height:26px;border-radius:50%;border:var(--bw) solid var(--ink);cursor:pointer;padding:0;flex-shrink:0;background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);}
 .pd-color-custom::-webkit-color-swatch-wrapper{padding:2px;}
 .pd-color-custom::-webkit-color-swatch{border:none;border-radius:50%;}
-.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:7px;padding-right:2px;min-height:100px;max-height:50vh;align-content:flex-start;}
+.pd-picker-list{flex:1;overflow-y:auto;display:flex;gap:7px;padding:4px;min-height:100px;max-height:50vh;align-content:flex-start;}
 .pd-picker-list.pd-view-words{flex-direction:row;flex-wrap:wrap;}
 .pd-picker-list.pd-view-phrases{flex-direction:column;}
 .pd-picker-empty{font-size:13px;color:var(--ink-soft);font-weight:600;text-align:center;padding:20px 8px;margin:auto;}
@@ -1695,7 +1706,6 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    finger, pinch with two to resize + rotate together (handled in JS);
    dedicated handles remain for precise mouse control. */
 .pd-placed-sticker{position:absolute;cursor:grab;touch-action:none;}
-.pd-placed-sticker.pd-placed-daycanvas{z-index:1;}
 .pd-placed-sticker.pd-dragging{cursor:grabbing;z-index:60;}
 .pd-placed-sticker.pd-selected{z-index:55;}
 .pd-placed-sticker .pd-sticker-remove{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;}
@@ -1733,6 +1743,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
   .pd-placed-sticker.pd-selected .pd-sticker-resize{display:none;}
   .pd-sticker-width{width:20px;height:20px;font-size:10px;right:-9px;}
   .pd-placed-sticker .pd-sticker-remove{width:26px;height:26px;font-size:13px;top:-12px;right:-12px;}
+  .pd-canvas-chip-remove{display:flex;width:20px;height:20px;font-size:11px;top:-9px;right:-9px;}
   /* Non-functional on mobile now (pdMakeDiaryResizable no-ops below this
      width) — hidden rather than left as a dead control. */
   .pd-diary-resize-handle{display:none;}
@@ -2523,8 +2534,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 
             <!-- Action buttons -->
             <div class="action-btns">
-              <button class="btn-holy"      id="pdHolyBtn"   disabled onclick="pdUsarHolyWater()">&#128167; [<span id="pdCostBadge">1</span> coins] Holy Water &times;<span id="pdHolyCount">0</span></button>
-              <button class="btn-secondary" id="pdExtraBtn"  disabled onclick="pdExtraPhrase()">&#128172; [10 coins] Extra phrase</button>
+              <button class="btn-holy"      id="pdHolyBtn"   disabled onclick="pdUsarHolyWater()">&#128167; [<span id="pdCostBadge">30</span> coins] Holy Water &times;<span id="pdHolyCount">0</span></button>
+              <button class="btn-secondary" id="pdExtraBtn"  disabled onclick="pdExtraPhrase()">&#128172; [160 coins] Extra phrase</button>
               <button class="btn-secondary" id="pdInventoryBtn" onclick="pdOpenInventory()" style="display:none;">My collection</button>
               <button class="btn-secondary" id="pdDlBtn"     disabled onclick="pdDownloadCanvas()">&#8595; Download HD</button>
             </div>
@@ -3915,8 +3926,9 @@ let pd={
   construyendo:false,TOTAL_DIAS:14,COLS:32,ROWS:32,
   canvasW:600,canvasH:600,intervalSpeed:30,bloquesPorCiclo:1,
   monedas:0,diasRevelados:[],diasReveladosNativos:[],
-  costoHolyWater:1,costoMaximoAlcanzado:1,
+  costoHolyWater:30,costoMaximoAlcanzado:30,
   coleccion:{},frasesUsadas:[],
+  genSessionId:0,
 };
 
 const pdFrases=[
@@ -3957,6 +3969,30 @@ const pdPalabrasClave=[...pdCategorias.common,...pdCategorias.rare,...pdCategori
 
 function pdRarezaAleatoria(){const r=Math.random();if(r<0.01)return'legendary';if(r<0.20)return'rare';return'common';}
 function pdColorRareza(p){if(pdCategorias.legendary.includes(p))return'rgb(240,64,64)';if(pdCategorias.rare.includes(p))return'rgb(255,145,34)';return'rgb(151,151,151)';}
+
+// Wraps any collectible word found within a phrase's own text in bold +
+// its rarity color, so a phrase's picker chip visually previews which
+// collectible(s) it contains — same weight/color scheme already used
+// for standalone word chips. Escapes everything else to keep this safe
+// as innerHTML. Matching is case-sensitive, same as pdMostrarFraseAleatoria's
+// own \b-bounded matching elsewhere, so the matched text always exactly
+// matches what's in pdCategorias — case-insensitive matching would risk
+// pdColorRareza silently missing a rare/legendary word's real casing.
+function pdHighlightCollectibleWords(text){
+  function escapeHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  if(!pdPalabrasClave.length) return escapeHtml(text);
+  const pattern=new RegExp('\\b('+pdPalabrasClave.map(function(w){
+    return w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  }).join('|')+')\\b','g');
+  let result='', lastIndex=0, m;
+  while((m=pattern.exec(text))){
+    result+=escapeHtml(text.slice(lastIndex, m.index));
+    result+='<span style="font-weight:800;color:'+pdColorRareza(m[0])+';">'+escapeHtml(m[0])+'</span>';
+    lastIndex=m.index+m[0].length;
+  }
+  result+=escapeHtml(text.slice(lastIndex));
+  return result;
+}
 
 // ── Toggle controls (mirrors wtToggleControls) ──
 function pdToggleControls(){
@@ -4050,8 +4086,9 @@ function pdProcesarImagen(){
   // Keep accumulated state: monedas, coleccion, frasesUsadas — only reset canvas state
   pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;
   pd.diasRevelados=[];pd.diasReveladosNativos=[];
-  pd.costoMaximoAlcanzado=1;pd.costoHolyWater=1;
+  pd.costoMaximoAlcanzado=30;pd.costoHolyWater=30;
   pd.construyendo=false;
+  pd.genSessionId++;
   document.getElementById('pdDlBtn').disabled=true;
   document.getElementById('pdCanvasEmpty').style.display='none';
   document.getElementById('pdP5Container').style.display='block';
@@ -4096,7 +4133,8 @@ function pdAnimarRevelado(bloques,cb){
 
 function pdRevelarColorActual(){
   if(pd.diasRevelados.includes(pd.diaActual)||pd.construyendo)return;
-  pd.monedas++;paxelWallet.monedas=pd.monedas;
+  pd.monedas+=Math.floor(Math.random()*21)+20; // random 20–40
+  paxelWallet.monedas=pd.monedas;
   pd.diasReveladosNativos.push(pd.diaActual);
   document.getElementById('pdRevealBtn').disabled=true;
   let bl=pd.bloquesADibujar.filter(b=>b.activo&&b.parte===pd.diaActual&&b.esEspecial);
@@ -4132,8 +4170,8 @@ function pdUsarHolyWater(){
 }
 
 function pdExtraPhrase(){
-  if(pd.diaActual<=0||pd.monedas<10||pd.construyendo)return;
-  pd.monedas-=10;paxelWallet.monedas=pd.monedas;
+  if(pd.diaActual<=0||pd.monedas<160||pd.construyendo)return;
+  pd.monedas-=160;paxelWallet.monedas=pd.monedas;
   pdMostrarFraseExtra();
   pdUpdateUI();
 }
@@ -4149,19 +4187,23 @@ function pdActualizarBotones(){
 }
 
 function pdUpdateUI(){
-  if(pd.diaActual>=8)pd.costoMaximoAlcanzado=2;
+  if(pd.diaActual>=8)pd.costoMaximoAlcanzado=60;
   pd.costoHolyWater=pd.costoMaximoAlcanzado;
   let pending=0;for(let i=1;i<=pd.diaActual;i++){if(!pd.diasRevelados.includes(i))pending++;}
   const totalCollect=Object.values(pd.coleccion).reduce((a,b)=>a+b,0);
   document.getElementById('pdHudDay').textContent    =pd.diaActual===0?'\u2014':pd.diaActual+' / '+pd.TOTAL_DIAS;
   pd.monedas=paxelWallet.monedas;document.getElementById('pdHudCoins').textContent  =pd.monedas;
+  const panelCoinsEl=document.getElementById('pdPanelCoinsCount');
+  if(panelCoinsEl) panelCoinsEl.textContent=pd.monedas;
   document.getElementById('pdHudPending').textContent=pending;
   document.getElementById('pdCostBadge').textContent =pd.costoHolyWater;
   document.getElementById('pdHolyCount').textContent =pending;
   const pi=document.getElementById('pdPendingInfo');
   if(pi)pi.innerHTML=pending>0?'<span>'+pending+'</span> day'+(pending>1?'s':'')+' unrevealed':(pd.diaActual>0?'All days revealed \u2713':'');
   document.getElementById('pdHolyBtn').disabled =(pd.monedas<pd.costoHolyWater||pending===0||pd.construyendo);
-  document.getElementById('pdExtraBtn').disabled=(pd.monedas<10||pd.diaActual<=0||pd.construyendo);
+  document.getElementById('pdExtraBtn').disabled=(pd.monedas<160||pd.diaActual<=0||pd.construyendo);
+  const canvasUploadZone=document.getElementById('pdCanvasUploadZone');
+  if(canvasUploadZone) canvasUploadZone.classList.toggle('pd-upload-zone-disabled', pd.monedas<20);
   // Inventory button collectibles count
   // Update count in both the top-row trigger and the action-btns button
   ['pdInventoryCount'].forEach(function(id){
@@ -4478,6 +4520,11 @@ function pdAnimateDiaryIn(floatEl){
       targetLeft=window.innerWidth*0.12;
       targetTop=window.innerHeight*0.08;
     }
+    // Defensive clamp: whatever #pdControlsCol's rect happened to measure
+    // as, never let the panel land partly or fully off-screen — a small
+    // margin from each edge, not flush against them.
+    const margin=16;
+    targetLeft=Math.max(margin, Math.min(targetLeft, window.innerWidth-fRect.width-margin));
   }
   // Starts off-screen below the actual viewport (window.innerHeight — the
   // computer screen itself, not the page's full scrollable height), and
@@ -4548,6 +4595,7 @@ function pdToggleStickerOrText(){
 }
 
 function pdToggleStickerPicker(){
+  if(!pdZineBook) return;
   const panel=document.getElementById('pdStickerPanel');
   if(!panel) return;
   const isOpen = panel.style.display==='flex';
@@ -4565,6 +4613,8 @@ function pdToggleStickerPicker(){
       pdMakeStickerPanelDraggable();
       pdStickerPanelInitialized=true;
     }
+    pdLastPanelLoneState=null; // forces a fresh position on this open, regardless of prior state
+    pdPositionStickerPanel();
   }else{
     panel.classList.add('pd-panel-closing');
     setTimeout(function(){
@@ -5202,7 +5252,7 @@ function pdRenderPicker(){
       chip.setAttribute('data-kind','phrase');
       chip.setAttribute('data-text',phrase);
       const label=document.createElement('span');
-      label.textContent=phrase;
+      label.innerHTML=pdHighlightCollectibleWords(phrase);
       chip.appendChild(label);
       if(remaining>1){
         const badge=document.createElement('span');
@@ -5323,8 +5373,8 @@ function pdPlaceDayCanvasOnPage(day, dataUrl, loadedImg){
   if(st){
     st.imageData=dataUrl;
   }else{
-    st={id:stickerId, kind:'dayCanvas', day:day, imageData:dataUrl, x:50, y:50, rot:0, scale:1};
-    page.stickers.push(st);
+    st={id:stickerId, kind:'dayCanvas', source:'generated', genSession:pd.genSessionId, day:day, imageData:dataUrl, x:50, y:50, rot:0, scale:1};
+    page.stickers.unshift(st);
   }
   // In case this same day's canvas was previously removed (sent to the
   // unplaced pool) and is now being regenerated/re-watered — it belongs
@@ -5343,22 +5393,67 @@ function pdPlaceDayCanvasOnPage(day, dataUrl, loadedImg){
   }
 }
 
-// Removes every day-canvas sticker from the whole book — both the ones
-// already placed on pages and any still waiting in the unplaced pool.
-// Used when the reveal format changes mid-generation: existing canvases
-// were captured at the old dimensions/aspect ratio and would otherwise
-// sit there stale, mismatched against whatever gets generated next.
+// Places a user-uploaded image into the unplaced pool — never auto-picks
+// a page for it. The cover and every page can already hold any number of
+// coexisting stickers (words, phrases, text all do), so there's no
+// "already has a canvas" restriction to apply here either; the user just
+// drags each uploaded image from the picker to wherever they actually
+// want it, cover included.
+function pdPlaceUploadedCanvas(dataUrl, loadedImg){
+  if(!pdBook) pdBook=pdLoadBook();
+  const stickerId='pd-uploaded-'+Date.now()+'-'+Math.floor(Math.random()*1000);
+  const st={id:stickerId, kind:'dayCanvas', source:'uploaded', imageData:dataUrl, x:50, y:50, rot:0, scale:1};
+  pdBook.unplacedCanvases=pdBook.unplacedCanvases||[];
+  pdBook.unplacedCanvases.push(st);
+  pdDayCanvasImageCache[stickerId]=loadedImg;
+  pdSaveBook();
+  // Open (or refresh) the Canvases tab so the user immediately sees
+  // where the upload landed and can drag it into place.
+  const mainTabs=document.getElementById('pdPanelMainTabs');
+  if(mainTabs && mainTabs.style.display==='flex') pdRenderCanvasesList();
+}
+
+// Reads a file picked from the device and hands it to pdPlaceUploadedCanvas.
+// Costs 20 coins — silently rejected if the user can't afford it (the
+// upload zone itself is visually disabled below that threshold too, via
+// pdUpdateUI, but this stays defensive in case drag-and-drop bypasses it).
+function pdHandleCanvasFileUpload(input){
+  const file=input.files && input.files[0];
+  if(!file) return;
+  if(pd.monedas<20){ input.value=''; return; }
+  pd.monedas-=20; paxelWallet.monedas=pd.monedas; pdUpdateUI();
+  const reader=new FileReader();
+  reader.onload=function(){
+    const dataUrl=reader.result;
+    const img=new Image();
+    img.addEventListener('load', function(){
+      pdPlaceUploadedCanvas(dataUrl, img);
+    }, {once:true});
+    img.src=dataUrl;
+  };
+  reader.readAsDataURL(file);
+  input.value=''; // allow re-selecting the same file again later
+}
+
+// Removes every generated day-canvas sticker from the whole book — both
+// the ones already placed on pages and any still waiting in the unplaced
+// pool. Used when the reveal format changes mid-generation: existing
+// generated canvases were captured at the old dimensions/aspect ratio
+// and would otherwise sit there stale, mismatched against whatever gets
+// generated next. Uploaded files are untouched — they're arbitrary user
+// images, not tied to the reveal tool's dimensions at all.
 function pdClearAllDayCanvases(){
   if(!pdBook) return;
   let removedAny=false;
   pdBook.pages.forEach(function(page){
     const before=(page.stickers||[]).length;
-    page.stickers=(page.stickers||[]).filter(function(s){ return s.kind!=='dayCanvas'; });
+    page.stickers=(page.stickers||[]).filter(function(s){ return !(s.kind==='dayCanvas' && s.source!=='uploaded'); });
     if(page.stickers.length!==before) removedAny=true;
   });
   if(pdBook.unplacedCanvases && pdBook.unplacedCanvases.length){
-    pdBook.unplacedCanvases=[];
-    removedAny=true;
+    const before=pdBook.unplacedCanvases.length;
+    pdBook.unplacedCanvases=pdBook.unplacedCanvases.filter(function(s){ return s.source==='uploaded'; });
+    if(pdBook.unplacedCanvases.length!==before) removedAny=true;
   }
   if(!removedAny) return;
   pdSaveBook();
@@ -5461,12 +5556,13 @@ function pdBakePageImage(pageIndex){
     ctx.restore();
   }
   const page=(pdBook.pages&&pdBook.pages[pageIndex])||{stickers:[]};
-  // Day-canvas snapshots always draw first (so everything else paints on
-  // top), regardless of where they fall in the stickers array — canvas
-  // has no z-index equivalent, so draw order is what determines stacking.
-  const orderedStickers=(page.stickers||[]).slice().sort(function(a,b){
-    return (a.kind==='dayCanvas'?0:1)-(b.kind==='dayCanvas'?0:1);
-  });
+  // Array order is the single source of truth for stacking — matches the
+  // live edit view's natural DOM order exactly, so "which sticker is on
+  // top" is never a separate, potentially-diverging decision between the
+  // two. Day-canvas stickers start at the front of the array when placed
+  // and move to the end when selected (see pdSelectSticker), rather than
+  // this function special-casing them independently.
+  const orderedStickers=page.stickers||[];
   orderedStickers.forEach(function(st){
     try{
     ctx.save();
@@ -5741,6 +5837,34 @@ function pdSyncBookLayoutRetrying(framesLeft){
 // Keeps the sticker-picker button and the shell's cover-vs-spread state in
 // sync — and, while editing, the two edit-page slots pinned to ZineJS's
 // current page geometry. Re-run after every build, flip, and resize.
+// Keeps the sticker panel positioned just to the right of the flipbook's
+// current visible extent, whether it's showing the cover, a full
+// two-page spread, or a lone odd page at the end — all three change how
+// far right the visible page content actually reaches, so a single fixed
+// offset only ever looked right for one of them. Desktop only — mobile
+// uses its own bottom-sheet layout, unrelated to this.
+const PD_PANEL_GAP=28;
+function pdPositionStickerPanel(){
+  if(pdIsMobile()) return;
+  const panel=document.getElementById('pdStickerPanel');
+  const shell=document.getElementById('pdZineShell');
+  if(!panel || !shell || panel.style.display!=='flex') return;
+  const shellRect=shell.getBoundingClientRect();
+  const isLone=shell.classList.contains('pd-book-cover');
+  // A lone page sits centered in the shell's middle 50% (see
+  // pdPositionEditPages) — its own right edge is 3/4 of the way across
+  // the shell, not the shell's own full right edge.
+  const contentRight = isLone ? shellRect.left + shellRect.width*0.75 : shellRect.right;
+  panel.style.transform='none';
+  panel.style.left=(contentRight + PD_PANEL_GAP)+'px';
+  panel.style.top=shellRect.top+'px';
+}
+// Tracks the lone/spread state from the last sync so the panel only gets
+// repositioned when the flipbook's shape actually changes — repositioning
+// on every safety-net tick regardless would fight any manual drag the
+// user just did, effectively breaking that feature.
+let pdLastPanelLoneState=null;
+
 function pdSyncBookLayout(){
   if(!pdZineBook) return;
   if(pdIsMobile()){
@@ -5765,6 +5889,11 @@ function pdSyncBookLayout(){
   // (via CSS) to animate in from the outer edge to where the centered
   // lone page's own edge is, matching ZineJS's own built-in centering.
   if(shell) shell.classList.toggle('pd-book-cover', isLoneSpread);
+
+  if(isLoneSpread!==pdLastPanelLoneState){
+    pdLastPanelLoneState=isLoneSpread;
+    pdPositionStickerPanel();
+  }
 
   // The 🎨 button now does double duty: word/phrase picker on interior
   // pages, title/subtitle editor on the cover — always visible either
@@ -5921,6 +6050,8 @@ function pdToggleCoverText(){
         pdMakeStickerPanelDraggable();
         pdStickerPanelInitialized=true;
       }
+      pdLastPanelLoneState=null; // forces a fresh position on this open, regardless of prior state
+      pdPositionStickerPanel();
     }
   }else{
     pdExitEditMode();
@@ -5999,30 +6130,81 @@ function pdShowCanvasesPanelBody(){
   }
 }
 
-// Shows every day-canvas that's been removed from a page (via its own ✕)
-// and hasn't been placed anywhere else yet — mirrors the exact same
-// picker model already used for words/phrases: drag a chip onto the
-// visible page to place it there.
+// Shows every canvas-type item that's been removed from a page (via its
+// own ✕) or freshly uploaded, and hasn't been placed anywhere else yet —
+// split into two sections (uploaded files first, then generated day
+// canvases) with a divider between them. Each item mirrors the exact
+// same picker model already used for words/phrases: drag a chip onto
+// the visible page to place it there.
 function pdRenderCanvasesList(){
   const list=document.getElementById('pdCanvasesList');
   if(!list || !pdBook) return;
   list.innerHTML='';
   const unplaced=pdBook.unplacedCanvases||[];
-  if(!unplaced.length){
+  const uploaded=unplaced.filter(function(s){ return s.source==='uploaded'; });
+  // Older saved canvases predate the source field — treat them as
+  // "generated" too, since that's the only kind that existed back then.
+  const generated=unplaced.filter(function(s){ return s.source!=='uploaded'; });
+
+  function buildSection(title, items){
+    if(!items.length) return;
+    const header=document.createElement('div');
+    header.className='pd-canvas-section-header';
+    header.textContent=title;
+    list.appendChild(header);
+    const row=document.createElement('div');
+    row.className='pd-picker-list pd-view-words';
+    items.slice().sort(function(a,b){ return (a.day||0)-(b.day||0); }).forEach(function(st){
+      const chip=document.createElement('div');
+      chip.className='pd-sticker-chip pd-dayCanvas pd-canvas-picker-chip';
+      chip.style.backgroundImage="url('"+st.imageData+"')";
+      chip.title = st.source==='uploaded' ? 'Uploaded image' : ('Day '+st.day);
+      pdMakeCanvasChipTappable(chip, st);
+      const rm=document.createElement('span');
+      rm.className='pd-canvas-chip-remove';
+      rm.textContent='\u2715';
+      rm.title='Delete permanently';
+      rm.addEventListener('pointerdown', function(e){ e.stopPropagation(); });
+      rm.addEventListener('click', function(e){
+        e.stopPropagation();
+        pdBook.unplacedCanvases=(pdBook.unplacedCanvases||[]).filter(function(s){ return s.id!==st.id; });
+        delete pdDayCanvasImageCache[st.id];
+        pdSaveBook();
+        pdRenderCanvasesList();
+      });
+      chip.appendChild(rm);
+      row.appendChild(chip);
+    });
+    list.appendChild(row);
+  }
+
+  buildSection('Uploaded', uploaded);
+
+  // Each separate reveal process (a distinct source image, or a format
+  // change that restarted one) gets its own "Generated" section, rather
+  // than mixing canvases from different generations into one group.
+  // Older saved stickers with no genSession at all form their own
+  // (single) legacy group instead of being scattered across others.
+  const sessions={};
+  const sessionOrder=[];
+  generated.forEach(function(st){
+    const key = (st.genSession===undefined || st.genSession===null) ? 'legacy' : st.genSession;
+    if(!sessions[key]){ sessions[key]=[]; sessionOrder.push(key); }
+    sessions[key].push(st);
+  });
+  sessionOrder.sort(function(a,b){
+    if(a==='legacy') return -1;
+    if(b==='legacy') return 1;
+    return a-b;
+  });
+  sessionOrder.forEach(function(key){ buildSection('Generated', sessions[key]); });
+
+  if(!uploaded.length && !generated.length){
     const empty=document.createElement('div');
     empty.className='pd-picker-empty';
-    empty.textContent="No canvases waiting to be placed — remove one from a page with its \u2715 to see it here.";
+    empty.textContent="No canvases waiting to be placed — remove one from a page with its \u2715, or upload a file above.";
     list.appendChild(empty);
-    return;
   }
-  unplaced.slice().sort(function(a,b){ return (a.day||0)-(b.day||0); }).forEach(function(st){
-    const chip=document.createElement('div');
-    chip.className='pd-sticker-chip pd-dayCanvas pd-canvas-picker-chip';
-    chip.style.backgroundImage="url('"+st.imageData+"')";
-    chip.title='Day '+st.day;
-    pdMakeCanvasChipTappable(chip, st);
-    list.appendChild(chip);
-  });
 }
 
 // Drag-to-place, mirroring pdMakeChipTappable exactly (same ghost that
@@ -6068,7 +6250,7 @@ function pdMakeCanvasChipTappable(chip, st){
           st.x=Math.max(4,Math.min(96,xPct));
           st.y=Math.max(4,Math.min(96,yPct));
           if(!pdBook.pages[zone.pageIndex]) pdBook.pages[zone.pageIndex]={stickers:[]};
-          pdBook.pages[zone.pageIndex].stickers.push(st);
+          pdBook.pages[zone.pageIndex].stickers.unshift(st);
           pdSaveBook();
           pdRenderEditPage();
           pdRenderCanvasesList();
@@ -6208,7 +6390,7 @@ function pdBuildPlacedSticker(st, pageIndex){
   if(typeof st.scale!=='number') st.scale=1;
   const isCoverText = st.kind==='text';
   const el=document.createElement('div');
-  el.className='pd-placed-sticker'+(st.kind==='dayCanvas'?' pd-placed-daycanvas':'');
+  el.className='pd-placed-sticker';
   el.setAttribute('data-sticker-id', st.id);
   el.style.left=st.x+'%';
   el.style.top=st.y+'%';
@@ -6381,9 +6563,27 @@ function pdSelectSticker(el){
   if(pdSelectedStickerEl && pdSelectedStickerEl!==el) pdSelectedStickerEl.classList.remove('pd-selected');
   pdSelectedStickerEl=el;
   el.classList.add('pd-selected');
+  const st=pdGetSelectedSticker();
+  // Day-canvas snapshots persist "brought to front" directly in the
+  // stickers array, since a temporary CSS z-index bump has no equivalent
+  // once you leave edit mode — the array's own order is the only signal
+  // the baked page can also read, so moving it here is what makes the
+  // two views agree once you deselect or exit, not just while actively
+  // selected.
+  if(st && st.kind==='dayCanvas'){
+    const page=pdBook.pages[pdTextToolPageIndex()];
+    if(page){
+      const idx=page.stickers.indexOf(st);
+      if(idx!==-1 && idx!==page.stickers.length-1){
+        page.stickers.splice(idx,1);
+        page.stickers.push(st);
+        pdSaveBook();
+        if(el.parentNode) el.parentNode.appendChild(el); // mirror the same reorder in the live DOM immediately
+      }
+    }
+  }
   // Keep the line-height slider and custom color swatch showing this
   // box's own current values, not whatever the last-selected box had.
-  const st=pdGetSelectedSticker();
   if(st && st.kind==='text'){
     const slider=document.getElementById('pdLineHeightSlider');
     if(slider) slider.value=st.lineHeight||1.25;
@@ -6875,6 +7075,7 @@ function pdSetFmt(tipo,w,h,btn){
     if(pd.img){
       pdPxSketch.background(255);
       pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;
+      pd.genSessionId++;
       pdUpdateUI();
       // The format just changed — any day-canvases already placed in the
       // diary were captured at the old dimensions/aspect ratio and would
@@ -7000,6 +7201,12 @@ window.addEventListener('DOMContentLoaded',()=>{
     pdZ.addEventListener('dragleave',()=>pdZ.classList.remove('dragover'));
     pdZ.addEventListener('drop',e=>{e.preventDefault();pdZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('pdFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;pdHandleFile(inp);}});
   }
+  const pdCanvasZ=document.getElementById('pdCanvasUploadZone');
+  if(pdCanvasZ){
+    pdCanvasZ.addEventListener('dragover',e=>{e.preventDefault();pdCanvasZ.classList.add('dragover');});
+    pdCanvasZ.addEventListener('dragleave',()=>pdCanvasZ.classList.remove('dragover'));
+    pdCanvasZ.addEventListener('drop',e=>{e.preventDefault();pdCanvasZ.classList.remove('dragover');const f=e.dataTransfer.files[0];if(f&&f.type.startsWith('image/')){const inp=document.getElementById('pdCanvasFileInput');const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;pdHandleCanvasFileUpload(inp);}});
+  }
 });
 
 
@@ -7036,6 +7243,7 @@ window.pdSetSelectedTextWeight=pdSetSelectedTextWeight;
 window.pdShowCoverTextPanelBody=pdShowCoverTextPanelBody;
 window.pdShowWordsPhrasesPanelBody=pdShowWordsPhrasesPanelBody;
 window.pdShowCanvasesPanelBody=pdShowCanvasesPanelBody;
+window.pdHandleCanvasFileUpload=pdHandleCanvasFileUpload;
 window.pdToggleControls=pdToggleControls;
 window.pdToggleInventory=pdToggleInventory;
 window.pdToggleStickerOrText=pdToggleStickerOrText;
@@ -7045,9 +7253,9 @@ window.pdUsarHolyWater=pdUsarHolyWater;
 /* Isolated, additive behavior only — does not touch any tool logic above.
    Toggles body classes on scroll so the nav + ticker react to scroll position. */
 (function(){
-  var COMPACT_ON = 60;    // nav shrinks once scrolled past this
-  var COMPACT_OFF = 30;   // ...and only expands again once back below this (hysteresis gap avoids flicker)
-  var TOP_THRESHOLD = 4;  // ticker only shows within this many px of the very top
+  var TOP_THRESHOLD = 4;   // ticker only shows within this many px of the very top
+  var COMPACT_ON = 8;      // nav now shrinks at (just past) the same point the ticker compresses away, instead of waiting until 60px
+  var COMPACT_OFF = 3;     // ...and only expands again once back below this (hysteresis gap avoids flicker)
   var isCompact = false;
   var ticking = false;
   function update(){
@@ -7290,6 +7498,7 @@ window.pdUsarHolyWater=pdUsarHolyWater;
     <span class="pd-diary-drag-grip">&#8942;&#8942;</span>
     <button class="pd-sticker-panel-close" onclick="pdToggleStickerOrText()">&#10005;</button>
   </div>
+  <div class="pd-panel-coins" id="pdPanelCoins">&#129689; <span id="pdPanelCoinsCount">0</span> coins</div>
   <div class="pd-panel-main-tabs" id="pdPanelMainTabs" style="display:none;">
     <button class="pd-panel-main-tab active" id="pdMainTabStickers" onclick="pdShowWordsPhrasesPanelBody()">&#127912; Stickers</button>
     <button class="pd-panel-main-tab" id="pdMainTabText" onclick="pdShowCoverTextPanelBody()">Aa Text</button>
@@ -7336,7 +7545,13 @@ window.pdUsarHolyWater=pdUsarHolyWater;
     </div>
   </div>
   <div class="pd-canvases-panel" id="pdCanvasesPanel" style="display:none;">
-    <div id="pdCanvasesList" class="pd-picker-list pd-view-words"></div>
+    <div class="upload-zone upload-zone-sm" id="pdCanvasUploadZone">
+      <input type="file" accept="image/*" id="pdCanvasFileInput" onchange="pdHandleCanvasFileUpload(this)">
+      <div class="upload-zone-icon">&#128247;</div>
+      <p>Add your own photo</p>
+      <span class="pd-upload-cost-badge">20 coins</span>
+    </div>
+    <div id="pdCanvasesList"></div>
   </div>
 </div>
 
