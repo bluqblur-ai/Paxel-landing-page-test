@@ -1650,6 +1650,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-mobile-text-edit-box:focus{outline:none;border-color:var(--blue);box-shadow:var(--s-md);}
 .pd-sheet-resizing button{transform:none !important;}
 .pd-cover-text-hint{font-family:var(--font);font-size:11px;color:var(--ink-soft);margin:12px 0 8px;text-align:center;}
+.pd-canvases-panel{display:flex;flex-direction:column;overflow-y:auto;}
+.pd-canvas-picker-chip{width:56px;height:56px;flex-shrink:0;border:var(--bw2) solid var(--ink);border-radius:4px;box-shadow:var(--s-sm);cursor:grab;background-size:cover;}
 .pd-font-row{display:flex;gap:6px;}
 .pd-font-choice{flex:1;padding:10px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-size:14px;transition:background .15s;}
 .pd-font-choice:hover{background:var(--paper-alt);}
@@ -1675,6 +1677,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-picker-empty{font-size:13px;color:var(--ink-soft);font-weight:600;text-align:center;padding:20px 8px;margin:auto;}
 
 .pd-sticker-chip{cursor:grab;user-select:none;touch-action:none;}
+.pd-sticker-chip.pd-dayCanvas{display:block;background-position:center;background-repeat:no-repeat;}
 .pd-sticker-chip.pd-word{display:inline-flex;font-family:var(--font);font-weight:700;font-size:12.5px;background:#fff;border:var(--bw) solid var(--ink);border-radius:999px;padding:5px 11px;box-shadow:var(--s-sm);}
 .pd-sticker-chip.pd-text{cursor:text;user-select:text;touch-action:auto;white-space:pre;outline:none;min-width:1ch;text-align:center;padding:4px 8px;border-radius:var(--r0);border:1px dashed transparent;transition:border-color .12s,background .12s;}
 .pd-sticker-chip.pd-text.pd-text-wrapped{white-space:pre-wrap;}
@@ -1692,6 +1695,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    finger, pinch with two to resize + rotate together (handled in JS);
    dedicated handles remain for precise mouse control. */
 .pd-placed-sticker{position:absolute;cursor:grab;touch-action:none;}
+.pd-placed-sticker.pd-placed-daycanvas{z-index:1;}
 .pd-placed-sticker.pd-dragging{cursor:grabbing;z-index:60;}
 .pd-placed-sticker.pd-selected{z-index:55;}
 .pd-placed-sticker .pd-sticker-remove{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;}
@@ -2028,8 +2032,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
             <div class="ctrl-panel-inner">
               <div class="ctrl-row"><label class="ctrl-label">Resolution</label><span class="ctrl-sublabel">Higher = more detail, slower</span><select class="ctrl-select" id="ptResSelect" onchange="ptOnResChange()"></select></div>
               <div class="ctrl-row"><label class="ctrl-label">Generation cycles</label><span class="ctrl-sublabel">Split the pixel generation. Lower = fewer cycles to complete.</span><select class="ctrl-select" id="ptDaysSelect" onchange="pt.TOTAL_DIAS=parseInt(this.value);pt.diaActual=0;pt.indiceActual=0;if(pt.img){ptProcesarImagen();}ptUpdateDayStatus();"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option selected>14</option></select></div>
-              <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="ptSpeedRange" min="1" max="200" value="30" oninput="ptIntervalSpeed=parseInt(this.value);document.getElementById('ptSpeedVal').textContent=this.value+'ms'"><div class="ctrl-range-value" id="ptSpeedVal">30ms</div></div>
-              <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="ptPpcInput" min="1" max="500" value="1" oninput="ptBloquesPorCiclo=parseInt(this.value)||1"></div>
+              <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="ptSpeedRange" min="1" max="200" value="30" oninput="ptSetIntervalSpeed(this.value)"><div class="ctrl-range-value" id="ptSpeedVal">30ms</div></div>
+              <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="ptPpcInput" min="1" max="500" value="1" oninput="ptSetBloquesPorCiclo(this.value)"></div>
             </div>
           </div>
         </div>
@@ -2132,8 +2136,8 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
             <div class="ctrl-panel-inner">
               <div class="ctrl-row"><label class="ctrl-label">Resolution</label><span class="ctrl-sublabel">Higher = more detail, slower</span><select class="ctrl-select" id="wtResSelect" onchange="wtOnResChange()"></select></div>
               <div class="ctrl-row"><label class="ctrl-label">Duration (days)</label><span class="ctrl-sublabel">Split pixel generation into N equal parts</span><select class="ctrl-select" id="wtDaysSelect" onchange="wt.TOTAL_DIAS=parseInt(this.value);wt.diaActual=0;wt.indiceActual=0;if(wt.img){wtProcesarImagen();}wtUpdateUI();"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option selected>14</option></select></div>
-              <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="wtSpeedRange" min="1" max="200" value="30" oninput="wt.intervalSpeed=parseInt(this.value);document.getElementById('wtSpeedVal').textContent=this.value+'ms'"><div class="ctrl-range-value" id="wtSpeedVal">30ms</div></div>
-              <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="wtPpcInput" min="1" max="500" value="1" oninput="wt.bloquesPorCiclo=parseInt(this.value)||1"></div>
+              <div class="ctrl-row"><label class="ctrl-label">Speed (ms between ticks)</label><span class="ctrl-sublabel">Lower = faster generation</span><input type="range" class="ctrl-range" id="wtSpeedRange" min="1" max="200" value="30" oninput="wtSetIntervalSpeed(this.value)"><div class="ctrl-range-value" id="wtSpeedVal">30ms</div></div>
+              <div class="ctrl-row"><label class="ctrl-label">Pixels per tick</label><span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span><input type="number" class="ctrl-number" id="wtPpcInput" min="1" max="500" value="1" oninput="wtSetBloquesPorCiclo(this.value)"></div>
             </div>
           </div>
         </div><!-- /#wtControlsCol -->
@@ -2283,14 +2287,14 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
                 <label class="ctrl-label">Speed (ms between ticks)</label>
                 <span class="ctrl-sublabel">Lower = faster generation</span>
                 <input type="range" class="ctrl-range" id="ppSpeedRange" min="1" max="200" value="30"
-                  oninput="pp.intervalSpeed=parseInt(this.value);document.getElementById('ppSpeedVal').textContent=this.value+'ms'">
+                  oninput="ppSetIntervalSpeed(this.value)">
                 <div class="ctrl-range-value" id="ppSpeedVal">30ms</div>
               </div>
               <div class="ctrl-row">
                 <label class="ctrl-label">Pixels per tick</label>
                 <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
                 <input type="number" class="ctrl-number" id="ppPpcInput" min="1" max="500" value="1"
-                  oninput="pp.bloquesPorCiclo=parseInt(this.value)||1">
+                  oninput="ppSetBloquesPorCiclo(this.value)">
               </div>
             </div>
           </div>
@@ -2463,14 +2467,14 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
                 <label class="ctrl-label">Speed (ms between ticks)</label>
                 <span class="ctrl-sublabel">Lower = faster generation</span>
                 <input type="range" class="ctrl-range" id="pdSpeedRange" min="1" max="200" value="30"
-                  oninput="pd.intervalSpeed=parseInt(this.value);document.getElementById('pdSpeedVal').textContent=this.value+'ms'">
+                  oninput="pdSetIntervalSpeed(this.value)">
                 <div class="ctrl-range-value" id="pdSpeedVal">30ms</div>
               </div>
               <div class="ctrl-row">
                 <label class="ctrl-label">Pixels per tick</label>
                 <span class="ctrl-sublabel">Higher = bursts of pixels per cycle</span>
                 <input type="number" class="ctrl-number" id="pdPpcInput" min="1" max="500" value="1"
-                  oninput="pd.bloquesPorCiclo=parseInt(this.value)||1">
+                  oninput="pdSetBloquesPorCiclo(this.value)">
               </div>
             </div>
           </div>
@@ -2650,7 +2654,17 @@ function ptInitP5(){
   const sk=function(p){
     ptPxSketch=p;
     p.setup=function(){let c=p.createCanvas(pt.canvasW,pt.canvasH);c.parent('ptP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
-    p.draw=function(){if(!pt.img)return;let w=p.width/pt.COLS,h=p.height/pt.ROWS;p.noStroke();for(let b of pt.bloquesADibujar){if(b.activo){p.fill(b.color[0],b.color[1],b.color[2]);p.rect(b.columna*w,b.fila*h,w,h);}}};
+    p.draw=function(){
+      if(!pt.img)return;
+      p.noStroke();
+      for(let b of pt.bloquesADibujar){
+        if(!b.activo)continue;
+        const x1=Math.round(b.columna*p.width/pt.COLS), x2=Math.round((b.columna+1)*p.width/pt.COLS);
+        const y1=Math.round(b.fila*p.height/pt.ROWS), y2=Math.round((b.fila+1)*p.height/pt.ROWS);
+        p.fill(b.color[0],b.color[1],b.color[2]);
+        p.rect(x1,y1,x2-x1,y2-y1);
+      }
+    };
   };
   ptP5Instance=new p5(sk);
   document.getElementById('ptCanvasEmpty').style.display='none';
@@ -2724,6 +2738,11 @@ function ptSetFmt(tipo,w,h,btn){
 }
 
 function ptOnResChange(){const v=document.getElementById('ptResSelect').value;if(!v)return;const p=v.split('x');pt.COLS=parseInt(p[0]);pt.ROWS=parseInt(p[1]);if(pt.img)ptProcesarImagen();}
+function ptSetIntervalSpeed(value){
+  ptIntervalSpeed=parseInt(value);
+  document.getElementById('ptSpeedVal').textContent=value+'ms';
+}
+function ptSetBloquesPorCiclo(value){ ptBloquesPorCiclo=parseInt(value)||1; }
 
 // Public API — everything else above stays private to this module.
 window.ptInitP5=ptInitP5;
@@ -2734,6 +2753,8 @@ window.ptUpdateDayStatus=ptUpdateDayStatus;
 window.ptDownloadCanvas=ptDownloadCanvas;
 window.ptSetFmt=ptSetFmt;
 window.ptOnResChange=ptOnResChange;
+window.ptSetIntervalSpeed=ptSetIntervalSpeed;
+window.ptSetBloquesPorCiclo=ptSetBloquesPorCiclo;
 Object.defineProperty(window,'ptP5Instance',{get:()=>ptP5Instance});
 })();
 
@@ -2819,7 +2840,17 @@ function wtInitP5(){
   const sk=function(p){
     wtPxSketch=p;
     p.setup=function(){let c=p.createCanvas(wt.canvasW,wt.canvasH);c.parent('wtP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
-    p.draw=function(){if(!wt.img)return;let w=p.width/wt.COLS,h=p.height/wt.ROWS;p.noStroke();for(let b of wt.bloquesADibujar){if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.rect(b.columna*w,b.fila*h,w,h);}}};
+    p.draw=function(){
+      if(!wt.img)return;
+      p.noStroke();
+      for(let b of wt.bloquesADibujar){
+        if(!b.activo)continue;
+        const x1=Math.round(b.columna*p.width/wt.COLS), x2=Math.round((b.columna+1)*p.width/wt.COLS);
+        const y1=Math.round(b.fila*p.height/wt.ROWS), y2=Math.round((b.fila+1)*p.height/wt.ROWS);
+        p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);
+        p.rect(x1,y1,x2-x1,y2-y1);
+      }
+    };
   };
   wtP5Instance=new p5(sk);
   document.getElementById('wtCanvasEmpty').style.display='none';
@@ -3150,6 +3181,11 @@ function wtSetFmt(tipo,w,h,btn){
 }
 
 function wtOnResChange(){const v=document.getElementById('wtResSelect').value;if(!v)return;const p=v.split('x');wt.COLS=parseInt(p[0]);wt.ROWS=parseInt(p[1]);if(wt.img)wtProcesarImagen();}
+function wtSetIntervalSpeed(value){
+  wt.intervalSpeed=parseInt(value);
+  document.getElementById('wtSpeedVal').textContent=value+'ms';
+}
+function wtSetBloquesPorCiclo(value){ wt.bloquesPorCiclo=parseInt(value)||1; }
 
 function wtRecalcCanvasHeight(){
   const wrap=document.getElementById('wtCanvasWrap');if(!wrap)return;
@@ -3179,6 +3215,8 @@ window.wtIniciarConstruccionDia=wtIniciarConstruccionDia;
 window.wtInitP5=wtInitP5;
 window.wtNextCertSerial=wtNextCertSerial;
 window.wtOnResChange=wtOnResChange;
+window.wtSetIntervalSpeed=wtSetIntervalSpeed;
+window.wtSetBloquesPorCiclo=wtSetBloquesPorCiclo;
 Object.defineProperty(window,'wtP5Instance',{get:()=>wtP5Instance});
 window.wtProcesarImagen=wtProcesarImagen;
 window.wtResetCoins=wtResetCoins;
@@ -3308,10 +3346,13 @@ function ppInitP5(){
     p.setup=function(){let c=p.createCanvas(pp.canvasW,pp.canvasH);c.parent('ppP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
     p.draw=function(){
       if(!pp.img)return;
-      let w=p.width/pp.COLS,h=p.height/pp.ROWS;
       p.noStroke();
       for(let b of pp.bloquesADibujar){
-        if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.rect(b.columna*w,b.fila*h,w,h);}
+        if(!b.activo)continue;
+        const x1=Math.round(b.columna*p.width/pp.COLS), x2=Math.round((b.columna+1)*p.width/pp.COLS);
+        const y1=Math.round(b.fila*p.height/pp.ROWS), y2=Math.round((b.fila+1)*p.height/pp.ROWS);
+        p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);
+        p.rect(x1,y1,x2-x1,y2-y1);
       }
     };
   };
@@ -3719,6 +3760,11 @@ function ppSetFmt(tipo,w,h,btn){
   ppOnResChange();
 }
 function ppOnResChange(){const v=document.getElementById('ppResSelect').value;if(!v)return;const p=v.split('x');pp.COLS=parseInt(p[0]);pp.ROWS=parseInt(p[1]);if(pp.img)ppProcesarImagen();}
+function ppSetIntervalSpeed(value){
+  pp.intervalSpeed=parseInt(value);
+  document.getElementById('ppSpeedVal').textContent=value+'ms';
+}
+function ppSetBloquesPorCiclo(value){ pp.bloquesPorCiclo=parseInt(value)||1; }
 
 // ── Download: PNG + PDF + ZIP (same as waterer) ──
 function ppCalcPurity(){if(pp.TOTAL_DIAS===0)return'0%';return Math.round(((pp.diasReveladosNativos||[]).length/pp.TOTAL_DIAS)*100)+'%';}
@@ -3835,6 +3881,8 @@ window.ppHandleFile=ppHandleFile;
 window.ppIniciarConstruccionDia=ppIniciarConstruccionDia;
 window.ppInitP5=ppInitP5;
 window.ppOnResChange=ppOnResChange;
+window.ppSetIntervalSpeed=ppSetIntervalSpeed;
+window.ppSetBloquesPorCiclo=ppSetBloquesPorCiclo;
 window.ppOpenInventory=ppOpenInventory;
 Object.defineProperty(window,'ppP5Instance',{get:()=>ppP5Instance});
 window.ppRevelarColorActual=ppRevelarColorActual;
@@ -3968,10 +4016,13 @@ function pdInitP5(){
     p.setup=function(){let c=p.createCanvas(pd.canvasW,pd.canvasH);c.parent('pdP5Container');p.pixelDensity(5);p.background(0);p.noLoop();};
     p.draw=function(){
       if(!pd.img)return;
-      let w=p.width/pd.COLS,h=p.height/pd.ROWS;
       p.noStroke();
       for(let b of pd.bloquesADibujar){
-        if(b.activo){p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);p.rect(b.columna*w,b.fila*h,w,h);}
+        if(!b.activo)continue;
+        const x1=Math.round(b.columna*p.width/pd.COLS), x2=Math.round((b.columna+1)*p.width/pd.COLS);
+        const y1=Math.round(b.fila*p.height/pd.ROWS), y2=Math.round((b.fila+1)*p.height/pd.ROWS);
+        p.fill(b.colorActual[0],b.colorActual[1],b.colorActual[2]);
+        p.rect(x1,y1,x2-x1,y2-y1);
       }
     };
   };
@@ -4029,7 +4080,7 @@ function pdIniciarConstruccionDia(){
   if(pdPxSketch)pdPxSketch.loop();
   let timer=setInterval(()=>{
     for(let i=0;i<pd.bloquesPorCiclo;i++){if(pc<pH&&pd.indiceActual<pd.bloquesADibujar.length){pd.bloquesADibujar[pd.indiceActual].activo=true;pd.bloquesADibujar[pd.indiceActual].parte=pd.diaActual;pd.indiceActual++;pc++;}}
-    if(pc>=pH||pd.indiceActual>=pd.bloquesADibujar.length){clearInterval(timer);pd.construyendo=false;pdActualizarBotones();if(pdPxSketch){pdPxSketch.redraw();pdPxSketch.noLoop();}}
+    if(pc>=pH||pd.indiceActual>=pd.bloquesADibujar.length){clearInterval(timer);pd.construyendo=false;pdActualizarBotones();if(pdPxSketch){pdPxSketch.redraw();pdPxSketch.noLoop();pdCaptureDayCanvasSnapshot(pd.diaActual);}}
   },pd.intervalSpeed);
 }
 
@@ -4055,6 +4106,7 @@ function pdRevelarColorActual(){
     if(pd.diaActual>=pd.TOTAL_DIAS)document.getElementById('pdDlBtn').disabled=false;
     pdMostrarFraseAleatoria();
     pdUpdateUI();
+    pdCaptureDayCanvasSnapshot(pd.diaActual);
   });
 }
 
@@ -4075,6 +4127,7 @@ function pdUsarHolyWater(){
     }
     if(pd.diaActual>=pd.TOTAL_DIAS)document.getElementById('pdDlBtn').disabled=false;
     pdUpdateUI();
+    pdCaptureDayCanvasSnapshot(d);
   });
 }
 
@@ -4367,7 +4420,11 @@ function pdUnlockBodyScroll(){
   window.scrollTo(0, pdScrollLockY);
 }
 
+let pdDiarySessionId=0;
+
 function pdOpenInventory(){
+  pdDiarySessionId++; // invalidates any pending close's delayed cleanup below
+  const mySession=pdDiarySessionId;
   if(!pdBook) pdBook=pdLoadBook();
   const floatEl=document.getElementById('pdDiaryFloat');
   if(!floatEl) return;
@@ -4375,7 +4432,14 @@ function pdOpenInventory(){
   floatEl.classList.add('pd-diary-open');
   pdAnimateDiaryIn(floatEl);
   pdRenderPicker();
-  pdBuildZine(0);
+  // The panel itself is already animating in above — that's a purely
+  // visual concern, independent of this. Only the ZineJS content waits
+  // (briefly — data URLs decode fast) until every day-canvas image is
+  // actually ready, so the very first bake never has to guess or react
+  // to anything finishing late.
+  pdPreloadDayCanvasImages().then(function(){
+    if(mySession===pdDiarySessionId) pdBuildZine(0);
+  });
   if(!pdDiaryInitialized){
     pdMakeDiaryDraggable();
     pdMakeDiaryResizable();
@@ -4443,7 +4507,19 @@ function pdCloseInventory(){
     floatEl.style.transition='top .4s cubic-bezier(.4,0,.6,1), opacity .3s ease';
     floatEl.style.top=startTop+'px';
     floatEl.style.opacity='0';
-    setTimeout(function(){ floatEl.classList.remove('pd-diary-open'); }, 400);
+    const closedSessionId=pdDiarySessionId;
+    setTimeout(function(){
+      floatEl.classList.remove('pd-diary-open');
+      // Only now, once it's actually offscreen/hidden — destroying mid-
+      // animation would visibly disrupt it. Guarded by the session id: if
+      // the diary was reopened before this timeout fired, pdDiarySessionId
+      // has since changed, and destroying here would tear down the NEW
+      // instance instead of the one this close actually applies to —
+      // leaving the panel visually open with nothing rendered inside it.
+      if(closedSessionId===pdDiarySessionId && pdZineBook){
+        try{ pdZineBook.destroy(); }catch(e){} pdZineBook=null;
+      }
+    }, 400);
   }
   const panel=document.getElementById('pdStickerPanel');
   if(panel){ panel.style.display='none'; panel.style.bottom=''; }
@@ -4479,6 +4555,8 @@ function pdToggleStickerPicker(){
     if(pdEditingPage===null) pdEnterEditMode(true);
     const mainTabs=document.getElementById('pdPanelMainTabs');
     if(mainTabs) mainTabs.style.display='flex';
+    const tabStickers=document.getElementById('pdMainTabStickers');
+    if(tabStickers) tabStickers.style.display='';
     pdShowWordsPhrasesPanelBody();
     pdRenderPicker();
     panel.classList.remove('pd-panel-closing');
@@ -5149,6 +5227,183 @@ function pdPageSide(pageIndex){
 // — resizing scales the whole phrase like a word, it never reflows text.
 const PD_PHRASE_BOX_W=286;
 
+// ── Day-canvas snapshots: each day's pixel-reveal progress becomes a
+// permanent, undeletable-but-repositionable sticker on the matching
+// diary page (day 1 → page 1, day 2 → page 2, ...), created automatically
+// the moment that day's reveal animation finishes — independent of
+// whether the optional "reveal phrase" bonus is ever claimed. ──
+
+// Baking is synchronous, but an <img> only draws once loaded. Rather than
+// reacting to each image's load event by triggering a rebuild (which can
+// cascade: a rebuild's own re-bake can encounter another image that
+// hasn't finished decoding yet, scheduling another rebuild, and so on),
+// every day-canvas image is preloaded up front — see
+// pdPreloadDayCanvasImages, called before the diary's very first build
+// each session. By the time any bake actually runs, everything it needs
+// is already sitting in this cache, so this stays a plain, side-effect-
+// free lookup.
+let pdDayCanvasImageCache={};
+
+function pdGetDayCanvasImage(st){
+  let img=pdDayCanvasImageCache[st.id];
+  if(img && img.src===st.imageData) return img;
+  img=new Image();
+  pdDayCanvasImageCache[st.id]=img;
+  img.src=st.imageData;
+  return img;
+}
+
+// Ensures every day-canvas image across the whole book is loaded before
+// resolving — called once, before the diary's first build each session
+// (pdOpenInventory). A broken image resolves too (via 'error') rather
+// than hanging the whole preload indefinitely.
+function pdPreloadDayCanvasImages(){
+  if(!pdBook) return Promise.resolve();
+  const promises=[];
+  pdBook.pages.forEach(function(page){
+    (page.stickers||[]).forEach(function(st){
+      if(st.kind!=='dayCanvas') return;
+      const cached=pdDayCanvasImageCache[st.id];
+      if(cached && cached.src===st.imageData && cached.complete) return;
+      promises.push(new Promise(function(resolve){
+        const img=new Image();
+        img.addEventListener('load', resolve, {once:true});
+        img.addEventListener('error', resolve, {once:true});
+        pdDayCanvasImageCache[st.id]=img;
+        img.src=st.imageData;
+      }));
+    });
+  });
+  return promises.length ? Promise.all(promises) : Promise.resolve();
+}
+
+// Grabs the reveal canvas's current pixels and places them as day N's
+// snapshot sticker — replacing any prior snapshot for that same day
+// in place (preserving whatever position/size/rotation the user already
+// gave it) rather than adding a duplicate.
+function pdCaptureDayCanvasSnapshot(day){
+  if(!pd.img || day<1) return;
+  const dataUrl=pdRenderTransparentSnapshot();
+  if(!dataUrl) return;
+  const img=new Image();
+  img.addEventListener('load', function(){
+    pdPlaceDayCanvasOnPage(day, dataUrl, img);
+  }, {once:true});
+  img.src=dataUrl;
+}
+
+// Draws only the currently-revealed blocks onto a fresh, naturally
+// transparent canvas — the live p5 sketch fills a solid black background
+// first (p.background(0) in setup), which reads fine for the reveal
+// tool's own on-screen view but would otherwise get baked into the
+// snapshot as an opaque black square wherever nothing's revealed yet.
+function pdRenderTransparentSnapshot(){
+  if(!pd.img) return null;
+  const RES_SCALE=2;
+  const canvas=document.createElement('canvas');
+  canvas.width=pd.canvasW*RES_SCALE; canvas.height=pd.canvasH*RES_SCALE;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(RES_SCALE, RES_SCALE);
+  pd.bloquesADibujar.forEach(function(b){
+    if(!b.activo) return;
+    const x1=Math.round(b.columna*pd.canvasW/pd.COLS), x2=Math.round((b.columna+1)*pd.canvasW/pd.COLS);
+    const y1=Math.round(b.fila*pd.canvasH/pd.ROWS), y2=Math.round((b.fila+1)*pd.canvasH/pd.ROWS);
+    ctx.fillStyle='rgb('+b.colorActual[0]+','+b.colorActual[1]+','+b.colorActual[2]+')';
+    ctx.fillRect(x1, y1, x2-x1, y2-y1);
+  });
+  return canvas.toDataURL('image/png');
+}
+
+function pdPlaceDayCanvasOnPage(day, dataUrl, loadedImg){
+  if(!pdBook) pdBook=pdLoadBook();
+  while(pdBook.pages.length<=day) pdBook.pages.push({stickers:[]});
+  const page=pdBook.pages[day];
+  const stickerId='pd-daycanvas-'+day;
+  let st=page.stickers.find(function(s){ return s.id===stickerId; });
+  if(st){
+    st.imageData=dataUrl;
+  }else{
+    st={id:stickerId, kind:'dayCanvas', day:day, imageData:dataUrl, x:50, y:50, rot:0, scale:1};
+    page.stickers.push(st);
+  }
+  // In case this same day's canvas was previously removed (sent to the
+  // unplaced pool) and is now being regenerated/re-watered — it belongs
+  // back on its page, not lingering as a stale duplicate in the pool too.
+  if(pdBook.unplacedCanvases && pdBook.unplacedCanvases.length){
+    pdBook.unplacedCanvases=pdBook.unplacedCanvases.filter(function(s){ return s.id!==stickerId; });
+  }
+  pdDayCanvasImageCache[stickerId]=loadedImg;
+  pdSaveBook();
+  // If the diary panel is currently open, refresh what's shown right
+  // away — otherwise this just updates the saved data, and the snapshot
+  // appears next time the diary is opened.
+  if(pdZineBook){
+    if(pdIsMobile()) pdBuildZine(pdMobileCurrentPage);
+    else pdBuildZine(pdZineBook.getPage());
+  }
+}
+
+// Removes every day-canvas sticker from the whole book — both the ones
+// already placed on pages and any still waiting in the unplaced pool.
+// Used when the reveal format changes mid-generation: existing canvases
+// were captured at the old dimensions/aspect ratio and would otherwise
+// sit there stale, mismatched against whatever gets generated next.
+function pdClearAllDayCanvases(){
+  if(!pdBook) return;
+  let removedAny=false;
+  pdBook.pages.forEach(function(page){
+    const before=(page.stickers||[]).length;
+    page.stickers=(page.stickers||[]).filter(function(s){ return s.kind!=='dayCanvas'; });
+    if(page.stickers.length!==before) removedAny=true;
+  });
+  if(pdBook.unplacedCanvases && pdBook.unplacedCanvases.length){
+    pdBook.unplacedCanvases=[];
+    removedAny=true;
+  }
+  if(!removedAny) return;
+  pdSaveBook();
+  if(pdZineBook){
+    if(pdIsMobile()) pdBuildZine(pdMobileCurrentPage);
+    else pdBuildZine(pdZineBook.getPage());
+  }
+}
+
+// Draws an image cropped (never stretched) to fill the destination box —
+// matching CSS background-size:cover, which the live editing view already
+// uses for this same snapshot, so the baked page matches what was shown
+// while editing.
+// Computes a display box that preserves the source image's own aspect
+// ratio (1:1, 4:3, or 3:4 — whichever format was active when this day's
+// canvas was captured) instead of always assuming square, which would
+// otherwise crop off the sides of a non-square canvas to force-fit it.
+// The longer side is fixed at maxSize, the shorter one scaled to match.
+// Reads the actual loaded image's own pixel dimensions directly (rather
+// than a separately-stored field) so there's exactly one source of
+// truth, used identically by both the live edit view and the baked
+// page — this is what actually fixes the two ever disagreeing about a
+// sticker's size, since they're now reading the same real image instead
+// of two copies of a dimension that could fall out of sync.
+function pdDayCanvasBoxSize(img, maxSize){
+  const cw=(img && img.naturalWidth) || 1;
+  const ch=(img && img.naturalHeight) || 1;
+  if(cw>=ch) return {w:maxSize, h:maxSize*ch/cw};
+  return {w:maxSize*cw/ch, h:maxSize};
+}
+
+function pdDrawImageCover(ctx, img, dx, dy, dw, dh){
+  const srcRatio=img.naturalWidth/img.naturalHeight;
+  const dstRatio=dw/dh;
+  let sx=0, sy=0, sw=img.naturalWidth, sh=img.naturalHeight;
+  if(srcRatio>dstRatio){
+    sw=img.naturalHeight*dstRatio;
+    sx=(img.naturalWidth-sw)/2;
+  }else{
+    sh=img.naturalWidth/dstRatio;
+    sy=(img.naturalHeight-sh)/2;
+  }
+  ctx.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh);
+}
+
 function pdBakePageImage(pageIndex){
   const W=600, H=849;
   const RES_SCALE=2; // renders at 2x for crisp shapes/text, especially the rounded-corner phrase boxes
@@ -5206,7 +5461,14 @@ function pdBakePageImage(pageIndex){
     ctx.restore();
   }
   const page=(pdBook.pages&&pdBook.pages[pageIndex])||{stickers:[]};
-  (page.stickers||[]).forEach(function(st){
+  // Day-canvas snapshots always draw first (so everything else paints on
+  // top), regardless of where they fall in the stickers array — canvas
+  // has no z-index equivalent, so draw order is what determines stacking.
+  const orderedStickers=(page.stickers||[]).slice().sort(function(a,b){
+    return (a.kind==='dayCanvas'?0:1)-(b.kind==='dayCanvas'?0:1);
+  });
+  orderedStickers.forEach(function(st){
+    try{
     ctx.save();
     ctx.translate(st.x/100*W, st.y/100*H);
     ctx.rotate((st.rot||0)*Math.PI/180);
@@ -5279,6 +5541,17 @@ function pdBakePageImage(pageIndex){
       ctx.fill(); ctx.stroke();
       ctx.fillStyle=pdColorRareza(st.text);
       ctx.fillText(st.text,0,1);
+    }else if(st.kind==='dayCanvas'){
+      const img=pdGetDayCanvasImage(st);
+      if(img && img.complete && img.naturalWidth>0){
+        const box=pdDayCanvasBoxSize(img, 500);
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(-box.w/2,-box.h/2,box.w,box.h);
+        ctx.clip();
+        pdDrawImageCover(ctx, img, -box.w/2,-box.h/2,box.w,box.h);
+        ctx.restore();
+      }
     }else{
       // The box wraps at a fixed width always (PD_PHRASE_BOX_W) — it
       // doesn't reflow on resize. The shared ctx.scale() above (same as
@@ -5320,7 +5593,11 @@ function pdBakePageImage(pageIndex){
         ctx.fillText(ln,-boxW/2+padX,-boxH/2+padY+lineH/2+i*lineH);
       });
     }
-    ctx.restore();
+    }catch(err){
+      console.error('pdBakePageImage: failed to draw a sticker, skipping it', st, err);
+    }finally{
+      ctx.restore();
+    }
   });
   // Thin, rounded black border baked right into the page itself, so the
   // flipbook reads as bordered pages regardless of how ZineJS sizes/
@@ -5391,12 +5668,35 @@ function pdPageBorderPath(ctx,x,y,w,h,r,omitSide){
 // since ImageSource takes its URLs once at construction. ──
 let pdZineBook=null;
 
+let pdLastBuildZineTime=0;
+let pdBuildZineBurstCount=0;
 function pdBuildZine(startPage){
+  // Circuit breaker: if something is calling this repeatedly in a tight
+  // loop (destroying and recreating the whole flipbook each time), that's
+  // exactly what would look like the flipbook flickering/flashing on and
+  // off — this stops it after a few rapid calls instead of letting it run
+  // indefinitely, and logs which call site is responsible so the actual
+  // trigger can be tracked down from the browser console.
+  const now=Date.now();
+  if(now-pdLastBuildZineTime<150){
+    pdBuildZineBurstCount++;
+    if(pdBuildZineBurstCount>4){
+      console.warn('pdBuildZine: called '+pdBuildZineBurstCount+' times within ~150ms of each other — skipping this call to stop a possible rebuild loop. Check this stack trace to find what keeps triggering it:', new Error().stack);
+      return;
+    }
+  }else{
+    pdBuildZineBurstCount=0;
+  }
+  pdLastBuildZineTime=now;
   const container=document.getElementById('pdZineContainer');
   if(!container || typeof ZineJS==='undefined') return;
   if(pdZineBook){ try{ pdZineBook.destroy(); }catch(e){} pdZineBook=null; }
   container.innerHTML='';
-  const urls=(pdBook.pages||[{stickers:[]}]).map(function(_,i){ return pdBakePageImage(i); });
+  const PD_BLANK_PAGE_FALLBACK='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="849"><rect width="600" height="849" fill="#ffffff"/></svg>');
+  const urls=(pdBook.pages||[{stickers:[]}]).map(function(_,i){
+    try{ return pdBakePageImage(i); }
+    catch(err){ console.error('pdBuildZine: failed to bake page', i, err); return PD_BLANK_PAGE_FALLBACK; }
+  });
   pdBakedPageUrlsCache=urls; // reused by the mobile page view instead of re-baking the same pages again
   pdZineBook=new ZineJS.Zine(container, {
     source:new ZineJS.ImageSource(urls),
@@ -5609,7 +5909,9 @@ function pdToggleCoverText(){
   if(pdEditingPage===null){
     pdEnterEditMode(true);
     const mainTabs=document.getElementById('pdPanelMainTabs');
-    if(mainTabs) mainTabs.style.display='none';
+    if(mainTabs) mainTabs.style.display='flex';
+    const tabStickers=document.getElementById('pdMainTabStickers');
+    if(tabStickers) tabStickers.style.display='none';
     pdShowCoverTextPanelBody();
     const panel=document.getElementById('pdStickerPanel');
     if(panel){
@@ -5632,13 +5934,17 @@ function pdShowWordsPhrasesPanelBody(){
   const toggle=document.querySelector('.pd-picker-toggle');
   const list=document.getElementById('pdPickerList');
   const textPanel=document.getElementById('pdCoverTextPanel');
+  const canvasesPanel=document.getElementById('pdCanvasesPanel');
   if(toggle) toggle.style.display='flex';
   if(list) list.style.display='';
   if(textPanel) textPanel.style.display='none';
+  if(canvasesPanel) canvasesPanel.style.display='none';
   const tabStickers=document.getElementById('pdMainTabStickers');
   const tabText=document.getElementById('pdMainTabText');
+  const tabCanvases=document.getElementById('pdMainTabCanvases');
   if(tabStickers) tabStickers.classList.add('active');
   if(tabText) tabText.classList.remove('active');
+  if(tabCanvases) tabCanvases.classList.remove('active');
   pdDeselectSticker();
   if(pdIsMobile()){
     const panel=document.getElementById('pdStickerPanel');
@@ -5649,13 +5955,17 @@ function pdShowCoverTextPanelBody(){
   const toggle=document.querySelector('.pd-picker-toggle');
   const list=document.getElementById('pdPickerList');
   const textPanel=document.getElementById('pdCoverTextPanel');
+  const canvasesPanel=document.getElementById('pdCanvasesPanel');
   if(toggle) toggle.style.display='none';
   if(list) list.style.display='none';
   if(textPanel) textPanel.style.display='block';
+  if(canvasesPanel) canvasesPanel.style.display='none';
   const tabStickers=document.getElementById('pdMainTabStickers');
   const tabText=document.getElementById('pdMainTabText');
+  const tabCanvases=document.getElementById('pdMainTabCanvases');
   if(tabStickers) tabStickers.classList.remove('active');
   if(tabText) tabText.classList.add('active');
+  if(tabCanvases) tabCanvases.classList.remove('active');
   pdDeselectSticker();
   if(pdIsMobile()){
     // Same height as the Stickers tab — switching tabs shouldn't visibly
@@ -5665,6 +5975,109 @@ function pdShowCoverTextPanelBody(){
     const panel=document.getElementById('pdStickerPanel');
     if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
   }
+}
+function pdShowCanvasesPanelBody(){
+  const toggle=document.querySelector('.pd-picker-toggle');
+  const list=document.getElementById('pdPickerList');
+  const textPanel=document.getElementById('pdCoverTextPanel');
+  const canvasesPanel=document.getElementById('pdCanvasesPanel');
+  if(toggle) toggle.style.display='none';
+  if(list) list.style.display='none';
+  if(textPanel) textPanel.style.display='none';
+  if(canvasesPanel) canvasesPanel.style.display='flex';
+  const tabStickers=document.getElementById('pdMainTabStickers');
+  const tabText=document.getElementById('pdMainTabText');
+  const tabCanvases=document.getElementById('pdMainTabCanvases');
+  if(tabStickers) tabStickers.classList.remove('active');
+  if(tabText) tabText.classList.remove('active');
+  if(tabCanvases) tabCanvases.classList.add('active');
+  pdDeselectSticker();
+  pdRenderCanvasesList();
+  if(pdIsMobile()){
+    const panel=document.getElementById('pdStickerPanel');
+    if(panel){ panel.style.height=PD_SHEET_DEFAULT_VH+'vh'; panel.style.maxHeight=PD_SHEET_DEFAULT_VH+'vh'; }
+  }
+}
+
+// Shows every day-canvas that's been removed from a page (via its own ✕)
+// and hasn't been placed anywhere else yet — mirrors the exact same
+// picker model already used for words/phrases: drag a chip onto the
+// visible page to place it there.
+function pdRenderCanvasesList(){
+  const list=document.getElementById('pdCanvasesList');
+  if(!list || !pdBook) return;
+  list.innerHTML='';
+  const unplaced=pdBook.unplacedCanvases||[];
+  if(!unplaced.length){
+    const empty=document.createElement('div');
+    empty.className='pd-picker-empty';
+    empty.textContent="No canvases waiting to be placed — remove one from a page with its \u2715 to see it here.";
+    list.appendChild(empty);
+    return;
+  }
+  unplaced.slice().sort(function(a,b){ return (a.day||0)-(b.day||0); }).forEach(function(st){
+    const chip=document.createElement('div');
+    chip.className='pd-sticker-chip pd-dayCanvas pd-canvas-picker-chip';
+    chip.style.backgroundImage="url('"+st.imageData+"')";
+    chip.title='Day '+st.day;
+    pdMakeCanvasChipTappable(chip, st);
+    list.appendChild(chip);
+  });
+}
+
+// Drag-to-place, mirroring pdMakeChipTappable exactly (same ghost that
+// follows the pointer, same drop-zone detection against the currently
+// visible edit pages) — but for one specific day-canvas sticker object
+// instead of a kind+text combination, since each canvas is unique.
+function pdMakeCanvasChipTappable(chip, st){
+  chip.addEventListener('pointerdown', function(e){
+    e.preventDefault();
+    const rect=chip.getBoundingClientRect();
+    const ghost=chip.cloneNode(true);
+    ghost.style.position='fixed';
+    ghost.style.zIndex='10001';
+    ghost.style.pointerEvents='none';
+    ghost.style.opacity='.9';
+    ghost.style.width=rect.width+'px';
+    ghost.style.height=rect.height+'px';
+    ghost.style.left=e.clientX+'px';
+    ghost.style.top=e.clientY+'px';
+    ghost.style.transform='translate(-50%,-50%)';
+    document.body.appendChild(ghost);
+
+    function move(ev){
+      ghost.style.left=ev.clientX+'px';
+      ghost.style.top=ev.clientY+'px';
+    }
+    function up(ev){
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      ghost.remove();
+      if(!pdEditingSpread) return;
+      const zones=[
+        {el:document.getElementById('pdEditPageLeft'), pageIndex:pdEditingSpread.left},
+        {el:document.getElementById('pdEditPageRight'), pageIndex:pdEditingSpread.right}
+      ];
+      zones.forEach(function(zone){
+        if(zone.pageIndex===null || zone.pageIndex===undefined || !zone.el || zone.el.style.display==='none') return;
+        const r=zone.el.getBoundingClientRect();
+        if(ev.clientX>=r.left && ev.clientX<=r.right && ev.clientY>=r.top && ev.clientY<=r.bottom){
+          const xPct=(ev.clientX-r.left)/r.width*100;
+          const yPct=(ev.clientY-r.top)/r.height*100;
+          pdBook.unplacedCanvases=(pdBook.unplacedCanvases||[]).filter(function(s){ return s.id!==st.id; });
+          st.x=Math.max(4,Math.min(96,xPct));
+          st.y=Math.max(4,Math.min(96,yPct));
+          if(!pdBook.pages[zone.pageIndex]) pdBook.pages[zone.pageIndex]={stickers:[]};
+          pdBook.pages[zone.pageIndex].stickers.push(st);
+          pdSaveBook();
+          pdRenderEditPage();
+          pdRenderCanvasesList();
+        }
+      });
+    }
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  });
 }
 
 // Adds a new, freely-placed text box to the cover — offset a little from
@@ -5795,7 +6208,7 @@ function pdBuildPlacedSticker(st, pageIndex){
   if(typeof st.scale!=='number') st.scale=1;
   const isCoverText = st.kind==='text';
   const el=document.createElement('div');
-  el.className='pd-placed-sticker';
+  el.className='pd-placed-sticker'+(st.kind==='dayCanvas'?' pd-placed-daycanvas':'');
   el.setAttribute('data-sticker-id', st.id);
   el.style.left=st.x+'%';
   el.style.top=st.y+'%';
@@ -5873,6 +6286,12 @@ function pdBuildPlacedSticker(st, pageIndex){
         pdSaveBook();
       }
     });
+  }else if(st.kind==='dayCanvas'){
+    inner.style.backgroundImage="url('"+st.imageData+"')";
+    inner.style.backgroundSize='cover';
+    const box=pdDayCanvasBoxSize(pdGetDayCanvasImage(st), 500);
+    inner.style.width=(box.w*scaleFactor)+'px';
+    inner.style.height=(box.h*scaleFactor)+'px';
   }else{
     inner.textContent=st.text;
     inner.style.fontSize = (st.kind==='word' ? 20*scaleFactor : 16*scaleFactor)+'px';
@@ -5888,6 +6307,7 @@ function pdBuildPlacedSticker(st, pageIndex){
   const resizeHandle=document.createElement('span');
   resizeHandle.className='pd-sticker-handle pd-sticker-resize';
   resizeHandle.innerHTML='&#8690;';
+  pdSyncConstantHandleSize(resizeHandle, st);
   let widthHandle=null;
   if(isCoverText){
     widthHandle=document.createElement('span');
@@ -5896,7 +6316,8 @@ function pdBuildPlacedSticker(st, pageIndex){
     widthHandle.title='Drag to set a wrap width';
   }
   el.appendChild(inner);
-  if(!isCoverText){
+  const isUndeletable = isCoverText; // day-canvas has its own removal path just below
+  if(!isUndeletable && st.kind!=='dayCanvas'){
     const rm=document.createElement('span');
     rm.className='pd-sticker-remove';
     rm.textContent='\u2715';
@@ -5907,6 +6328,39 @@ function pdBuildPlacedSticker(st, pageIndex){
       pdSaveBook();
       pdRenderEditPage();
       pdRenderPicker();
+    };
+    el.appendChild(rm);
+  }
+  if(st.kind==='dayCanvas'){
+    // Same "X" position/style as the remove button — removes it from
+    // this page and sends it to the Canvases tab's picker, exactly like
+    // removing a word or phrase sends it back to its own picker.
+    const rm=document.createElement('span');
+    rm.className='pd-sticker-remove';
+    rm.textContent='\u2715';
+    rm.title='Remove from this page';
+    rm.onclick=function(e){
+      e.stopPropagation();
+      const page=pdBook.pages[pageIndex];
+      page.stickers=page.stickers.filter(function(s){return s.id!==st.id;});
+      pdBook.unplacedCanvases=pdBook.unplacedCanvases||[];
+      pdBook.unplacedCanvases.push(st);
+      pdSaveBook();
+      pdRenderEditPage();
+      const mainTabs=document.getElementById('pdPanelMainTabs');
+      if(mainTabs) mainTabs.style.display='flex';
+      const tabStickers=document.getElementById('pdMainTabStickers');
+      if(tabStickers) tabStickers.style.display = pageIndex===0 ? 'none' : '';
+      pdShowCanvasesPanelBody();
+      const panel=document.getElementById('pdStickerPanel');
+      if(panel){
+        panel.classList.remove('pd-panel-closing');
+        panel.style.display='flex';
+        if(!pdStickerPanelInitialized){
+          pdMakeStickerPanelDraggable();
+          pdStickerPanelInitialized=true;
+        }
+      }
     };
     el.appendChild(rm);
   }
@@ -6021,6 +6475,25 @@ function pdMakeTextWidthAdjustable(el, handle, st, inner, scaleFactor){
   });
 }
 
+// Keeps the resize handle a constant on-screen size regardless of the
+// sticker's own scale. Day-canvas snapshots get resized far more
+// dramatically than a word or phrase typically would, so a handle that
+// scales right along with it quickly becomes oversized — this
+// pre-shrinks/grows the handle by the inverse of the sticker's scale, so
+// the parent's own transform:scale() brings it back to a constant size.
+function pdSyncConstantHandleSize(resizeHandle, st){
+  if(st.kind!=='dayCanvas') return;
+  const baseSize = pdIsMobile() ? 30 : 20; // matches this handle's normal CSS size at scale:1
+  const baseFontSize = pdIsMobile() ? 14 : 11;
+  const inv=1/(st.scale||1);
+  const preScaleSize=baseSize*inv;
+  resizeHandle.style.width=preScaleSize+'px';
+  resizeHandle.style.height=preScaleSize+'px';
+  resizeHandle.style.bottom=(-preScaleSize/2)+'px';
+  resizeHandle.style.right=(-preScaleSize/2)+'px';
+  resizeHandle.style.fontSize=(baseFontSize*inv)+'px';
+}
+
 function pdMakeResizeRotatable(el, handle, st, pageIndex){
   handle.addEventListener('pointerdown', function(e){
     e.preventDefault(); e.stopPropagation();
@@ -6051,6 +6524,7 @@ function pdMakeResizeRotatable(el, handle, st, pageIndex){
       newScale=Math.max(0.4, Math.min(4, newScale));
       st.scale=Math.round(newScale*100)/100;
       el.style.transform='translate(-50%,-50%) rotate('+st.rot+'deg) scale('+st.scale+')';
+      pdSyncConstantHandleSize(handle, st);
     }
     function up(){
       document.removeEventListener('pointermove', move);
@@ -6396,13 +6870,31 @@ function pdSetFmt(tipo,w,h,btn){
   const wrap=document.getElementById('pdCanvasWrap');
   wrap.style.aspectRatio=w+'/'+h;
   wrap.classList.toggle('fmt-portrait',tipo==='3:4');
-  if(pdP5Instance&&pdPxSketch){pdPxSketch.resizeCanvas(w,h);if(pd.img){pdPxSketch.background(255);pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;pdUpdateUI();}document.getElementById('pdDlBtn').disabled=true;}
+  if(pdP5Instance&&pdPxSketch){
+    pdPxSketch.resizeCanvas(w,h);
+    if(pd.img){
+      pdPxSketch.background(255);
+      pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;
+      pdUpdateUI();
+      // The format just changed — any day-canvases already placed in the
+      // diary were captured at the old dimensions/aspect ratio and would
+      // otherwise sit there stale and mismatched once new days get
+      // generated at the new format.
+      pdClearAllDayCanvases();
+    }
+    document.getElementById('pdDlBtn').disabled=true;
+  }
   const sel=document.getElementById('pdResSelect');sel.innerHTML='';
   const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
   opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});
   pdOnResChange();
 }
 function pdOnResChange(){const v=document.getElementById('pdResSelect').value;if(!v)return;const p=v.split('x');pd.COLS=parseInt(p[0]);pd.ROWS=parseInt(p[1]);if(pd.img)pdProcesarImagen();}
+function pdSetIntervalSpeed(value){
+  pd.intervalSpeed=parseInt(value);
+  document.getElementById('pdSpeedVal').textContent=value+'ms';
+}
+function pdSetBloquesPorCiclo(value){ pd.bloquesPorCiclo=parseInt(value)||1; }
 
 // ── Download: PNG + PDF + ZIP (same as waterer) ──
 function pdCalcPurity(){if(pd.TOTAL_DIAS===0)return'0%';return Math.round(((pd.diasReveladosNativos||[]).length/pd.TOTAL_DIAS)*100)+'%';}
@@ -6529,6 +7021,8 @@ window.pdIniciarConstruccionDia=pdIniciarConstruccionDia;
 window.pdMobileSyncTextEditBox=pdMobileSyncTextEditBox;
 window.pdMobileTextEditBoxBlur=pdMobileTextEditBoxBlur;
 window.pdOnResChange=pdOnResChange;
+window.pdSetIntervalSpeed=pdSetIntervalSpeed;
+window.pdSetBloquesPorCiclo=pdSetBloquesPorCiclo;
 window.pdOpenInventory=pdOpenInventory;
 window.pdPageBackgroundClick=pdPageBackgroundClick;
 window.pdRevelarColorActual=pdRevelarColorActual;
@@ -6541,6 +7035,7 @@ window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
 window.pdSetSelectedTextWeight=pdSetSelectedTextWeight;
 window.pdShowCoverTextPanelBody=pdShowCoverTextPanelBody;
 window.pdShowWordsPhrasesPanelBody=pdShowWordsPhrasesPanelBody;
+window.pdShowCanvasesPanelBody=pdShowCanvasesPanelBody;
 window.pdToggleControls=pdToggleControls;
 window.pdToggleInventory=pdToggleInventory;
 window.pdToggleStickerOrText=pdToggleStickerOrText;
@@ -6798,6 +7293,7 @@ window.pdUsarHolyWater=pdUsarHolyWater;
   <div class="pd-panel-main-tabs" id="pdPanelMainTabs" style="display:none;">
     <button class="pd-panel-main-tab active" id="pdMainTabStickers" onclick="pdShowWordsPhrasesPanelBody()">&#127912; Stickers</button>
     <button class="pd-panel-main-tab" id="pdMainTabText" onclick="pdShowCoverTextPanelBody()">Aa Text</button>
+    <button class="pd-panel-main-tab" id="pdMainTabCanvases" onclick="pdShowCanvasesPanelBody()">&#128444; Canvases</button>
   </div>
   <div class="pd-picker-toggle">
     <button class="pd-picker-tab active" id="pdPickerTabWords" onclick="pdSetPickerView('words')">Words</button>
@@ -6838,6 +7334,9 @@ window.pdUsarHolyWater=pdUsarHolyWater;
         <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" title="Custom color">
       </div>
     </div>
+  </div>
+  <div class="pd-canvases-panel" id="pdCanvasesPanel" style="display:none;">
+    <div id="pdCanvasesList" class="pd-picker-list pd-view-words"></div>
   </div>
 </div>
 
