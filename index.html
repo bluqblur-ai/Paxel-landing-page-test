@@ -1223,6 +1223,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
 .wt-hud-card{flex:1;min-width:110px;background:#fff;border:var(--bw) solid var(--ink);border-radius:var(--r1);padding:10px 14px;display:flex;flex-direction:column;gap:2px;}
 .wt-hud-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);}
 .wt-hud-value{font-size:23px;font-weight:800;color:var(--ink);line-height:1.3;}
+.pd-coin-gain-indicator{margin-left:6px;font-size:.7em;font-weight:800;opacity:0;display:inline-block;transform:translateY(10px);transition:opacity .3s ease, transform .3s ease;vertical-align:middle;}
+.pd-coin-gain-indicator.pd-coin-gain-shown{opacity:1;transform:translateY(0);}
 @media(max-width:640px){
   .wt-hud{gap:6px;}
   .wt-hud-card{padding:7px 9px;gap:1px;min-width:0;}
@@ -2538,7 +2540,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
               </div>
               <div class="wt-hud-card">
                 <div class="wt-hud-label">Coins</div>
-                <div class="wt-hud-value" style="color:var(--blue-deep);" id="pdHudCoins">0</div>
+                <div class="wt-hud-value" style="color:var(--blue-deep);">&#129689; <span id="pdHudCoinsNum">0</span><span class="pd-coin-gain-indicator" id="pdHudCoinsGain"></span></div>
               </div>
               <div class="wt-hud-card" style="display:none;">
                 <div class="wt-hud-label">Unrevealed</div>
@@ -4154,7 +4156,9 @@ function pdAnimarRevelado(bloques,cb){
 
 function pdRevelarColorActual(){
   if(pd.diasRevelados.includes(pd.diaActual)||pd.construyendo)return;
-  pd.monedas+=Math.floor(Math.random()*21)+20; // random 20–40
+  const coinGain=Math.floor(Math.random()*21)+20; // random 20–40
+  const coinsBefore=pd.monedas;
+  pd.monedas+=coinGain;
   paxelWallet.monedas=pd.monedas;
   pd.diasReveladosNativos.push(pd.diaActual);
   document.getElementById('pdRevealBtn').disabled=true;
@@ -4164,7 +4168,8 @@ function pdRevelarColorActual(){
     document.getElementById('pdRevealBtn').textContent='Phrase revealed \u2713';
     if(pd.diaActual>=pd.TOTAL_DIAS)document.getElementById('pdDlBtn').disabled=false;
     pdMostrarFraseAleatoria();
-    pdUpdateUI();
+    pdUpdateUI(true);
+    pdAnimateCoinGain(coinGain, coinsBefore, pd.monedas);
     pdCaptureDayCanvasSnapshot(pd.diaActual);
   });
 }
@@ -4207,13 +4212,57 @@ function pdActualizarBotones(){
   pdUpdateUI();
 }
 
-function pdUpdateUI(){
+// Sets the coin display's plain, static number — no animation, used
+// every time pdUpdateUI runs.
+function pdSetCoinReelValue(value){
+  const num=document.getElementById('pdHudCoinsNum');
+  if(num) num.textContent=value;
+}
+
+// Which color the "+N" gain indicator uses, grouped by how big the gain
+// was — a visual cue for a better roll, without needing to read the
+// exact number.
+function pdCoinGainColor(amount){
+  if(amount>=36) return '#EAB308'; // 36–40: yellow
+  if(amount>=30) return '#15803D'; // 30–35: green
+  return '#47BEEE'; // 20–29: light blue
+}
+
+// Coin gain animation: a colored "+N" appears to the right of the
+// balance (never covering it) and fades out on its own fixed timer,
+// while the balance number itself visibly counts up from the old total
+// to the new one, instead of jumping straight to the final value.
+function pdAnimateCoinGain(gainAmount, oldValue, newValue){
+  const numEl=document.getElementById('pdHudCoinsNum');
+  const gainEl=document.getElementById('pdHudCoinsGain');
+  if(!numEl || gainAmount<=0){ pdSetCoinReelValue(newValue); return; }
+  if(gainEl){
+    gainEl.textContent='+'+gainAmount;
+    gainEl.style.color=pdCoinGainColor(gainAmount);
+    gainEl.classList.add('pd-coin-gain-shown');
+    // Runs on its own fixed timer, independent of the count-up below —
+    // the indicator reliably appears then disappears regardless of
+    // anything else happening on the page.
+    setTimeout(function(){ gainEl.classList.remove('pd-coin-gain-shown'); }, 1200);
+  }
+  const duration=700;
+  const startTime=performance.now();
+  function step(now){
+    const t=Math.min(1, (now-startTime)/duration);
+    const eased=1-Math.pow(1-t,3); // ease-out cubic — quick start, settles smoothly
+    numEl.textContent=Math.round(oldValue+(newValue-oldValue)*eased);
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function pdUpdateUI(skipCoinDisplay){
   if(pd.diaActual>=8)pd.costoMaximoAlcanzado=60;
   pd.costoHolyWater=pd.costoMaximoAlcanzado;
   let pending=0;for(let i=1;i<=pd.diaActual;i++){if(!pd.diasRevelados.includes(i))pending++;}
   const totalCollect=Object.values(pd.coleccion).reduce((a,b)=>a+b,0);
   document.getElementById('pdHudDay').textContent    =pd.diaActual===0?'\u2014':pd.diaActual+' / '+pd.TOTAL_DIAS;
-  pd.monedas=paxelWallet.monedas;document.getElementById('pdHudCoins').textContent  =pd.monedas;
+  pd.monedas=paxelWallet.monedas;if(!skipCoinDisplay)pdSetCoinReelValue(pd.monedas);
   const panelCoinsEl=document.getElementById('pdPanelCoinsCount');
   if(panelCoinsEl) panelCoinsEl.textContent=pd.monedas;
   document.getElementById('pdHudPending').textContent=pending;
@@ -7447,7 +7496,6 @@ window.pdSetPickerView=pdSetPickerView;
 window.pdSetSelectedTextAlign=pdSetSelectedTextAlign;
 window.pdSetSelectedTextColor=pdSetSelectedTextColor;
 window.pdSetPageBackground=pdSetPageBackground;
-window.pdUpdateUI=pdUpdateUI;
 window.pdSetSelectedTextFont=pdSetSelectedTextFont;
 window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
 window.pdSetSelectedTextWeight=pdSetSelectedTextWeight;
