@@ -1234,8 +1234,8 @@ footer .foot-tabs button:hover{color:var(--ink);}
   .wt-hud-label{font-size:8px;letter-spacing:.06em;}
   .wt-hud-value{font-size:16px;}
   /* Unrevealed (3rd card) — mobile only, shown right next to Day (1st card) */
-  .wt-hud > .wt-hud-card:nth-child(3){display:flex !important;order:2;}
-  .wt-hud > .wt-hud-card:nth-child(2){order:3;}
+  .wt-hud:not(#pdHudRow) > .wt-hud-card:nth-child(3){display:flex !important;order:2;}
+  .wt-hud:not(#pdHudRow) > .wt-hud-card:nth-child(2){order:3;}
 }
 .wt-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;}
 .wt-legend-item{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--ink-soft);}
@@ -1403,8 +1403,10 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #page-tool.entered .canvas-wrap, #page-waterer.entered .canvas-wrap, #page-diary.entered #pdCanvasWrap{opacity:1;transform:translateY(0);}
 
 #page-waterer #wtBelowCanvas, #page-diary #pdBelowCanvas{filter:opacity(0);margin-top:26px;}
+#page-diary #pdHudRow{filter:opacity(0);margin-top:26px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1),filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
 
 #page-waterer.entered #wtBelowCanvas, #page-diary.entered #pdBelowCanvas{filter:opacity(1);margin-top:0;}
+#page-diary.entered #pdHudRow{filter:opacity(1);margin-top:0;}
 
 
 
@@ -1425,10 +1427,12 @@ footer .foot-tabs button:hover{color:var(--ink);}
 #pdControlsCol.pd-collapsing{opacity:0;visibility:hidden;}
 
 #pdCanvasCol{display:flex;flex-direction:column;gap:14px;min-width:0;overflow:visible;}
+@media(max-width:640px){#pdHudRow{order:-1;}}
 
 #pdBelowCanvas{display:flex;flex-direction:column;gap:14px;transition:opacity .32s ease,transform .35s cubic-bezier(.4,0,.2,1),filter .8s cubic-bezier(.25,.7,.4,1) 1.9s,margin-top .8s cubic-bezier(.25,.7,.4,1) 1.9s;}
 
 #pdBelowCanvas.pd-sliding{opacity:0;transform:translateX(var(--pd-slide-from,60px));}
+#pdHudRow.pd-sliding{opacity:0;transform:translateX(var(--pd-slide-from,60px));}
 
 #pdSidePanelSlot{display:none;flex-direction:column;gap:14px;opacity:0;transition:opacity .28s ease;}
 
@@ -1697,6 +1701,9 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-font-choice.pd-font-serif{font-family:'Playfair Display',Georgia,serif;font-weight:700;}
 .pd-font-choice.pd-font-script{font-family:'Dancing Script',cursive;font-weight:700;}
 .pd-text-ctrl-label{font-family:var(--font);font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin:12px 0 6px;}
+.pd-bg-target-row{display:flex;gap:6px;margin-top:10px;}
+.pd-bg-target-btn{flex:1;font-family:var(--font);font-size:11px;font-weight:700;padding:6px 8px;border:var(--bw) solid var(--ink);border-radius:999px;background:#fff;color:var(--ink-soft);cursor:pointer;transition:background .12s,color .12s;}
+.pd-bg-target-btn.active{background:var(--blue);color:var(--ink);}
 .pd-weight-choice{flex:1;padding:9px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-family:var(--font);font-size:12px;transition:background .15s;}
 .pd-weight-choice:hover{background:var(--paper-alt);}
 .pd-align-choice{flex:1;padding:9px 4px;border:var(--bw) solid var(--ink);border-radius:var(--r1);background:#fff;cursor:pointer;font-family:var(--font);font-size:12px;transition:background .15s,color .15s;}
@@ -2548,26 +2555,29 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
             </div>
           </div>
 
+          <!-- HUD — sibling of the canvas area (not nested in
+               #pdBelowCanvas) specifically so a mobile-only CSS order
+               rule can move it above the canvas without touching the
+               DOM or JS at all. -->
+          <div class="wt-hud" id="pdHudRow">
+            <div class="wt-hud-card">
+              <div class="wt-hud-label">Coins</div>
+              <div class="wt-hud-value" style="color:var(--blue-deep);">&#129689; <span id="pdHudCoinsNum">0</span><span class="pd-coin-gain-indicator" id="pdHudCoinsGain"></span></div>
+            </div>
+            <div class="wt-hud-card">
+              <div class="wt-hud-label">Day</div>
+              <div class="wt-hud-value" id="pdHudDay">&mdash;</div>
+            </div>
+            <div class="wt-hud-card">
+              <div class="wt-hud-label">Unrevealed</div>
+              <div class="wt-hud-value" id="pdHudPending">0</div>
+            </div>
+          </div>
+
           <!-- Below-canvas panels (same pattern as waterer) -->
           <div id="pdBelowCanvas">
             <!-- Day pips -->
             <div id="pdDayTrack" class="wt-day-track"></div>
-
-            <!-- HUD -->
-            <div class="wt-hud">
-              <div class="wt-hud-card">
-                <div class="wt-hud-label">Day</div>
-                <div class="wt-hud-value" id="pdHudDay">&mdash;</div>
-              </div>
-              <div class="wt-hud-card">
-                <div class="wt-hud-label">Coins</div>
-                <div class="wt-hud-value" style="color:var(--blue-deep);">&#129689; <span id="pdHudCoinsNum">0</span><span class="pd-coin-gain-indicator" id="pdHudCoinsGain"></span></div>
-              </div>
-              <div class="wt-hud-card" style="display:none;">
-                <div class="wt-hud-label">Unrevealed</div>
-                <div class="wt-hud-value" id="pdHudPending">0</div>
-              </div>
-            </div>
             <div id="pdPendingInfo" style="display:none;"></div>
 
             <!-- Primary actions -->
@@ -4046,6 +4056,7 @@ function pdToggleControls(){
   const ctrlCol  =document.getElementById('pdControlsCol');
   const canvasCol=document.getElementById('pdCanvasCol');
   const below    =document.getElementById('pdBelowCanvas');
+  const hudRow   =document.getElementById('pdHudRow');
   const btn      =document.getElementById('pdToggleBtn');
   const arrow    =document.getElementById('pdToggleArrow');
   const label    =document.getElementById('pdToggleBtnLabel');
@@ -4056,10 +4067,12 @@ function pdToggleControls(){
     grid.style.setProperty('--pd-canvas-col-w',cw+'px');
     below.style.setProperty('--pd-slide-from','60px');
     below.classList.add('pd-sliding');
+    if(hudRow){ hudRow.style.setProperty('--pd-slide-from','60px'); hudRow.classList.add('pd-sliding'); }
     ctrlCol.classList.add('pd-collapsing');
     setTimeout(()=>{
       ctrlCol.style.display='none';
       slot.classList.add('pd-slot-visible');
+      if(hudRow) slot.appendChild(hudRow);
       slot.appendChild(below);
       grid.classList.add('pd-ctrl-hidden');
       btn.classList.add('ctrl-hidden');
@@ -4068,13 +4081,20 @@ function pdToggleControls(){
       void below.getBoundingClientRect();
       below.style.setProperty('--pd-slide-from','-60px');
       requestAnimationFrame(()=>requestAnimationFrame(()=>below.classList.remove('pd-sliding')));
+      if(hudRow){
+        void hudRow.getBoundingClientRect();
+        hudRow.style.setProperty('--pd-slide-from','-60px');
+        requestAnimationFrame(()=>requestAnimationFrame(()=>hudRow.classList.remove('pd-sliding')));
+      }
     },FADE);
   } else {
     below.style.setProperty('--pd-slide-from','-60px');
     below.classList.add('pd-sliding');
+    if(hudRow){ hudRow.style.setProperty('--pd-slide-from','-60px'); hudRow.classList.add('pd-sliding'); }
     setTimeout(()=>{
       grid.style.removeProperty('--pd-canvas-col-w');
       slot.classList.remove('pd-slot-visible');
+      if(hudRow) canvasCol.appendChild(hudRow);
       canvasCol.appendChild(below);
       ctrlCol.style.display='';
       ctrlCol.classList.remove('pd-collapsing');
@@ -4085,6 +4105,11 @@ function pdToggleControls(){
       void below.getBoundingClientRect();
       below.style.setProperty('--pd-slide-from','60px');
       requestAnimationFrame(()=>requestAnimationFrame(()=>below.classList.remove('pd-sliding')));
+      if(hudRow){
+        void hudRow.getBoundingClientRect();
+        hudRow.style.setProperty('--pd-slide-from','60px');
+        requestAnimationFrame(()=>requestAnimationFrame(()=>hudRow.classList.remove('pd-sliding')));
+      }
     },FADE);
   }
 }
@@ -6276,9 +6301,17 @@ function pdShowCoverTextPanelBody(){
   if(tabText) tabText.classList.add('active');
   if(tabCanvases) tabCanvases.classList.remove('active');
   pdDeselectSticker();
+  pdBgTargetSide='left';
+  const bgTargetRow=document.getElementById('pdBgTargetRow');
+  const hasBothSides = pdEditingSpread && pdEditingSpread.left!==null && pdEditingSpread.left!==undefined && pdEditingSpread.right!==null && pdEditingSpread.right!==undefined;
+  if(bgTargetRow) bgTargetRow.style.display = hasBothSides ? 'flex' : 'none';
+  const leftBtn=document.getElementById('pdBgTargetLeft');
+  const rightBtn=document.getElementById('pdBgTargetRight');
+  if(leftBtn) leftBtn.classList.add('active');
+  if(rightBtn) rightBtn.classList.remove('active');
   const bgInput=document.getElementById('pdPageBgCustom');
   if(bgInput){
-    const page=pdBook.pages[pdTextToolPageIndex()];
+    const page=pdBook.pages[pdBgTargetPageIndex()];
     bgInput.value=(page && page.bgColor) || '#ffffff';
   }
   pdRenderColorRecents('pdTextColorRecents', PD_TEXT_COLOR_RECENTS_KEY, pdCommitTextColor);
@@ -6579,8 +6612,31 @@ function pdCommitTextColor(color){
 // Sets the background color of whichever page is currently being edited
 // (cover or interior page alike) — replaces the old fixed dot-grid,
 // which no longer suits a page that can now be any color.
+// Tracks which side of a two-page spread the background picker targets
+// — 'left' (default, matching the previous behavior) or 'right'. Only
+// meaningful when both sides of the spread genuinely exist; a lone page
+// (the cover) always uses its own single index regardless of this.
+let pdBgTargetSide='left';
+function pdBgTargetPageIndex(){
+  if(pdEditingSpread && pdEditingSpread.right!==null && pdEditingSpread.right!==undefined && pdBgTargetSide==='right'){
+    return pdEditingSpread.right;
+  }
+  return pdTextToolPageIndex();
+}
+function pdSetBgTargetSide(side){
+  pdBgTargetSide=side;
+  const leftBtn=document.getElementById('pdBgTargetLeft');
+  const rightBtn=document.getElementById('pdBgTargetRight');
+  if(leftBtn) leftBtn.classList.toggle('active', side==='left');
+  if(rightBtn) rightBtn.classList.toggle('active', side==='right');
+  const bgInput=document.getElementById('pdPageBgCustom');
+  if(bgInput){
+    const page=pdBook.pages[pdBgTargetPageIndex()];
+    bgInput.value=(page && page.bgColor) || '#ffffff';
+  }
+}
 function pdSetPageBackground(color){
-  const pageIndex=pdTextToolPageIndex();
+  const pageIndex=pdBgTargetPageIndex();
   if(!pdBook.pages[pageIndex]) pdBook.pages[pageIndex]={stickers:[]};
   pdBook.pages[pageIndex].bgColor=color;
   const bgInput=document.getElementById('pdPageBgCustom');
@@ -7676,6 +7732,7 @@ window.pdSetSelectedTextAlign=pdSetSelectedTextAlign;
 window.pdSetSelectedTextColor=pdSetSelectedTextColor;
 window.pdCommitTextColor=pdCommitTextColor;
 window.pdCommitBgColor=pdCommitBgColor;
+window.pdSetBgTargetSide=pdSetBgTargetSide;
 window.pdSetPageBackground=pdSetPageBackground;
 window.pdSetSelectedTextFont=pdSetSelectedTextFont;
 window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
@@ -7979,6 +8036,10 @@ window.pdUsarHolyWater=pdUsarHolyWater;
       <div class="pd-color-row" id="pdTextColorRecents">
         <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" onchange="pdCommitTextColor(this.value)" title="Custom color">
       </div>
+    </div>
+    <div class="pd-bg-target-row" id="pdBgTargetRow" style="display:none;">
+      <button class="pd-bg-target-btn active" id="pdBgTargetLeft" onclick="pdSetBgTargetSide('left')">Left page</button>
+      <button class="pd-bg-target-btn" id="pdBgTargetRight" onclick="pdSetBgTargetSide('right')">Right page</button>
     </div>
     <div class="pd-text-ctrl-label">Background</div>
     <div class="pd-color-row" id="pdBgColorRecents">
