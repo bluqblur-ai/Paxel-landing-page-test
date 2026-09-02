@@ -1582,7 +1582,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-edit-page.pd-flip-page-cover{background-image:none;}
 
 .pd-edit-done-btn{position:absolute;top:8px;right:48px;font-family:var(--font);font-weight:800;font-size:12px;color:var(--ink);background:var(--blue);border:var(--bw) solid var(--ink);border-radius:999px;padding:6px 13px;cursor:pointer;box-shadow:var(--s-sm);z-index:9;transition:transform .12s,box-shadow .12s,right .4s ease;}
-.pd-zine-shell.pd-book-cover .pd-edit-done-btn{right:calc(25% + 40px);}
+.pd-zine-shell.pd-book-cover .pd-edit-done-btn{right:calc(25% + 56px);}
 .pd-edit-done-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
 
 /* Sticker picker: this is now the ONLY way into edit mode (tapping a page
@@ -1592,7 +1592,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
    stickers only belong on interior pages. */
 .pd-sticker-picker-btn{position:absolute;top:8px;right:8px;width:32px;height:32px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);box-shadow:var(--s-sm);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;z-index:8;transition:transform .12s,box-shadow .12s,right .4s ease;}
 .pd-sticker-picker-btn:hover{transform:translate(-1px,-1px);box-shadow:var(--s-md);}
-.pd-zine-shell.pd-book-cover .pd-sticker-picker-btn{right:25%;}
+.pd-zine-shell.pd-book-cover .pd-sticker-picker-btn{right:calc(25% + 16px);}
 
 /* New page: only shown when there's no next page to flip to — center of
    the right edge, same animated position as the other buttons (25%/75%
@@ -1732,6 +1732,7 @@ body.pd-diary-active{overflow:hidden;touch-action:none;}
 .pd-placed-sticker.pd-dragging{cursor:grabbing;z-index:60;}
 .pd-placed-sticker.pd-selected{z-index:55;}
 .pd-placed-sticker .pd-sticker-remove{position:absolute;top:-9px;right:-9px;width:18px;height:18px;border-radius:50%;background:#fff;border:var(--bw) solid var(--ink);font-size:10px;line-height:1;display:none;align-items:center;justify-content:center;cursor:pointer;}
+.pd-placed-sticker .pd-sticker-save{font-size:12px;}
 .pd-placed-sticker:hover .pd-sticker-remove,
 .pd-placed-sticker.pd-selected .pd-sticker-remove{display:flex;}
 .pd-sticker-handle{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--blue);border:var(--bw) solid var(--ink);font-size:11px;line-height:1;display:none;align-items:center;justify-content:center;box-shadow:var(--s-sm);touch-action:none;}
@@ -3951,7 +3952,7 @@ let pd={
   monedas:0,diasRevelados:[],diasReveladosNativos:[],
   costoHolyWater:30,costoMaximoAlcanzado:30,
   coleccion:{},frasesUsadas:[],
-  genSessionId:0,
+  currentImageGenLabel:Date.now(),
 };
 
 const pdFrases=[
@@ -4111,7 +4112,8 @@ function pdProcesarImagen(){
   pd.diasRevelados=[];pd.diasReveladosNativos=[];
   pd.costoMaximoAlcanzado=30;pd.costoHolyWater=30;
   pd.construyendo=false;
-  pd.genSessionId++;
+  pd.currentImageGenLabel=Date.now();
+  pd.dayCanvasCurrentStickerId={};
   document.getElementById('pdDlBtn').disabled=true;
   document.getElementById('pdCanvasEmpty').style.display='none';
   document.getElementById('pdP5Container').style.display='block';
@@ -4178,7 +4180,9 @@ function pdUsarHolyWater(){
   if(pd.construyendo)return;
   let d=-1;for(let i=1;i<=pd.diaActual;i++){if(!pd.diasRevelados.includes(i)){d=i;break;}}
   if(d===-1||pd.monedas<pd.costoHolyWater)return;
-  pd.monedas-=pd.costoHolyWater;paxelWallet.monedas=pd.monedas;
+  const spendAmount=pd.costoHolyWater;
+  const coinsBefore=pd.monedas;
+  pd.monedas-=spendAmount;paxelWallet.monedas=pd.monedas;
   document.getElementById('pdHolyBtn').disabled=true;
   let bl=pd.bloquesADibujar.filter(b=>b.activo&&b.parte===d);
   pdAnimarRevelado(bl,()=>{
@@ -4190,16 +4194,19 @@ function pdUsarHolyWater(){
       pdMostrarFraseAleatoria();
     }
     if(pd.diaActual>=pd.TOTAL_DIAS)document.getElementById('pdDlBtn').disabled=false;
-    pdUpdateUI();
+    pdUpdateUI(true);
+    pdAnimateCoinSpend(spendAmount, coinsBefore, pd.monedas);
     pdCaptureDayCanvasSnapshot(d);
   });
 }
 
 function pdExtraPhrase(){
   if(pd.diaActual<=0||pd.monedas<160||pd.construyendo)return;
+  const coinsBefore=pd.monedas;
   pd.monedas-=160;paxelWallet.monedas=pd.monedas;
   pdMostrarFraseExtra();
-  pdUpdateUI();
+  pdUpdateUI(true);
+  pdAnimateCoinSpend(160, coinsBefore, pd.monedas);
 }
 
 function pdActualizarBotones(){
@@ -4250,6 +4257,25 @@ function pdAnimateCoinGain(gainAmount, oldValue, newValue){
   function step(now){
     const t=Math.min(1, (now-startTime)/duration);
     const eased=1-Math.pow(1-t,3); // ease-out cubic — quick start, settles smoothly
+    numEl.textContent=Math.round(oldValue+(newValue-oldValue)*eased);
+    if(t<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+// Same count animation as the gain version above, for whenever coins
+// get spent instead (Holy Water, Extra Phrase, uploading a canvas
+// image) — but with no "-N" indicator at all, just the balance number
+// itself counting down. The underlying count naturally goes the right
+// direction on its own, since newValue is simply lower than oldValue.
+function pdAnimateCoinSpend(spendAmount, oldValue, newValue){
+  const numEl=document.getElementById('pdHudCoinsNum');
+  if(!numEl || spendAmount<=0){ pdSetCoinReelValue(newValue); return; }
+  const duration=700;
+  const startTime=performance.now();
+  function step(now){
+    const t=Math.min(1, (now-startTime)/duration);
+    const eased=1-Math.pow(1-t,3);
     numEl.textContent=Math.round(oldValue+(newValue-oldValue)*eased);
     if(t<1) requestAnimationFrame(step);
   }
@@ -5470,14 +5496,39 @@ function pdRenderTransparentSnapshot(){
 
 function pdPlaceDayCanvasOnPage(day, dataUrl, loadedImg){
   if(!pdBook) pdBook=pdLoadBook();
-  while(pdBook.pages.length<=day) pdBook.pages.push({stickers:[]});
-  const page=pdBook.pages[day];
-  const stickerId='pd-daycanvas-'+day;
-  let st=page.stickers.find(function(s){ return s.id===stickerId; });
-  if(st){
-    st.imageData=dataUrl;
+  pd.dayCanvasCurrentStickerId=pd.dayCanvasCurrentStickerId||{};
+  const currentId=pd.dayCanvasCurrentStickerId[day];
+  // If this day already has a sticker placed for the current image/
+  // generation (re-watering the same day again before loading anything
+  // new) — find that exact sticker by its own id and refresh it in
+  // place, wherever it's already sitting.
+  let existingSticker=null;
+  if(currentId){
+    for(let i=0;i<pdBook.pages.length && !existingSticker;i++){
+      existingSticker=(pdBook.pages[i].stickers||[]).find(function(s){ return s.id===currentId; });
+    }
+  }
+  let stickerId;
+  if(existingSticker){
+    stickerId=currentId;
+    existingSticker.imageData=dataUrl;
   }else{
-    st={id:stickerId, kind:'dayCanvas', source:'generated', genSession:pd.genSessionId, day:day, imageData:dataUrl, x:50, y:50, rot:0, scale:1};
+    // A genuinely new canvas for this day — give it its own unique id
+    // (same pattern as uploaded canvases, so there's no risk of ever
+    // colliding with an older one, regardless of page reloads or how
+    // many images have been generated before) — and find a page that
+    // doesn't already carry a different generated day-canvas, starting
+    // from this day's own natural page and searching forward, so it
+    // never displaces whatever an earlier generation already placed.
+    stickerId='pd-daycanvas-'+Date.now()+'-'+Math.floor(Math.random()*100000);
+    pd.dayCanvasCurrentStickerId[day]=stickerId;
+    let targetIndex=day;
+    while(pdBook.pages[targetIndex] && (pdBook.pages[targetIndex].stickers||[]).some(function(s){ return s.kind==='dayCanvas' && s.source==='generated'; })){
+      targetIndex++;
+    }
+    while(pdBook.pages.length<=targetIndex) pdBook.pages.push({stickers:[]});
+    const page=pdBook.pages[targetIndex];
+    const st={id:stickerId, kind:'dayCanvas', source:'generated', genSession:pd.currentImageGenLabel, day:day, imageData:dataUrl, x:50, y:50, rot:0, scale:1};
     page.stickers.unshift(st);
   }
   // In case this same day's canvas was previously removed (sent to the
@@ -5525,7 +5576,8 @@ function pdHandleCanvasFileUpload(input){
   const file=input.files && input.files[0];
   if(!file) return;
   if(pd.monedas<20){ input.value=''; return; }
-  pd.monedas-=20; paxelWallet.monedas=pd.monedas; pdUpdateUI();
+  const coinsBefore=pd.monedas;
+  pd.monedas-=20; paxelWallet.monedas=pd.monedas; pdUpdateUI(true); pdAnimateCoinSpend(20, coinsBefore, pd.monedas);
   const reader=new FileReader();
   reader.onload=function(){
     const dataUrl=reader.result;
@@ -6209,6 +6261,8 @@ function pdShowCoverTextPanelBody(){
     const page=pdBook.pages[pdTextToolPageIndex()];
     bgInput.value=(page && page.bgColor) || '#ffffff';
   }
+  pdRenderColorRecents('pdTextColorRecents', PD_TEXT_COLOR_RECENTS_KEY, pdCommitTextColor);
+  pdRenderColorRecents('pdBgColorRecents', PD_BG_COLOR_RECENTS_KEY, pdCommitBgColor);
   if(pdIsMobile()){
     // Same height as the Stickers tab — switching tabs shouldn't visibly
     // resize the sheet. Sized to comfortably fit the main tabs + the
@@ -6445,6 +6499,44 @@ function pdSetSelectedTextLineHeight(value){
   if(inner) inner.style.lineHeight=st.lineHeight;
   pdSaveBook();
 }
+// Tracks up to 5 most-recently-used colors per section (text color,
+// background), persisted so they survive a page reload — replaces the
+// old fixed preset swatches with whatever the user has actually used.
+const PD_TEXT_COLOR_RECENTS_KEY='paxel_pd_text_color_recents';
+const PD_BG_COLOR_RECENTS_KEY='paxel_pd_bg_color_recents';
+
+function pdLoadColorRecents(key){
+  try{
+    const raw=localStorage.getItem(key);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return [];
+}
+function pdAddColorRecent(key, color){
+  let list=pdLoadColorRecents(key);
+  list=list.filter(function(c){ return c.toLowerCase()!==color.toLowerCase(); });
+  list.unshift(color);
+  if(list.length>5) list=list.slice(0,5);
+  try{ localStorage.setItem(key, JSON.stringify(list)); }catch(e){}
+}
+// Renders the recent-color swatches into the given row, inserted before
+// its own color-picker input (which always stays last, static).
+function pdRenderColorRecents(containerId, key, onPick){
+  const container=document.getElementById(containerId);
+  if(!container) return;
+  const customInput=container.querySelector('.pd-color-custom');
+  container.querySelectorAll('.pd-color-swatch').forEach(function(el){ el.remove(); });
+  pdLoadColorRecents(key).forEach(function(color){
+    const btn=document.createElement('button');
+    btn.className='pd-color-swatch';
+    btn.style.background=color;
+    btn.title=color;
+    btn.onclick=function(){ onPick(color); };
+    if(customInput) container.insertBefore(btn, customInput);
+    else container.appendChild(btn);
+  });
+}
+
 function pdSetSelectedTextColor(color){
   const st=pdGetSelectedTextSticker();
   if(!st) return;
@@ -6452,6 +6544,16 @@ function pdSetSelectedTextColor(color){
   const inner=pdSelectedStickerEl.querySelector('.pd-sticker-chip');
   if(inner) inner.style.color=color;
   pdSaveBook();
+}
+// Called once a color choice is actually finalized (clicking a swatch,
+// or the native picker's own "Done"/confirm, which fires a change event
+// — not on every intermediate drag update within the picker, which
+// would otherwise flood the recents list with near-identical shades
+// from a single drag instead of one deliberately chosen color).
+function pdCommitTextColor(color){
+  pdSetSelectedTextColor(color);
+  pdAddColorRecent(PD_TEXT_COLOR_RECENTS_KEY, color);
+  pdRenderColorRecents('pdTextColorRecents', PD_TEXT_COLOR_RECENTS_KEY, pdCommitTextColor);
 }
 
 // Sets the background color of whichever page is currently being edited
@@ -6476,6 +6578,12 @@ function pdSetPageBackground(color){
     }
   }
   pdSaveBook();
+}
+// Same finalized-choice-only recording as pdCommitTextColor above.
+function pdCommitBgColor(color){
+  pdSetPageBackground(color);
+  pdAddColorRecent(PD_BG_COLOR_RECENTS_KEY, color);
+  pdRenderColorRecents('pdBgColorRecents', PD_BG_COLOR_RECENTS_KEY, pdCommitBgColor);
 }
 
 function pdExitEditMode(){
@@ -6650,13 +6758,14 @@ function pdBuildPlacedSticker(st, pageIndex){
     el.appendChild(rm);
   }
   if(st.kind==='dayCanvas'){
-    // Same "X" position/style as the remove button — removes it from
-    // this page and sends it to the Canvases tab's picker, exactly like
+    // Same position/style as the remove button, but a save icon instead
+    // of an "X" — this doesn't delete the canvas, it sends it back to
+    // the Canvases tab's picker for later placement, exactly like
     // removing a word or phrase sends it back to its own picker.
     const rm=document.createElement('span');
-    rm.className='pd-sticker-remove';
-    rm.textContent='\u2715';
-    rm.title='Remove from this page';
+    rm.className='pd-sticker-remove pd-sticker-save';
+    rm.textContent='\u{1F4BE}';
+    rm.title='Save for later';
     rm.onclick=function(e){
       e.stopPropagation();
       const page=pdBook.pages[pageIndex];
@@ -7321,29 +7430,36 @@ function pdAddPage(){
 function pdSetFmt(tipo,w,h,btn){
   document.querySelectorAll('#page-diary .fmt-btn').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
+  const formatActuallyChanged = (pd.canvasW!==w || pd.canvasH!==h);
   pd.canvasW=w;pd.canvasH=h;
   const wrap=document.getElementById('pdCanvasWrap');
   wrap.style.aspectRatio=w+'/'+h;
   wrap.classList.toggle('fmt-portrait',tipo==='3:4');
   if(pdP5Instance&&pdPxSketch){
     pdPxSketch.resizeCanvas(w,h);
-    if(pd.img){
+    if(pd.img && formatActuallyChanged){
       pdPxSketch.background(255);
       pd.bloquesADibujar=[];pd.indiceActual=0;pd.diaActual=0;
-      pd.genSessionId++;
+      // A new generation, same as loading a fresh source image — but
+      // deliberately does NOT touch any day-canvases already placed in
+      // the flipbook. Each one stores and renders itself using its own
+      // image's dimensions (see pdDayCanvasBoxSize), so canvases from
+      // different formats coexist there just fine; only the tracking
+      // map needs resetting, so today's reveal is treated as new rather
+      // than a re-water of whatever the previous format last placed.
+      pd.currentImageGenLabel=Date.now();
+      pd.dayCanvasCurrentStickerId={};
       pdUpdateUI();
-      // The format just changed — any day-canvases already placed in the
-      // diary were captured at the old dimensions/aspect ratio and would
-      // otherwise sit there stale and mismatched once new days get
-      // generated at the new format.
-      pdClearAllDayCanvases();
     }
     document.getElementById('pdDlBtn').disabled=true;
   }
-  const sel=document.getElementById('pdResSelect');sel.innerHTML='';
-  const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
-  opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});
-  pdOnResChange();
+  const sel=document.getElementById('pdResSelect');
+  if(formatActuallyChanged || sel.options.length===0){
+    sel.innerHTML='';
+    const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
+    opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});
+    pdOnResChange();
+  }
 }
 function pdOnResChange(){const v=document.getElementById('pdResSelect').value;if(!v)return;const p=v.split('x');pd.COLS=parseInt(p[0]);pd.ROWS=parseInt(p[1]);if(pd.img)pdProcesarImagen();}
 function pdSetIntervalSpeed(value){
@@ -7495,6 +7611,8 @@ window.pdSetFmt=pdSetFmt;
 window.pdSetPickerView=pdSetPickerView;
 window.pdSetSelectedTextAlign=pdSetSelectedTextAlign;
 window.pdSetSelectedTextColor=pdSetSelectedTextColor;
+window.pdCommitTextColor=pdCommitTextColor;
+window.pdCommitBgColor=pdCommitBgColor;
 window.pdSetPageBackground=pdSetPageBackground;
 window.pdSetSelectedTextFont=pdSetSelectedTextFont;
 window.pdSetSelectedTextLineHeight=pdSetSelectedTextLineHeight;
@@ -7794,24 +7912,14 @@ window.pdUsarHolyWater=pdUsarHolyWater;
       </div>
       <div class="pd-text-ctrl-label">Line spacing</div>
       <input type="range" class="pd-line-height-slider" id="pdLineHeightSlider" min="0.9" max="2.2" step="0.05" value="1.25" oninput="pdSetSelectedTextLineHeight(this.value)">
-      <div class="pd-text-ctrl-label">Color</div>
-      <div class="pd-color-row">
-        <button class="pd-color-swatch" style="background:#000000;" onclick="pdSetSelectedTextColor('#000000')" title="Black"></button>
-        <button class="pd-color-swatch" style="background:#0B84B8;" onclick="pdSetSelectedTextColor('#0B84B8')" title="Blue"></button>
-        <button class="pd-color-swatch" style="background:#4B5563;" onclick="pdSetSelectedTextColor('#4B5563')" title="Gray"></button>
-        <button class="pd-color-swatch" style="background:#DC2626;" onclick="pdSetSelectedTextColor('#DC2626')" title="Red"></button>
-        <button class="pd-color-swatch" style="background:#15803D;" onclick="pdSetSelectedTextColor('#15803D')" title="Green"></button>
-        <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" title="Custom color">
+      <div class="pd-text-ctrl-label">Text Color</div>
+      <div class="pd-color-row" id="pdTextColorRecents">
+        <input type="color" class="pd-color-custom" id="pdColorCustom" value="#000000" oninput="pdSetSelectedTextColor(this.value)" onchange="pdCommitTextColor(this.value)" title="Custom color">
       </div>
     </div>
     <div class="pd-text-ctrl-label">Background</div>
-    <div class="pd-color-row">
-      <button class="pd-color-swatch" style="background:#ffffff;" onclick="pdSetPageBackground('#ffffff')" title="White"></button>
-      <button class="pd-color-swatch" style="background:#F5FBFE;" onclick="pdSetPageBackground('#F5FBFE')" title="Pale blue"></button>
-      <button class="pd-color-swatch" style="background:#FFF8E7;" onclick="pdSetPageBackground('#FFF8E7')" title="Cream"></button>
-      <button class="pd-color-swatch" style="background:#F0FDF4;" onclick="pdSetPageBackground('#F0FDF4')" title="Pale green"></button>
-      <button class="pd-color-swatch" style="background:#1a1a1a;" onclick="pdSetPageBackground('#1a1a1a')" title="Black"></button>
-      <input type="color" class="pd-color-custom" id="pdPageBgCustom" value="#ffffff" oninput="pdSetPageBackground(this.value)" title="Custom color">
+    <div class="pd-color-row" id="pdBgColorRecents">
+      <input type="color" class="pd-color-custom" id="pdPageBgCustom" value="#ffffff" oninput="pdSetPageBackground(this.value)" onchange="pdCommitBgColor(this.value)" title="Custom color">
     </div>
   </div>
   <div class="pd-canvases-panel" id="pdCanvasesPanel" style="display:none;">
