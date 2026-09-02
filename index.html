@@ -7311,14 +7311,37 @@ function pdWireDeleteButtonHover(){
     pdDeleteBtnExpanded=false;
     btn.classList.remove('pd-delete-expanded');
   });
+  // Mobile has no hover to work with — a long-press plays the same role
+  // instead: holding the button down opens the "delete more" popover,
+  // while a normal tap (released before the delay) falls through to the
+  // click handler below for the quick single-page path.
+  let longPressFired=false;
+  let longPressTimer=null;
+  btn.addEventListener('touchstart', function(){
+    longPressFired=false;
+    longPressTimer=setTimeout(function(){
+      longPressFired=true;
+      pdDeleteBtnLongPressFired=true;
+      pdShowDeleteMorePopover();
+    }, PD_DELETE_HOVER_DELAY);
+  }, {passive:true});
+  btn.addEventListener('touchend', function(e){
+    if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; }
+    if(longPressFired) e.preventDefault(); // suppress the click that would otherwise follow this touch
+  });
+  btn.addEventListener('touchcancel', function(){
+    if(longPressTimer){ clearTimeout(longPressTimer); longPressTimer=null; }
+  });
 }
 // The button's own click handler — routes to whichever path matches
-// what the button is currently showing. A touch tap (no hover possible)
-// always lands here with pdDeleteBtnExpanded still false, so it always
-// takes the popover path instead of a surprise instant deletion.
+// what the button is currently showing. A long-press already handled
+// via touchstart/touchend above sets this flag so the click that may
+// still follow doesn't also run something. A plain tap or desktop click
+// (nothing expanded) takes the quick single-page path.
+let pdDeleteBtnLongPressFired=false;
 function pdHandleDeleteButtonClick(){
+  if(pdDeleteBtnLongPressFired){ pdDeleteBtnLongPressFired=false; return; }
   if(pdDeleteBtnExpanded) pdShowDeleteMorePopover();
-  else if(pdIsMobile()) pdShowDeleteMorePopover();
   else pdQuickDeleteOnePage();
 }
 
@@ -7339,12 +7362,20 @@ function pdShowDeleteMorePopover(){
   input.max=String(deletable);
   input.value='1';
   popover.style.display='flex';
-  const rect=btn.getBoundingClientRect();
-  const pRect=popover.getBoundingClientRect();
-  let left=rect.left+rect.width/2-pRect.width/2;
-  left=Math.max(8, Math.min(left, window.innerWidth-pRect.width-8));
-  popover.style.left=left+'px';
-  popover.style.top=(rect.bottom+10)+'px';
+  if(pdIsMobile()){
+    // Centered in the viewport — reached via a long-press, so there's no
+    // on-screen button position worth anchoring to on a narrow layout.
+    const pRect=popover.getBoundingClientRect();
+    popover.style.left=Math.round((window.innerWidth-pRect.width)/2)+'px';
+    popover.style.top=Math.round((window.innerHeight-pRect.height)/2)+'px';
+  }else{
+    const rect=btn.getBoundingClientRect();
+    const pRect=popover.getBoundingClientRect();
+    let left=rect.left+rect.width/2-pRect.width/2;
+    left=Math.max(8, Math.min(left, window.innerWidth-pRect.width-8));
+    popover.style.left=left+'px';
+    popover.style.top=(rect.bottom+10)+'px';
+  }
   setTimeout(function(){ document.addEventListener('pointerdown', pdMaybeCloseDeleteMorePopover); }, 0);
 }
 function pdMaybeCloseDeleteMorePopover(e){
