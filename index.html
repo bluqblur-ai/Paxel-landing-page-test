@@ -7453,8 +7453,9 @@ function pdSetFmt(tipo,w,h,btn){
     }
     document.getElementById('pdDlBtn').disabled=true;
   }
-  if(formatActuallyChanged){
-    const sel=document.getElementById('pdResSelect');sel.innerHTML='';
+  const sel=document.getElementById('pdResSelect');
+  if(formatActuallyChanged || sel.options.length===0){
+    sel.innerHTML='';
     const opts=tipo==='1:1'?['16x16','32x32','64x64','128x128']:tipo==='3:4'?['12x16','24x32','48x64','96x128']:['16x12','32x24','64x48','128x96'];
     opts.forEach((o,i)=>{const opt=document.createElement('option');opt.value=o;opt.textContent=o;if(i===1)opt.selected=true;sel.appendChild(opt);});
     pdOnResChange();
